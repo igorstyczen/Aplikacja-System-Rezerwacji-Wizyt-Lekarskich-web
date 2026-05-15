@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - dev
       - '*.x'
   pull_request:
   schedule:
@@ -39,6 +40,15 @@ jobs:
 
       - name: Copy environment file
         run: cp .env.example .env
+
+      - name: Configure SQLite database
+        run: |
+          touch database/database.sqlite
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=${{ github.workspace }}/database/database.sqlite" >> .env
+          echo "SESSION_DRIVER=array" >> .env
+          echo "CACHE_STORE=array" >> .env
+          echo "QUEUE_CONNECTION=sync" >> .env
 
       - name: Generate app key
         run: php artisan key:generate
