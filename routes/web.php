@@ -4,9 +4,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\AppointmentController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
+
+Route::post('/appointments', [AppointmentController::class, 'store'])
+    ->middleware('auth')
+    ->name('appointments.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
