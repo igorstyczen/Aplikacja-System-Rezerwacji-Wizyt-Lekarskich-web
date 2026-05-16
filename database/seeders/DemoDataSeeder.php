@@ -17,7 +17,7 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
+        $admin = User::create([
             'name' => 'Admin Systemu',
             'email' => 'admin@test.pl',
             'password' => Hash::make('password'),
@@ -50,7 +50,7 @@ class DemoDataSeeder extends Seeder
             'first_name' => 'Jan',
             'last_name' => 'Kowalski',
             'photo_url' => null,
-            'bio' => 'Lekarz rodzinny z wieloletnim doświadczeniem.',
+            'bio' => 'Doświadczony lekarz rodzinny.',
             'is_verified' => true,
             'is_for_adults' => true,
             'is_for_children' => true,
@@ -67,7 +67,7 @@ class DemoDataSeeder extends Seeder
             'is_for_children' => false,
         ]);
 
-        Patient::create([
+        $patient1 = Patient::create([
             'user_id' => $patientUser1->id,
             'first_name' => 'Piotr',
             'last_name' => 'Pacjent',
@@ -75,11 +75,12 @@ class DemoDataSeeder extends Seeder
             'phone' => '500600700',
         ]);
 
+        // Lekarz też może być pacjentem
         Patient::create([
             'user_id' => $doctorUser1->id,
             'first_name' => 'Jan',
             'last_name' => 'Kowalski',
-            'pesel' => null,
+            'pesel' => '88020212345',
             'phone' => '501501501',
         ]);
 
@@ -93,39 +94,38 @@ class DemoDataSeeder extends Seeder
             'specialization_name' => 'Dermatolog',
         ]);
 
-        $tagHeadache = HelpTag::create(['tag_name' => 'ból głowy']);
-        $tagSkin = HelpTag::create(['tag_name' => 'problemy skórne']);
-        $tagChild = HelpTag::create(['tag_name' => 'dziecko']);
-        $tagRecipe = HelpTag::create(['tag_name' => 'recepta']);
-
-        $doctor1->helpTags()->attach([
-            $tagHeadache->id,
-            $tagChild->id,
-            $tagRecipe->id,
+        $tag1 = HelpTag::create([
+            'tag_name' => 'ból głowy',
         ]);
 
-        $doctor2->helpTags()->attach([
-            $tagSkin->id,
-            $tagRecipe->id,
+        $tag2 = HelpTag::create([
+            'tag_name' => 'problemy skórne',
         ]);
+
+        $tag3 = HelpTag::create([
+            'tag_name' => 'gorączka',
+        ]);
+
+        $doctor1->helpTags()->attach([$tag1->id, $tag3->id]);
+        $doctor2->helpTags()->attach([$tag2->id]);
 
         $clinic1 = Clinic::create([
             'doctor_id' => $doctor1->id,
-            'name' => 'Centrum Medyczne Zdrowie',
+            'name' => 'Przychodnia Zdrowie',
             'address' => 'ul. Medyczna 10',
             'city' => 'Rzeszów',
-            'details' => 'Gabinet numer 12, pierwsze piętro.',
+            'details' => 'Gabinet 12, pierwsze piętro.',
         ]);
 
         $clinic2 = Clinic::create([
             'doctor_id' => $doctor2->id,
-            'name' => 'Klinika Dermatologiczna SkinMed',
+            'name' => 'Centrum Dermatologii',
             'address' => 'ul. Skórna 5',
             'city' => 'Rzeszów',
-            'details' => 'Wejście od parkingu.',
+            'details' => 'Gabinet 3.',
         ]);
 
-        Service::create([
+        $service1 = Service::create([
             'doctor_id' => $doctor1->id,
             'clinic_id' => $clinic1->id,
             'name' => 'Konsultacja lekarska',
@@ -134,7 +134,7 @@ class DemoDataSeeder extends Seeder
             'duration_minutes' => 30,
         ]);
 
-        Service::create([
+        $service2 = Service::create([
             'doctor_id' => $doctor2->id,
             'clinic_id' => $clinic2->id,
             'name' => 'Konsultacja dermatologiczna',
@@ -146,8 +146,8 @@ class DemoDataSeeder extends Seeder
         AvailabilitySlot::create([
             'doctor_id' => $doctor1->id,
             'clinic_id' => $clinic1->id,
-            'start_time' => now()->addDay()->setTime(9, 0),
-            'end_time' => now()->addDay()->setTime(9, 30),
+            'start_time' => now()->addDays(1)->setTime(9, 0),
+            'end_time' => now()->addDays(1)->setTime(9, 30),
             'is_recurring' => false,
             'recurrence_rule' => null,
             'status' => 'available',
@@ -156,8 +156,8 @@ class DemoDataSeeder extends Seeder
         AvailabilitySlot::create([
             'doctor_id' => $doctor1->id,
             'clinic_id' => $clinic1->id,
-            'start_time' => now()->addDay()->setTime(10, 0),
-            'end_time' => now()->addDay()->setTime(10, 30),
+            'start_time' => now()->addDays(1)->setTime(10, 0),
+            'end_time' => now()->addDays(1)->setTime(10, 30),
             'is_recurring' => false,
             'recurrence_rule' => null,
             'status' => 'available',
@@ -166,8 +166,8 @@ class DemoDataSeeder extends Seeder
         AvailabilitySlot::create([
             'doctor_id' => $doctor2->id,
             'clinic_id' => $clinic2->id,
-            'start_time' => now()->addDays(2)->setTime(12, 0),
-            'end_time' => now()->addDays(2)->setTime(12, 30),
+            'start_time' => now()->addDays(2)->setTime(11, 0),
+            'end_time' => now()->addDays(2)->setTime(11, 30),
             'is_recurring' => false,
             'recurrence_rule' => null,
             'status' => 'available',
