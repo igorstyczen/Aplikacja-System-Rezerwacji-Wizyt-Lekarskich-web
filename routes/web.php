@@ -15,6 +15,10 @@ Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
     ->middleware('auth')
     ->name('doctor.schedule');
 
+Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
+->middleware('auth')
+->name('doctor.appointments');
+
 Route::get('/my-appointments', [PatientDashboardController::class, 'appointments'])
     ->middleware('auth')
     ->name('patient.appointments');

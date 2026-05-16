@@ -28,6 +28,10 @@
                         <x-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
                             Mój grafik
                         </x-nav-link>
+
+                        <x-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
+                            Wizyty pacjentów
+                        </x-nav-link>
                     @endauth
                 </div>
             </div>
@@ -107,6 +111,10 @@
 
                 <x-responsive-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
                     Mój grafik
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
+                    Wizyty pacjentów
                 </x-responsive-nav-link>
             @endauth
         </div>
