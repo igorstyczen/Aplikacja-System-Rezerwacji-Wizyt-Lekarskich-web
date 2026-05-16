@@ -23,6 +23,10 @@ Route::post('/appointments', [AppointmentController::class, 'store'])
     ->middleware('auth')
     ->name('appointments.store');
 
+Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
+    ->middleware('auth')
+    ->name('appointments.cancel');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
