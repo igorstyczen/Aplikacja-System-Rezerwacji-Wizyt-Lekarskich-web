@@ -8,6 +8,20 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             @if ($message)
                 <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded mb-6">
                     {{ $message }}
@@ -24,6 +38,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usługa</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klinika</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
                             </tr>
                         </thead>
 
@@ -51,9 +66,40 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
-                                            {{ $appointment->status }}
-                                        </span>
+                                        @if ($appointment->status === 'cancelled')
+                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                                anulowana
+                                            </span>
+                                        @elseif ($appointment->status === 'pending')
+                                            <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
+                                                pending
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                                                {{ $appointment->status }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
+                                        @if ($appointment->status !== 'cancelled')
+                                            <form method="POST" action="{{ route('appointments.cancel', $appointment) }}">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button
+                                                    type="submit"
+                                                    onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
+                                                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                >
+                                                    Anuluj
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="text-gray-400 text-xs">
+                                                Brak akcji
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

@@ -74,4 +74,39 @@ class AppointmentController extends Controller
 
         return back()->with('success', 'Wizyta została zarezerwowana.');
     }
+
+    public function cancel(Appointment $appointment)
+    {
+        $user = Auth::user();
+
+        $patient = Patient::where('user_id', $user->id)->first();
+
+        if (! $patient || $appointment->patient_id !== $patient->id) {
+            abort(403);
+        }
+
+        if ($appointment->status === 'cancelled') {
+            return back()->with('success', 'Ta wizyta jest już anulowana.');
+        }
+
+        DB::transaction(function () use ($appointment) {
+            $appointment->update([
+                'status' => 'cancelled',
+            ]);
+
+            $slot = AvailabilitySlot::where('doctor_id', $appointment->doctor_id)
+                ->where('clinic_id', $appointment->clinic_id)
+                ->where('start_time', $appointment->date)
+                ->lockForUpdate()
+                ->first();
+
+            if ($slot) {
+                $slot->update([
+                    'status' => 'available',
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Wizyta została anulowana.');
+    }
 }
