@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PatientDashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -8,6 +9,10 @@ use App\Http\Controllers\AppointmentController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
+
+Route::get('/my-appointments', [PatientDashboardController::class, 'appointments'])
+    ->middleware('auth')
+    ->name('patient.appointments');
 
 Route::post('/appointments', [AppointmentController::class, 'store'])
     ->middleware('auth')
