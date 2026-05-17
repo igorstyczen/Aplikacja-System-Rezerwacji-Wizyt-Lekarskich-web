@@ -54,4 +54,31 @@ class AdminDashboardController extends Controller
             'users' => $users,
         ]);
     }
+
+    public function doctors()
+    {
+        $doctors = Doctor::with([
+                'user',
+                'specializations',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('admin.doctors', [
+            'doctors' => $doctors,
+        ]);
+    }
+
+    public function toggleDoctorVerification(Doctor $doctor)
+    {
+        $doctor->update([
+            'is_verified' => ! $doctor->is_verified,
+        ]);
+
+        if ($doctor->is_verified) {
+            return back()->with('success', 'Lekarz został zweryfikowany.');
+        }
+
+        return back()->with('success', 'Weryfikacja lekarza została cofnięta.');
+    }
 }
