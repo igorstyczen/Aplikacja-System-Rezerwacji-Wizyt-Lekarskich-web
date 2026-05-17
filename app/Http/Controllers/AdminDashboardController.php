@@ -81,4 +81,20 @@ class AdminDashboardController extends Controller
 
         return back()->with('success', 'Weryfikacja lekarza została cofnięta.');
     }
+
+    public function appointments()
+    {
+        $appointments = Appointment::with([
+                'patient',
+                'doctor',
+                'service',
+                'clinic',
+            ])
+            ->orderBy('date', 'desc')
+            ->paginate(20);
+
+        return view('admin.appointments', [
+            'appointments' => $appointments,
+        ]);
+    }
 }

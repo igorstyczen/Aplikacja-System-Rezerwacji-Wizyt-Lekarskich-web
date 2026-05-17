@@ -25,6 +25,10 @@ Route::patch('/admin/doctors/{doctor}/toggle-verification', [AdminDashboardContr
     ->middleware(['auth', 'role:admin'])
     ->name('admin.doctors.toggle-verification');
 
+Route::get('/admin/appointments', [AdminDashboardController::class, 'appointments'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
