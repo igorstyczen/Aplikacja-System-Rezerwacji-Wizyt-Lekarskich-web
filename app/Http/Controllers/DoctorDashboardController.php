@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\AvailabilitySlot;
 use App\Models\Doctor;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DoctorDashboardController extends Controller
@@ -80,10 +81,10 @@ class DoctorDashboardController extends Controller
         ]);
 
         return back()->with('success', 'Wizyta została potwierdzona.');
-        }
+    }
 
-        public function completeAppointment(Appointment $appointment)
-        {
+    public function completeAppointment(Appointment $appointment)
+    {
         $doctor = Doctor::where('user_id', Auth::id())->first();
 
         if (! $doctor || $appointment->doctor_id !== $doctor->id) {
@@ -102,4 +103,44 @@ class DoctorDashboardController extends Controller
 
         return back()->with('success', 'Wizyta została zakończona.');
     }
+
+    public function profile()
+    {
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            return view('doctor.profile', [
+                'doctor' => null,
+                'message' => 'Nie masz profilu lekarza.',
+            ]);
+        }
+
+        return view('doctor.profile', [
+            'doctor' => $doctor,
+            'message' => null,
+        ]);
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            abort(403);
+        }
+
+        $file = $request->file('photo');
+        $path = $file->store('doctor-avatars', 'public');
+
+        $doctor->update([
+            'photo_url' => 'storage/' . $path,
+        ]);
+
+        return back()->with('success', 'Zdjęcie profilowe zostało zaktualizowane.');
+    }
 }
+
