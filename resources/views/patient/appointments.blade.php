@@ -44,6 +44,10 @@
 
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach ($appointments as $appointment)
+                                @php
+                                    $hasReview = \App\Models\Review::where('appointment_id', $appointment->id)->exists();
+                                @endphp
+
                                 <tr>
                                     <td class="px-6 py-4 text-sm text-gray-900">
                                         {{ $appointment->date->format('d.m.Y H:i') }}
@@ -68,11 +72,19 @@
                                     <td class="px-6 py-4 text-sm">
                                         @if ($appointment->status === 'cancelled')
                                             <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
-                                                anulowana
+                                                Anulowana
                                             </span>
                                         @elseif ($appointment->status === 'pending')
                                             <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
-                                                pending
+                                                Oczekująca
+                                            </span>
+                                        @elseif ($appointment->status === 'confirmed')
+                                            <span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">
+                                                Potwierdzona
+                                            </span>
+                                        @elseif ($appointment->status === 'completed')
+                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                                Zakończona
                                             </span>
                                         @else
                                             <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
@@ -82,24 +94,43 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->status !== 'cancelled')
-                                            <form method="POST" action="{{ route('appointments.cancel', $appointment) }}">
-                                                @csrf
-                                                @method('PATCH')
+                                        <div class="flex flex-wrap gap-2">
+                                            @if (! in_array($appointment->status, ['cancelled', 'completed']))
+                                                <form method="POST" action="{{ route('appointments.cancel', $appointment) }}">
+                                                    @csrf
+                                                    @method('PATCH')
 
-                                                <button
-                                                    type="submit"
-                                                    onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
-                                                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                    <button
+                                                        type="submit"
+                                                        onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
+                                                        class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                    >
+                                                        Anuluj
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if ($appointment->status === 'completed' && ! $hasReview)
+                                                <a
+                                                    href="{{ route('reviews.create', $appointment) }}"
+                                                    class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
                                                 >
-                                                    Anuluj
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="text-gray-400 text-xs">
-                                                Brak akcji
-                                            </span>
-                                        @endif
+                                                    Dodaj opinię
+                                                </a>
+                                            @endif
+
+                                            @if ($appointment->status === 'completed' && $hasReview)
+                                                <span class="text-gray-400 text-xs">
+                                                    Opinia dodana
+                                                </span>
+                                            @endif
+
+                                            @if ($appointment->status === 'cancelled')
+                                                <span class="text-gray-400 text-xs">
+                                                    Brak akcji
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

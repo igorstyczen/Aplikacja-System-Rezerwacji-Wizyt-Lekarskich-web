@@ -34,7 +34,7 @@
                 <div class="flex items-start gap-6">
                     <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                         @if ($doctor->photo_url)
-                            <img src="{{ $doctor->photo_url }}" alt="Zdjęcie lekarza" class="w-full h-full object-cover">
+                            <img src="{{ asset($doctor->photo_url) }}" alt="Zdjęcie lekarza" class="w-full h-full object-cover">
                         @else
                             <span class="text-gray-500 text-2xl font-bold">
                                 {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
@@ -233,6 +233,20 @@
                             <p class="text-gray-600 mt-2">
                                 {{ $review->comment }}
                             </p>
+                        @endif
+
+                        @if ($review->images->count() > 0)
+                            <div class="mt-4 flex flex-wrap gap-3">
+                                @foreach ($review->images as $image)
+                                    <a href="{{ asset($image->image) }}" target="_blank">
+                                        <img
+                                            src="{{ asset($image->image) }}"
+                                            alt="Zdjęcie dodane do opinii"
+                                            class="w-32 h-32 object-cover rounded-lg border border-gray-200 hover:opacity-90"
+                                        >
+                                    </a>
+                                @endforeach
+                            </div>
                         @endif
                     </div>
                 @empty
