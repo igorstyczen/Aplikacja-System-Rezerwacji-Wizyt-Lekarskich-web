@@ -19,6 +19,14 @@ Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointme
 ->middleware('auth')
 ->name('doctor.appointments');
 
+Route::patch('/doctor/appointments/{appointment}/confirm', [DoctorDashboardController::class, 'confirmAppointment'])
+    ->middleware('auth')
+    ->name('doctor.appointments.confirm');
+
+Route::patch('/doctor/appointments/{appointment}/complete', [DoctorDashboardController::class, 'completeAppointment'])
+    ->middleware('auth')
+    ->name('doctor.appointments.complete');
+
 Route::get('/my-appointments', [PatientDashboardController::class, 'appointments'])
     ->middleware('auth')
     ->name('patient.appointments');
