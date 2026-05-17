@@ -17,6 +17,14 @@ Route::get('/admin/users', [AdminDashboardController::class, 'users'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.users');
 
+Route::get('/admin/doctors', [AdminDashboardController::class, 'doctors'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors');
+
+Route::patch('/admin/doctors/{doctor}/toggle-verification', [AdminDashboardController::class, 'toggleDoctorVerification'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.toggle-verification');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 

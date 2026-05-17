@@ -29,6 +29,10 @@
                             <x-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
                                 Użytkownicy
                             </x-nav-link>
+
+                            <x-nav-link :href="route('admin.doctors')" :active="request()->routeIs('admin.doctors')">
+                                Lekarze
+                            </x-nav-link>
                         @endif
 
                         @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
@@ -126,6 +130,10 @@
 
                     <x-responsive-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
                         Użytkownicy
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.doctors')" :active="request()->routeIs('admin.doctors')">
+                        Lekarze
                     </x-responsive-nav-link>
                 @endif
 
