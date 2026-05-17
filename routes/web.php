@@ -65,6 +65,14 @@ Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointme
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments');
 
+Route::get('/doctor/profile', [DoctorDashboardController::class, 'profile'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile');
+
+Route::post('/doctor/profile/photo', [DoctorDashboardController::class, 'updatePhoto'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile.photo');
+
 Route::patch('/doctor/appointments/{appointment}/confirm', [DoctorDashboardController::class, 'confirmAppointment'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments.confirm');

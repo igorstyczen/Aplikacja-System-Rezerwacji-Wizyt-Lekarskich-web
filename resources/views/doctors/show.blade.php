@@ -32,9 +32,13 @@
 
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-start gap-6">
-                    <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <div style="width: 96px; height: 96px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         @if ($doctor->photo_url)
-                            <img src="{{ asset($doctor->photo_url) }}" alt="Zdjęcie lekarza" class="w-full h-full object-cover">
+                            <img
+                                src="{{ asset($doctor->photo_url) }}"
+                                alt="Zdjęcie lekarza"
+                                style="width: 96px; height: 96px; object-fit: cover; object-position: center 20%; display: block;"
+                            >
                         @else
                             <span class="text-gray-500 text-2xl font-bold">
                                 {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
