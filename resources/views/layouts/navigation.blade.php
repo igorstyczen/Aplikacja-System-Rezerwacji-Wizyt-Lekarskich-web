@@ -21,17 +21,21 @@
                             Panel
                         </x-nav-link>
 
-                        <x-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
-                            Moje wizyty
-                        </x-nav-link>
+                        @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
+                            <x-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
+                                Moje wizyty
+                            </x-nav-link>
+                        @endif
 
-                        <x-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
-                            Mój grafik
-                        </x-nav-link>
+                        @if (Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                            <x-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
+                                Mój grafik
+                            </x-nav-link>
 
-                        <x-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
-                            Wizyty pacjentów
-                        </x-nav-link>
+                            <x-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
+                                Wizyty pacjentów
+                            </x-nav-link>
+                        @endif
                     @endauth
                 </div>
             </div>
@@ -105,17 +109,21 @@
                     Panel
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
-                    Moje wizyty
-                </x-responsive-nav-link>
+                @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
+                    <x-responsive-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
+                        Moje wizyty
+                    </x-responsive-nav-link>
+                @endif
 
-                <x-responsive-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
-                    Mój grafik
-                </x-responsive-nav-link>
+                @if (Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                    <x-responsive-nav-link :href="route('doctor.schedule')" :active="request()->routeIs('doctor.schedule')">
+                        Mój grafik
+                    </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
-                    Wizyty pacjentów
-                </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
+                        Wizyty pacjentów
+                    </x-responsive-nav-link>
+                @endif
             @endauth
         </div>
 
@@ -125,6 +133,9 @@
                 <div class="px-4">
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                    <div class="font-medium text-xs text-gray-400 mt-1">
+                        Rola: {{ Auth::user()->role }}
+                    </div>
                 </div>
 
                 <div class="mt-3 space-y-1">
