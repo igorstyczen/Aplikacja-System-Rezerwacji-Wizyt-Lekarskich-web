@@ -25,6 +25,10 @@
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                                 Admin
                             </x-nav-link>
+
+                            <x-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
+                                Użytkownicy
+                            </x-nav-link>
                         @endif
 
                         @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
@@ -118,6 +122,10 @@
                 @if (Auth::user()->role === 'admin')
                     <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         Admin
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users')">
+                        Użytkownicy
                     </x-responsive-nav-link>
                 @endif
 

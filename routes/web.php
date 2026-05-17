@@ -13,6 +13,10 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard');
 
+Route::get('/admin/users', [AdminDashboardController::class, 'users'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
