@@ -8,13 +8,27 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
                 <h1 class="text-2xl font-bold text-gray-900">
                     Użytkownicy systemu
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Tutaj administrator widzi listę kont zarejestrowanych w systemie.
+                    Administrator widzi listę kont i może zmieniać role użytkowników.
                 </p>
             </div>
 
@@ -33,7 +47,10 @@
                                     Email
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Rola
+                                    Aktualna rola
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Zmień rolę
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Data utworzenia
@@ -74,6 +91,33 @@
                                                 {{ $user->role }}
                                             </span>
                                         @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
+                                        <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex gap-2 items-center">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <select name="role" class="border-gray-300 rounded-md text-sm">
+                                                <option value="patient" @selected($user->role === 'patient')>
+                                                    patient
+                                                </option>
+                                                <option value="doctor" @selected($user->role === 'doctor')>
+                                                    doctor
+                                                </option>
+                                                <option value="admin" @selected($user->role === 'admin')>
+                                                    admin
+                                                </option>
+                                            </select>
+
+                                            <button
+                                                type="submit"
+                                                onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
+                                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                            >
+                                                Zapisz
+                                            </button>
+                                        </form>
                                     </td>
 
                                     <td class="px-6 py-4 text-sm text-gray-700">

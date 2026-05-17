@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
@@ -155,5 +156,18 @@ class AdminDashboardController extends Controller
         });
 
         return back()->with('success', 'Wizyta została anulowana.');
+    }
+
+    public function updateUserRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role' => ['required', 'in:patient,doctor,admin'],
+        ]);
+
+        $user->update([
+            'role' => $request->role,
+        ]);
+
+        return back()->with('success', 'Rola użytkownika została zmieniona.');
     }
 }
