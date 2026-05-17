@@ -12,23 +12,23 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
 Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.schedule');
 
 Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
-->middleware('auth')
-->name('doctor.appointments');
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.appointments');
 
 Route::patch('/doctor/appointments/{appointment}/confirm', [DoctorDashboardController::class, 'confirmAppointment'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments.confirm');
 
 Route::patch('/doctor/appointments/{appointment}/complete', [DoctorDashboardController::class, 'completeAppointment'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments.complete');
 
 Route::get('/my-appointments', [PatientDashboardController::class, 'appointments'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:patient,admin'])
     ->name('patient.appointments');
 
 Route::post('/appointments', [AppointmentController::class, 'store'])
@@ -36,7 +36,7 @@ Route::post('/appointments', [AppointmentController::class, 'store'])
     ->name('appointments.store');
 
 Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:patient,admin'])
     ->name('appointments.cancel');
 
 Route::get('/dashboard', function () {
