@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -44,6 +45,14 @@ Route::patch('/admin/appointments/{appointment}/cancel', [AdminDashboardControll
 Route::patch('/admin/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.users.update-role');
+
+Route::get('/appointments/{appointment}/review', [ReviewController::class, 'create'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('reviews.create');
+
+Route::post('/appointments/{appointment}/review', [ReviewController::class, 'store'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('reviews.store');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
