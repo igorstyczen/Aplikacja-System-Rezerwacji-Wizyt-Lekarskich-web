@@ -21,6 +21,12 @@
                             Panel
                         </x-nav-link>
 
+                        @if (Auth::user()->role === 'admin')
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                Admin
+                            </x-nav-link>
+                        @endif
+
                         @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
                             <x-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
                                 Moje wizyty
@@ -108,6 +114,12 @@
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     Panel
                 </x-responsive-nav-link>
+
+                @if (Auth::user()->role === 'admin')
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        Admin
+                    </x-responsive-nav-link>
+                @endif
 
                 @if (Auth::user()->role === 'patient' || Auth::user()->role === 'admin')
                     <x-responsive-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
