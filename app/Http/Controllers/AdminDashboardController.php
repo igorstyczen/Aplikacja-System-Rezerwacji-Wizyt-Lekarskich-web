@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\AvailabilitySlot;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -96,5 +98,62 @@ class AdminDashboardController extends Controller
         return view('admin.appointments', [
             'appointments' => $appointments,
         ]);
+    }
+
+    public function confirmAppointment(Appointment $appointment)
+    {
+        if ($appointment->status !== 'pending') {
+            return back()->withErrors([
+                'status' => 'Można potwierdzić tylko wizytę oczekującą.',
+            ]);
+        }
+
+        $appointment->update([
+            'status' => 'confirmed',
+        ]);
+
+        return back()->with('success', 'Wizyta została potwierdzona.');
+    }
+
+    public function completeAppointment(Appointment $appointment)
+    {
+        if ($appointment->status !== 'confirmed') {
+            return back()->withErrors([
+                'status' => 'Można zakończyć tylko wizytę potwierdzoną.',
+            ]);
+        }
+
+        $appointment->update([
+            'status' => 'completed',
+        ]);
+
+        return back()->with('success', 'Wizyta została zakończona.');
+    }
+
+    public function cancelAppointment(Appointment $appointment)
+    {
+        if ($appointment->status === 'cancelled') {
+            return back()->with('success', 'Ta wizyta jest już anulowana.');
+        }
+
+        DB::transaction(function () use ($appointment) {
+            $appointment->update([
+                'status' => 'cancelled',
+            ]);
+
+            $slot = AvailabilitySlot::where('doctor_id', $appointment->doctor_id)
+                ->where('clinic_id', $appointment->clinic_id)
+                ->where('start_time', $appointment->date)
+                ->lockForUpdate()
+                ->first();
+
+            if ($slot) {
+                $slot->update([
+                    'status' => 'available',
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Wizyta została anulowana.');
     }
 }

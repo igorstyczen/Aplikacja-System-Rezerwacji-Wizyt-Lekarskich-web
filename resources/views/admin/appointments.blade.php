@@ -8,13 +8,27 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
                 <h1 class="text-2xl font-bold text-gray-900">
                     Lista wszystkich wizyt
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator widzi wszystkie wizyty zapisane w systemie.
+                    Administrator widzi wszystkie wizyty zapisane w systemie i może zarządzać ich statusem.
                 </p>
             </div>
 
@@ -43,6 +57,9 @@
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Status
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Akcje
                                 </th>
                             </tr>
                         </thead>
@@ -100,6 +117,59 @@
                                                 {{ $appointment->status }}
                                             </span>
                                         @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
+                                        <div class="flex flex-wrap gap-2">
+                                            @if ($appointment->status === 'pending')
+                                                <form method="POST" action="{{ route('admin.appointments.confirm', $appointment) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <button
+                                                        type="submit"
+                                                        class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                                    >
+                                                        Potwierdź
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if ($appointment->status === 'confirmed')
+                                                <form method="POST" action="{{ route('admin.appointments.complete', $appointment) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <button
+                                                        type="submit"
+                                                        class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                                                    >
+                                                        Zakończ
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if (! in_array($appointment->status, ['cancelled', 'completed']))
+                                                <form method="POST" action="{{ route('admin.appointments.cancel', $appointment) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <button
+                                                        type="submit"
+                                                        onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
+                                                        class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                    >
+                                                        Anuluj
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if (in_array($appointment->status, ['cancelled', 'completed']))
+                                                <span class="text-gray-400 text-xs">
+                                                    Brak akcji
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

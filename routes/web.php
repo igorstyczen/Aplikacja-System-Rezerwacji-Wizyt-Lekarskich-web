@@ -29,6 +29,18 @@ Route::get('/admin/appointments', [AdminDashboardController::class, 'appointment
     ->middleware(['auth', 'role:admin'])
     ->name('admin.appointments');
 
+Route::patch('/admin/appointments/{appointment}/confirm', [AdminDashboardController::class, 'confirmAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.confirm');
+
+Route::patch('/admin/appointments/{appointment}/complete', [AdminDashboardController::class, 'completeAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.complete');
+
+Route::patch('/admin/appointments/{appointment}/cancel', [AdminDashboardController::class, 'cancelAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.cancel');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
