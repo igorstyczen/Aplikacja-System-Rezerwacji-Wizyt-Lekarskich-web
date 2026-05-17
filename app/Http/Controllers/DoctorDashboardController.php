@@ -60,4 +60,46 @@ class DoctorDashboardController extends Controller
             'message' => null,
         ]);
     }
+
+    public function confirmAppointment(Appointment $appointment)
+    {
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor || $appointment->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
+        if ($appointment->status !== 'pending') {
+            return back()->withErrors([
+                'status' => 'Można potwierdzić tylko wizytę oczekującą.',
+            ]);
+        }
+
+        $appointment->update([
+            'status' => 'confirmed',
+        ]);
+
+        return back()->with('success', 'Wizyta została potwierdzona.');
+        }
+
+        public function completeAppointment(Appointment $appointment)
+        {
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor || $appointment->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
+        if ($appointment->status !== 'confirmed') {
+            return back()->withErrors([
+                'status' => 'Można zakończyć tylko wizytę potwierdzoną.',
+            ]);
+        }
+
+        $appointment->update([
+            'status' => 'completed',
+        ]);
+
+        return back()->with('success', 'Wizyta została zakończona.');
+    }
 }
