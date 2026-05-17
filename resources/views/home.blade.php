@@ -136,11 +136,15 @@
                     @foreach ($doctors as $doctor)
                         <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
                             <div class="flex items-center gap-4 mb-4">
-                                <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                <div style="width: 72px; height: 72px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     @if ($doctor->photo_url)
-                                        <img src="{{ $doctor->photo_url }}" alt="Zdjęcie lekarza" class="w-full h-full object-cover">
+                                        <img
+                                            src="{{ asset($doctor->photo_url) }}"
+                                            alt="Zdjęcie lekarza"
+                                            style="width: 72px; height: 72px; object-fit: cover; object-position: center 20%; display: block;"
+                                        >
                                     @else
-                                        <span class="text-gray-500 text-xl font-bold">
+                                        <span class="text-gray-500 text-lg font-bold">
                                             {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
                                         </span>
                                     @endif
