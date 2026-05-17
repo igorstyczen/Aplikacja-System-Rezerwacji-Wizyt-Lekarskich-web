@@ -41,6 +41,10 @@ Route::patch('/admin/appointments/{appointment}/cancel', [AdminDashboardControll
     ->middleware(['auth', 'role:admin'])
     ->name('admin.appointments.cancel');
 
+Route::patch('/admin/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.update-role');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
