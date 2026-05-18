@@ -28,8 +28,91 @@
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator widzi listę kont i może zmieniać role użytkowników.
+                    Administrator widzi listę kont, może filtrować użytkowników i zmieniać ich role.
                 </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    Filtry
+                </h2>
+
+                <form method="GET" action="{{ route('admin.users') }}" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                                Imię / nazwa
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value="{{ request('name') }}"
+                                placeholder="np. Jan"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                Email
+                            </label>
+                            <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                value="{{ request('email') }}"
+                                placeholder="np. test.pl"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
+                                Rola
+                            </label>
+                            <select
+                                id="role"
+                                name="role"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                                <option value="">Wszystkie</option>
+                                <option value="admin" @selected(request('role') === 'admin')>admin</option>
+                                <option value="doctor" @selected(request('role') === 'doctor')>doctor</option>
+                                <option value="patient" @selected(request('role') === 'patient')>patient</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="created_from" class="block text-sm font-medium text-gray-700 mb-1">
+                                Utworzony od
+                            </label>
+                            <input
+                                type="date"
+                                id="created_from"
+                                name="created_from"
+                                value="{{ request('created_from') }}"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                        >
+                            Filtruj
+                        </button>
+
+                        <a
+                            href="{{ route('admin.users') }}"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                        >
+                            Wyczyść
+                        </a>
+                    </div>
+                </form>
             </div>
 
             @if ($users->count() > 0)
