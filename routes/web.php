@@ -9,6 +9,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardRedirectController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -93,9 +94,9 @@ Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class
     ->middleware(['auth', 'role:patient,admin'])
     ->name('appointments.cancel');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardRedirectController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
