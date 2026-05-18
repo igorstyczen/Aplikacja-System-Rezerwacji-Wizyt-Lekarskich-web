@@ -77,14 +77,41 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    public function doctors()
+    public function doctors(Request $request)
     {
-        $doctors = Doctor::with([
-                'user',
-                'specializations',
-            ])
+        $query = Doctor::with([
+            'user',
+            'specializations',
+        ]);
+
+        if ($request->filled('name')) {
+            $query->where(function ($doctorQuery) use ($request) {
+                $doctorQuery
+                    ->where('first_name', 'like', '%' . $request->name . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->name . '%');
+            });
+        }
+
+        if ($request->filled('email')) {
+            $query->whereHas('user', function ($userQuery) use ($request) {
+                $userQuery->where('email', 'like', '%' . $request->email . '%');
+            });
+        }
+
+        if ($request->filled('specialization')) {
+            $query->whereHas('specializations', function ($specializationQuery) use ($request) {
+                $specializationQuery->where('specialization_name', 'like', '%' . $request->specialization . '%');
+            });
+        }
+
+        if ($request->filled('is_verified')) {
+            $query->where('is_verified', $request->is_verified);
+        }
+
+        $doctors = $query
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.doctors', [
             'doctors' => $doctors,
