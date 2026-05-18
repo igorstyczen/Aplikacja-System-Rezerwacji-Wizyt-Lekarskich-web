@@ -94,30 +94,36 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex gap-2 items-center">
-                                            @csrf
-                                            @method('PATCH')
+                                        @if ($user->id === Auth::id())
+                                            <span class="text-gray-400 text-xs">
+                                                Nie można zmienić własnej roli
+                                            </span>
+                                        @else
+                                            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex gap-2 items-center">
+                                                @csrf
+                                                @method('PATCH')
 
-                                            <select name="role" class="border-gray-300 rounded-md text-sm">
-                                                <option value="patient" @selected($user->role === 'patient')>
-                                                    patient
-                                                </option>
-                                                <option value="doctor" @selected($user->role === 'doctor')>
-                                                    doctor
-                                                </option>
-                                                <option value="admin" @selected($user->role === 'admin')>
-                                                    admin
-                                                </option>
-                                            </select>
+                                                <select name="role" class="border-gray-300 rounded-md text-sm">
+                                                    <option value="patient" @selected($user->role === 'patient')>
+                                                        patient
+                                                    </option>
+                                                    <option value="doctor" @selected($user->role === 'doctor')>
+                                                        doctor
+                                                    </option>
+                                                    <option value="admin" @selected($user->role === 'admin')>
+                                                        admin
+                                                    </option>
+                                                </select>
 
-                                            <button
-                                                type="submit"
-                                                onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
-                                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
-                                            >
-                                                Zapisz
-                                            </button>
-                                        </form>
+                                                <button
+                                                    type="submit"
+                                                    onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
+                                                    class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                                >
+                                                    Zapisz
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
 
                                     <td class="px-6 py-4 text-sm text-gray-700">
