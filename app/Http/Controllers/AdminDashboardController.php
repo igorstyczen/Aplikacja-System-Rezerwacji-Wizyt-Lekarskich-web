@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
 class AdminDashboardController extends Controller
 {
@@ -156,6 +157,60 @@ class AdminDashboardController extends Controller
         return view('admin.doctors', [
             'doctors' => $doctors,
         ]);
+    }
+
+    public function createDoctor()
+    {
+        return view('admin.create-doctor');
+    }
+
+    public function storeDoctor(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'password' => ['required', 'string', 'min:8'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'is_for_adults' => ['nullable', 'boolean'],
+            'is_for_children' => ['nullable', 'boolean'],
+            'is_verified' => ['nullable', 'boolean'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'role' => 'doctor',
+                'is_active' => true,
+            ]);
+
+            $doctorData = [
+                'user_id' => $user->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'bio' => $request->bio,
+                'is_for_adults' => $request->boolean('is_for_adults'),
+                'is_for_children' => $request->boolean('is_for_children'),
+                'is_verified' => $request->boolean('is_verified'),
+            ];
+
+            if ($request->hasFile('photo')) {
+                $path = $request->file('photo')->store('doctor-avatars', 'public');
+                $doctorData['photo_url'] = 'storage/' . $path;
+            }
+
+            Doctor::create($doctorData);
+        });
+
+        return redirect()
+            ->route('admin.doctors')
+            ->with('success', 'Lekarz został dodany.');
     }
 
     public function editDoctor(Doctor $doctor)

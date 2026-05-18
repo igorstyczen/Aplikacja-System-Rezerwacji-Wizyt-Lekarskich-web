@@ -15,13 +15,24 @@
             @endif
 
             <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
-                    Lista lekarzy
-                </h1>
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            Lista lekarzy
+                        </h1>
 
-                <p class="text-gray-600 mt-1">
-                    Administrator może filtrować lekarzy, sprawdzać ich dane oraz zarządzać weryfikacją.
-                </p>
+                        <p class="text-gray-600 mt-1">
+                            Administrator może dodawać lekarzy, filtrować ich, edytować profile oraz zarządzać weryfikacją.
+                        </p>
+                    </div>
+
+                    <a
+                        href="{{ route('admin.doctors.create') }}"
+                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                    >
+                        Dodaj lekarza
+                    </a>
+                </div>
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
@@ -177,27 +188,36 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        <form method="POST" action="{{ route('admin.doctors.toggle-verification', $doctor) }}">
-                                            @csrf
-                                            @method('PATCH')
+                                        <div class="flex flex-wrap gap-2">
+                                            <a
+                                                href="{{ route('admin.doctors.edit', $doctor) }}"
+                                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                            >
+                                                Edytuj
+                                            </a>
 
-                                            @if ($doctor->is_verified)
-                                                <button
-                                                    type="submit"
-                                                    onclick="return confirm('Czy na pewno chcesz cofnąć weryfikację tego lekarza?')"
-                                                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
-                                                >
-                                                    Cofnij weryfikację
-                                                </button>
-                                            @else
-                                                <button
-                                                    type="submit"
-                                                    class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
-                                                >
-                                                    Zweryfikuj
-                                                </button>
-                                            @endif
-                                        </form>
+                                            <form method="POST" action="{{ route('admin.doctors.toggle-verification', $doctor) }}">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                @if ($doctor->is_verified)
+                                                    <button
+                                                        type="submit"
+                                                        onclick="return confirm('Czy na pewno chcesz cofnąć weryfikację tego lekarza?')"
+                                                        class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                    >
+                                                        Cofnij weryfikację
+                                                    </button>
+                                                @else
+                                                    <button
+                                                        type="submit"
+                                                        class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                                                    >
+                                                        Zweryfikuj
+                                                    </button>
+                                                @endif
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
