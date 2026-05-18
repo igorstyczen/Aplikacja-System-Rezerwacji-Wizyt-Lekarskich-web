@@ -164,6 +164,12 @@ class AdminDashboardController extends Controller
             'role' => ['required', 'in:patient,doctor,admin'],
         ]);
 
+        if ($user->id === auth()->id()) {
+            return back()->withErrors([
+                'role' => 'Nie możesz zmienić własnej roli, aby nie utracić dostępu do panelu administratora.',
+            ]);
+        }
+
         $user->update([
             'role' => $request->role,
         ]);
