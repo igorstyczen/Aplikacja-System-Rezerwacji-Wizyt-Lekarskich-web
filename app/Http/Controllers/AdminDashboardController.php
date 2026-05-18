@@ -131,16 +131,52 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Weryfikacja lekarza została cofnięta.');
     }
 
-    public function appointments()
+    public function appointments(Request $request)
     {
-        $appointments = Appointment::with([
-                'patient',
-                'doctor',
-                'service',
-                'clinic',
-            ])
+        $query = Appointment::with([
+            'patient',
+            'doctor',
+            'service',
+            'clinic',
+        ]);
+
+        if ($request->filled('patient')) {
+            $query->whereHas('patient', function ($patientQuery) use ($request) {
+                $patientQuery
+                    ->where('first_name', 'like', '%' . $request->patient . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->patient . '%')
+                    ->orWhere('phone', 'like', '%' . $request->patient . '%');
+            });
+        }
+
+        if ($request->filled('doctor')) {
+            $query->whereHas('doctor', function ($doctorQuery) use ($request) {
+                $doctorQuery
+                    ->where('first_name', 'like', '%' . $request->doctor . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->doctor . '%');
+            });
+        }
+
+        if ($request->filled('clinic')) {
+            $query->whereHas('clinic', function ($clinicQuery) use ($request) {
+                $clinicQuery
+                    ->where('name', 'like', '%' . $request->clinic . '%')
+                    ->orWhere('city', 'like', '%' . $request->clinic . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+
+        $appointments = $query
             ->orderBy('date', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.appointments', [
             'appointments' => $appointments,
