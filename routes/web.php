@@ -27,6 +27,22 @@ Route::patch('/admin/doctors/{doctor}/toggle-verification', [AdminDashboardContr
     ->middleware(['auth', 'role:admin'])
     ->name('admin.doctors.toggle-verification');
 
+Route::get('/admin/doctors/{doctor}/edit', [AdminDashboardController::class, 'editDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.edit');
+
+Route::put('/admin/doctors/{doctor}', [AdminDashboardController::class, 'updateDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.update');
+
+Route::get('/admin/users/{user}/edit', [AdminDashboardController::class, 'editUser'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.edit');
+
+Route::put('/admin/users/{user}', [AdminDashboardController::class, 'updateUser'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.update');
+
 Route::get('/admin/appointments', [AdminDashboardController::class, 'appointments'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.appointments');
@@ -46,6 +62,10 @@ Route::patch('/admin/appointments/{appointment}/cancel', [AdminDashboardControll
 Route::patch('/admin/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.users.update-role');
+
+Route::patch('/admin/users/{user}/toggle-active', [AdminDashboardController::class, 'toggleUserActive'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.toggle-active');
 
 Route::get('/appointments/{appointment}/review', [ReviewController::class, 'create'])
     ->middleware(['auth', 'role:patient,admin'])

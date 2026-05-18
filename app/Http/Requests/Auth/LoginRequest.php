@@ -50,6 +50,14 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if (! Auth::user()->is_active) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'To konto zostało dezaktywowane przez administratora.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
