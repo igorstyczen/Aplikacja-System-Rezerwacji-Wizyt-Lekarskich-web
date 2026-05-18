@@ -27,6 +27,14 @@ Route::patch('/admin/doctors/{doctor}/toggle-verification', [AdminDashboardContr
     ->middleware(['auth', 'role:admin'])
     ->name('admin.doctors.toggle-verification');
 
+Route::get('/admin/doctors/create', [AdminDashboardController::class, 'createDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.create');
+
+Route::post('/admin/doctors', [AdminDashboardController::class, 'storeDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.store');
+
 Route::get('/admin/doctors/{doctor}/edit', [AdminDashboardController::class, 'editDoctor'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.doctors.edit');
