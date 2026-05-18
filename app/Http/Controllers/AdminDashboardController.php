@@ -7,8 +7,8 @@ use App\Models\AvailabilitySlot;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -116,6 +116,51 @@ class AdminDashboardController extends Controller
         return view('admin.doctors', [
             'doctors' => $doctors,
         ]);
+    }
+
+    public function editDoctor(Doctor $doctor)
+    {
+        $doctor->load([
+            'user',
+            'specializations',
+        ]);
+
+        return view('admin.edit-doctor', [
+            'doctor' => $doctor,
+        ]);
+    }
+
+    public function updateDoctor(Request $request, Doctor $doctor)
+    {
+        $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'is_for_adults' => ['nullable', 'boolean'],
+            'is_for_children' => ['nullable', 'boolean'],
+            'is_verified' => ['nullable', 'boolean'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $data = [
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'bio' => $request->bio,
+            'is_for_adults' => $request->boolean('is_for_adults'),
+            'is_for_children' => $request->boolean('is_for_children'),
+            'is_verified' => $request->boolean('is_verified'),
+        ];
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('doctor-avatars', 'public');
+            $data['photo_url'] = 'storage/' . $path;
+        }
+
+        $doctor->update($data);
+
+        return redirect()
+            ->route('admin.doctors')
+            ->with('success', 'Profil lekarza został zaktualizowany.');
     }
 
     public function toggleDoctorVerification(Doctor $doctor)
