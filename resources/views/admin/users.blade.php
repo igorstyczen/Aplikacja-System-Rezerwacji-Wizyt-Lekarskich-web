@@ -28,7 +28,7 @@
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator widzi listę kont, może filtrować użytkowników i zmieniać ich role.
+                    Administrator widzi listę kont, może filtrować użytkowników, edytować ich dane i zmieniać role.
                 </p>
             </div>
 
@@ -130,6 +130,9 @@
                                     Email
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Telefon
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Aktualna rola
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -137,6 +140,9 @@
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Data utworzenia
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Akcje
                                 </th>
                             </tr>
                         </thead>
@@ -154,6 +160,10 @@
 
                                     <td class="px-6 py-4 text-sm text-gray-700">
                                         {{ $user->email }}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm text-gray-700">
+                                        {{ $user->phone ?? 'Brak telefonu' }}
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
@@ -211,6 +221,15 @@
 
                                     <td class="px-6 py-4 text-sm text-gray-700">
                                         {{ $user->created_at->format('d.m.Y H:i') }}
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
+                                        <a
+                                            href="{{ route('admin.users.edit', $user) }}"
+                                            class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                        >
+                                            Edytuj
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

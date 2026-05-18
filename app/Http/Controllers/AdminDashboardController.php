@@ -9,6 +9,7 @@ use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AdminDashboardController extends Controller
 {
@@ -75,6 +76,45 @@ class AdminDashboardController extends Controller
         return view('admin.users', [
             'users' => $users,
         ]);
+    }
+
+    public function editUser(User $user)
+    {
+        return view('admin.edit-user', [
+            'user' => $user,
+        ]);
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'role' => ['required', 'in:patient,doctor,admin'],
+        ]);
+
+        if ($user->id === auth()->id() && $request->role !== 'admin') {
+            return back()->withErrors([
+                'role' => 'Nie możesz odebrać sobie roli administratora.',
+            ]);
+        }
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+        ]);
+
+        return redirect()
+            ->route('admin.users')
+            ->with('success', 'Dane użytkownika zostały zaktualizowane.');
     }
 
     public function doctors(Request $request)
