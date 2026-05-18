@@ -17,7 +17,8 @@ class HomeController extends Controller
                 'helpTags',
                 'clinics',
             ])
-            ->where('is_verified', true);
+            ->where('is_verified', true)
+            ->where('is_active', true);
 
         if ($request->filled('search')) {
             $search = $request->search;

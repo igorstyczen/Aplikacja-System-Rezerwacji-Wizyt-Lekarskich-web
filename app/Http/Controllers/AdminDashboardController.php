@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -100,7 +101,7 @@ class AdminDashboardController extends Controller
             'role' => ['required', 'in:patient,doctor,admin'],
         ]);
 
-        if ($user->id === auth()->id() && $request->role !== 'admin') {
+        if ($user->id === Auth::id() && $request->role !== 'admin') {
             return back()->withErrors([
                 'role' => 'Nie możesz odebrać sobie roli administratora.',
             ]);
@@ -386,7 +387,7 @@ class AdminDashboardController extends Controller
             'role' => ['required', 'in:patient,doctor,admin'],
         ]);
 
-        if ($user->id === auth()->id()) {
+        if ($user->id === Auth::id()) {
             return back()->withErrors([
                 'role' => 'Nie możesz zmienić własnej roli, aby nie utracić dostępu do panelu administratora.',
             ]);
@@ -401,7 +402,7 @@ class AdminDashboardController extends Controller
 
     public function toggleUserActive(User $user)
     {
-        if ($user->id === auth()->id()) {
+        if ($user->id === Auth::id()) {
             return back()->withErrors([
                 'user' => 'Nie możesz dezaktywować własnego konta administratora.',
             ]);
@@ -416,5 +417,18 @@ class AdminDashboardController extends Controller
         }
 
         return back()->with('success', 'Użytkownik został dezaktywowany.');
+    }
+
+    public function toggleDoctorActive(Doctor $doctor)
+    {
+        $doctor->update([
+            'is_active' => ! $doctor->is_active,
+        ]);
+
+        if ($doctor->is_active) {
+            return back()->with('success', 'Lekarz został aktywowany.');
+        }
+
+        return back()->with('success', 'Lekarz został dezaktywowany.');
     }
 }
