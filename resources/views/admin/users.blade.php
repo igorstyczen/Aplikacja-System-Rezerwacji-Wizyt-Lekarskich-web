@@ -28,7 +28,7 @@
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator widzi listę kont, może filtrować użytkowników, edytować ich dane i zmieniać role.
+                    Administrator widzi listę kont, może filtrować użytkowników, edytować ich dane, zmieniać role oraz aktywować lub dezaktywować konta.
                 </p>
             </div>
 
@@ -136,6 +136,9 @@
                                     Aktualna rola
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Status konta
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Zmień rolę
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -187,6 +190,18 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
+                                        @if ($user->is_active)
+                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                                Aktywne
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                                Nieaktywne
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
                                         @if ($user->id === Auth::id())
                                             <span class="text-gray-400 text-xs">
                                                 Nie można zmienić własnej roli
@@ -224,12 +239,42 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        <a
-                                            href="{{ route('admin.users.edit', $user) }}"
-                                            class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
-                                        >
-                                            Edytuj
-                                        </a>
+                                        <div class="flex flex-wrap gap-2">
+                                            <a
+                                                href="{{ route('admin.users.edit', $user) }}"
+                                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                                            >
+                                                Edytuj
+                                            </a>
+
+                                            @if ($user->id !== Auth::id())
+                                                <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    @if ($user->is_active)
+                                                        <button
+                                                            type="submit"
+                                                            onclick="return confirm('Czy na pewno chcesz dezaktywować tego użytkownika?')"
+                                                            class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                                                        >
+                                                            Dezaktywuj
+                                                        </button>
+                                                    @else
+                                                        <button
+                                                            type="submit"
+                                                            class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                                                        >
+                                                            Aktywuj
+                                                        </button>
+                                                    @endif
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400 text-xs">
+                                                    Brak dezaktywacji
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

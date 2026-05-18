@@ -343,4 +343,23 @@ class AdminDashboardController extends Controller
 
         return back()->with('success', 'Rola użytkownika została zmieniona.');
     }
+
+    public function toggleUserActive(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->withErrors([
+                'user' => 'Nie możesz dezaktywować własnego konta administratora.',
+            ]);
+        }
+
+        $user->update([
+            'is_active' => ! $user->is_active,
+        ]);
+
+        if ($user->is_active) {
+            return back()->with('success', 'Użytkownik został aktywowany.');
+        }
+
+        return back()->with('success', 'Użytkownik został dezaktywowany.');
+    }
 }
