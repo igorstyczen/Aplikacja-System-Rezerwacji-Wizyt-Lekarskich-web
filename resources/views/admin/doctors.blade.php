@@ -20,8 +20,99 @@
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator może zweryfikować lekarza albo cofnąć jego weryfikację.
+                    Administrator może filtrować lekarzy, sprawdzać ich dane oraz zarządzać weryfikacją.
                 </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    Filtry
+                </h2>
+
+                <form method="GET" action="{{ route('admin.doctors') }}" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                                Imię / nazwisko
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value="{{ request('name') }}"
+                                placeholder="np. Jan"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                Email
+                            </label>
+
+                            <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                value="{{ request('email') }}"
+                                placeholder="np. doktor@test.pl"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">
+                                Specjalizacja
+                            </label>
+
+                            <input
+                                type="text"
+                                id="specialization"
+                                name="specialization"
+                                value="{{ request('specialization') }}"
+                                placeholder="np. Dermatolog"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="is_verified" class="block text-sm font-medium text-gray-700 mb-1">
+                                Status weryfikacji
+                            </label>
+
+                            <select
+                                id="is_verified"
+                                name="is_verified"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                                <option value="">Wszystkie</option>
+                                <option value="1" @selected(request('is_verified') === '1')>
+                                    Zweryfikowany
+                                </option>
+                                <option value="0" @selected(request('is_verified') === '0')>
+                                    Niezweryfikowany
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                        >
+                            Filtruj
+                        </button>
+
+                        <a
+                            href="{{ route('admin.doctors') }}"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                        >
+                            Wyczyść
+                        </a>
+                    </div>
+                </form>
             </div>
 
             @if ($doctors->count() > 0)
@@ -120,7 +211,7 @@
             @else
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <p class="text-gray-600">
-                        Brak lekarzy do wyświetlenia.
+                        Brak lekarzy spełniających wybrane filtry.
                     </p>
                 </div>
             @endif
