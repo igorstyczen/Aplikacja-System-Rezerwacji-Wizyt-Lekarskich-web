@@ -15,9 +15,15 @@ class PaymentController extends Controller
     {
         $this->authorizePaymentAccess($appointment);
 
-        $this->cancelExpiredPaymentIfNeeded($appointment);
+        if ($this->isPaymentExpired($appointment)) {
+            $this->cancelExpiredPayment($appointment);
 
-        $appointment->refresh();
+            return redirect()
+                ->route('patient.appointments')
+                ->withErrors([
+                    'payment' => 'Czas na płatność minął. Termin został zwolniony i można zarezerwować go ponownie.',
+                ]);
+        }
 
         $appointment->load([
             'patient',
@@ -35,15 +41,21 @@ class PaymentController extends Controller
     {
         $this->authorizePaymentAccess($appointment);
 
-        $this->cancelExpiredPaymentIfNeeded($appointment);
+        if ($this->isPaymentExpired($appointment)) {
+            $this->cancelExpiredPayment($appointment);
 
-        $appointment->refresh();
+            return redirect()
+                ->route('patient.appointments')
+                ->withErrors([
+                    'payment' => 'Czas na płatność minął. Termin został zwolniony i można zarezerwować go ponownie.',
+                ]);
+        }
 
         if ($appointment->status === 'cancelled') {
             return redirect()
                 ->route('patient.appointments')
                 ->withErrors([
-                    'payment' => 'Czas na płatność minął. Termin został zwolniony i można zarezerwować go ponownie.',
+                    'payment' => 'Nie można opłacić anulowanej wizyty.',
                 ]);
         }
 
@@ -102,16 +114,15 @@ class PaymentController extends Controller
         }
     }
 
-    private function cancelExpiredPaymentIfNeeded(Appointment $appointment): void
+    private function isPaymentExpired(Appointment $appointment): bool
     {
-        if (
-            $appointment->status !== 'pending_payment'
-            || $appointment->payment_status !== 'unpaid'
-            || $appointment->created_at->greaterThanOrEqualTo(now()->subMinutes(10))
-        ) {
-            return;
-        }
+        return $appointment->status === 'pending_payment'
+            && $appointment->payment_status === 'unpaid'
+            && $appointment->created_at->lessThan(now()->subMinutes(10));
+    }
 
+    private function cancelExpiredPayment(Appointment $appointment): void
+    {
         DB::transaction(function () use ($appointment) {
             $appointment->update([
                 'status' => 'cancelled',
