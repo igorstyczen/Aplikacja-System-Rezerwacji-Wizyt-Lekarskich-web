@@ -30,7 +30,12 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="bg-orange-50 p-6 rounded-lg shadow-sm">
+                    <p class="text-sm text-orange-700">Oczekuje na płatność</p>
+                    <p class="text-2xl font-bold text-orange-900">{{ $pendingPaymentAppointmentsCount }}</p>
+                </div>
+
                 <div class="bg-blue-50 p-6 rounded-lg shadow-sm">
                     <p class="text-sm text-blue-700">Oczekujące</p>
                     <p class="text-2xl font-bold text-blue-900">{{ $pendingAppointmentsCount }}</p>
@@ -69,6 +74,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usługa</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klinika</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Płatność</th>
                             </tr>
                         </thead>
 
@@ -96,7 +102,11 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->status === 'pending')
+                                        @if ($appointment->status === 'pending_payment')
+                                            <span class="px-2 py-1 rounded text-xs bg-orange-100 text-orange-700">
+                                                Oczekuje na płatność
+                                            </span>
+                                        @elseif ($appointment->status === 'pending')
                                             <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
                                                 Oczekująca
                                             </span>
@@ -115,6 +125,31 @@
                                         @else
                                             <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
                                                 {{ $appointment->status }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
+                                        @if ($appointment->payment_status === 'paid')
+                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                                Opłacona
+                                            </span>
+
+                                            @if ($appointment->payment_method)
+                                                <br>
+                                                <span class="text-xs text-gray-500">
+                                                    @if ($appointment->payment_method === 'blik')
+                                                        BLIK
+                                                    @elseif ($appointment->payment_method === 'card')
+                                                        Karta bankowa
+                                                    @else
+                                                        {{ $appointment->payment_method }}
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                                Nieopłacona
                                             </span>
                                         @endif
                                     </td>

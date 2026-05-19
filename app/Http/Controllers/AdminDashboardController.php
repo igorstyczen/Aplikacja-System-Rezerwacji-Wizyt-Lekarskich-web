@@ -22,6 +22,7 @@ class AdminDashboardController extends Controller
         $patientsCount = Patient::count();
         $appointmentsCount = Appointment::count();
 
+        $pendingPaymentAppointmentsCount = Appointment::where('status', 'pending_payment')->count();
         $pendingAppointmentsCount = Appointment::where('status', 'pending')->count();
         $confirmedAppointmentsCount = Appointment::where('status', 'confirmed')->count();
         $cancelledAppointmentsCount = Appointment::where('status', 'cancelled')->count();
@@ -42,6 +43,7 @@ class AdminDashboardController extends Controller
             'doctorsCount' => $doctorsCount,
             'patientsCount' => $patientsCount,
             'appointmentsCount' => $appointmentsCount,
+            'pendingPaymentAppointmentsCount' => $pendingPaymentAppointmentsCount,
             'pendingAppointmentsCount' => $pendingAppointmentsCount,
             'confirmedAppointmentsCount' => $confirmedAppointmentsCount,
             'cancelledAppointmentsCount' => $cancelledAppointmentsCount,
