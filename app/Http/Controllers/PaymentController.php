@@ -6,7 +6,6 @@ use App\Models\Appointment;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class PaymentController extends Controller
 {
@@ -68,7 +67,7 @@ class PaymentController extends Controller
 
         return redirect()
             ->route('patient.appointments')
-            ->with('success', 'Płatność testowa zakończona powodzeniem. Wizyta została opłacona.');
+            ->with('success', 'Płatność zakończona powodzeniem. Wizyta została opłacona.');
     }
 
     private function authorizePaymentAccess(Appointment $appointment): void

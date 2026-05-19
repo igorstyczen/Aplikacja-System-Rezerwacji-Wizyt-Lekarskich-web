@@ -10,6 +10,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardRedirectController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -93,6 +94,14 @@ Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
 Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments');
+
+Route::get('/appointments/{appointment}/payment', [PaymentController::class, 'show'])
+    ->middleware('auth')
+    ->name('payments.show');
+
+Route::post('/appointments/{appointment}/payment', [PaymentController::class, 'pay'])
+    ->middleware('auth')
+    ->name('payments.pay');
 
 Route::get('/doctor/profile', [DoctorDashboardController::class, 'profile'])
     ->middleware(['auth', 'role:doctor,admin'])

@@ -2,7 +2,11 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+<<<<<<< HEAD
                 Płatność testowa
+=======
+                Płatność
+>>>>>>> a4a013861968fe9a64dcd3ea35fa118a51fbb2aa
             </h2>
 
             <a href="{{ route('patient.appointments') }}" class="text-sm text-blue-600 hover:text-blue-800">
@@ -91,7 +95,11 @@
             @else
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">
+<<<<<<< HEAD
                         Wybierz metodę płatności testowej
+=======
+                        Wybierz metodę płatności
+>>>>>>> a4a013861968fe9a64dcd3ea35fa118a51fbb2aa
                     </h2>
 
                     <form method="POST" action="{{ route('payments.pay', $appointment) }}" id="paymentForm">
@@ -157,7 +165,11 @@
                                     >
 
                                     <p class="text-xs text-gray-500 mt-1">
+<<<<<<< HEAD
                                         Wpisz dowolne 16 cyfr.
+=======
+                                        Wpisz 16 cyfr.
+>>>>>>> a4a013861968fe9a64dcd3ea35fa118a51fbb2aa
                                     </p>
                                 </div>
 
@@ -195,6 +207,10 @@
                                     </div>
                                 </div>
                             </div>
+<<<<<<< HEAD
+=======
+                        </div>
+>>>>>>> a4a013861968fe9a64dcd3ea35fa118a51fbb2aa
 
                         <button
                             type="submit"
