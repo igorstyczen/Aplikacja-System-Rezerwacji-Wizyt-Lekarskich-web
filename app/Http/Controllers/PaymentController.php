@@ -60,6 +60,7 @@ class PaymentController extends Controller
         }
 
         $appointment->update([
+            'status' => 'pending',
             'payment_status' => 'paid',
             'payment_method' => $request->payment_method,
             'paid_at' => now(),
@@ -67,7 +68,7 @@ class PaymentController extends Controller
 
         return redirect()
             ->route('patient.appointments')
-            ->with('success', 'Płatność zakończona powodzeniem. Wizyta została opłacona.');
+            ->with('success', 'Płatność zakończona powodzeniem. Wizyta została opłacona i oczekuje na potwierdzenie lekarza.');
     }
 
     private function authorizePaymentAccess(Appointment $appointment): void

@@ -61,7 +61,7 @@ class AppointmentController extends Controller
                     'clinic_id' => $slot->clinic_id,
                     'date' => $slot->start_time,
                     'length' => $service->duration_minutes,
-                    'status' => 'pending',
+                    'status' => 'pending_payment',
                     'payment_status' => 'unpaid',
                     'payment_method' => null,
                     'payment_amount' => $service->price,
@@ -80,7 +80,7 @@ class AppointmentController extends Controller
 
         return redirect()
             ->route('payments.show', $appointment)
-            ->with('success', 'Wizyta została zarezerwowana. Dokończ płatność testową.');
+            ->with('success', 'Termin został wstępnie zablokowany. Dokończ płatność, aby potwierdzić rezerwację.');
     }
 
     public function cancel(Appointment $appointment)
