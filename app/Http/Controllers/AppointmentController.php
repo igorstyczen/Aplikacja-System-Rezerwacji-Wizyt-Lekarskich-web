@@ -41,7 +41,26 @@ class AppointmentController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                if ($slot->status !== 'available') {
+                $expiredAppointment = Appointment::where('doctor_id', $slot->doctor_id)
+                    ->where('clinic_id', $slot->clinic_id)
+                    ->where('date', $slot->start_time)
+                    ->where('status', 'pending_payment')
+                    ->where('payment_status', 'unpaid')
+                    ->where('created_at', '<', now()->subMinutes(10))
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($expiredAppointment) {
+                    $expiredAppointment->update([
+                        'status' => 'cancelled',
+                    ]);
+
+                    $slot->update([
+                        'status' => 'available',
+                    ]);
+                }
+
+                if ($slot->fresh()->status !== 'available') {
                     throw new \Exception('Ten termin jest już zajęty.');
                 }
 
@@ -80,7 +99,7 @@ class AppointmentController extends Controller
 
         return redirect()
             ->route('payments.show', $appointment)
-            ->with('success', 'Termin został wstępnie zablokowany. Dokończ płatność, aby potwierdzić rezerwację.');
+            ->with('success', 'Termin został wstępnie zablokowany na 10 minut. Dokończ płatność, aby potwierdzić rezerwację.');
     }
 
     public function cancel(Appointment $appointment)

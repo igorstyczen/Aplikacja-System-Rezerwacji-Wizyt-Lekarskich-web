@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\AvailabilitySlot;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
     public function show(Appointment $appointment)
     {
         $this->authorizePaymentAccess($appointment);
+
+        $this->cancelExpiredPaymentIfNeeded($appointment);
+
+        $appointment->refresh();
 
         $appointment->load([
             'patient',
@@ -29,10 +35,16 @@ class PaymentController extends Controller
     {
         $this->authorizePaymentAccess($appointment);
 
+        $this->cancelExpiredPaymentIfNeeded($appointment);
+
+        $appointment->refresh();
+
         if ($appointment->status === 'cancelled') {
-            return back()->withErrors([
-                'payment' => 'Nie można opłacić anulowanej wizyty.',
-            ]);
+            return redirect()
+                ->route('patient.appointments')
+                ->withErrors([
+                    'payment' => 'Czas na płatność minął. Termin został zwolniony i można zarezerwować go ponownie.',
+                ]);
         }
 
         if ($appointment->payment_status === 'paid') {
@@ -88,5 +100,34 @@ class PaymentController extends Controller
         if (! $patient || $appointment->patient_id !== $patient->id) {
             abort(403);
         }
+    }
+
+    private function cancelExpiredPaymentIfNeeded(Appointment $appointment): void
+    {
+        if (
+            $appointment->status !== 'pending_payment'
+            || $appointment->payment_status !== 'unpaid'
+            || $appointment->created_at->greaterThanOrEqualTo(now()->subMinutes(10))
+        ) {
+            return;
+        }
+
+        DB::transaction(function () use ($appointment) {
+            $appointment->update([
+                'status' => 'cancelled',
+            ]);
+
+            $slot = AvailabilitySlot::where('doctor_id', $appointment->doctor_id)
+                ->where('clinic_id', $appointment->clinic_id)
+                ->where('start_time', $appointment->date)
+                ->lockForUpdate()
+                ->first();
+
+            if ($slot) {
+                $slot->update([
+                    'status' => 'available',
+                ]);
+            }
+        });
     }
 }
