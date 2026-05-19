@@ -33,8 +33,10 @@ class AppointmentController extends Controller
             ]);
         }
 
+        $appointment = null;
+
         try {
-            DB::transaction(function () use ($request, $patient) {
+            DB::transaction(function () use ($request, $patient, &$appointment) {
                 $slot = AvailabilitySlot::where('id', $request->slot_id)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -52,7 +54,7 @@ class AppointmentController extends Controller
                     throw new \Exception('Wybrana usługa nie pasuje do tego lekarza lub kliniki.');
                 }
 
-                Appointment::create([
+                $appointment = Appointment::create([
                     'patient_id' => $patient->id,
                     'doctor_id' => $slot->doctor_id,
                     'service_id' => $service->id,
@@ -60,6 +62,10 @@ class AppointmentController extends Controller
                     'date' => $slot->start_time,
                     'length' => $service->duration_minutes,
                     'status' => 'pending',
+                    'payment_status' => 'unpaid',
+                    'payment_method' => null,
+                    'payment_amount' => $service->price,
+                    'paid_at' => null,
                 ]);
 
                 $slot->update([
@@ -72,7 +78,9 @@ class AppointmentController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Wizyta została zarezerwowana.');
+        return redirect()
+            ->route('payments.show', $appointment)
+            ->with('success', 'Wizyta została zarezerwowana. Dokończ płatność testową.');
     }
 
     public function cancel(Appointment $appointment)

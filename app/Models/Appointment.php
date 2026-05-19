@@ -14,10 +14,16 @@ class Appointment extends Model
         'date',
         'length',
         'status',
+        'payment_status',
+        'payment_method',
+        'payment_amount',
+        'paid_at',
     ];
 
     protected $casts = [
         'date' => 'datetime',
+        'paid_at' => 'datetime',
+        'payment_amount' => 'decimal:2',
     ];
 
     public function patient()
@@ -63,5 +69,15 @@ class Appointment extends Model
     public function isCompleted(): bool
     {
         return $this->status === 'completed';
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    public function isUnpaid(): bool
+    {
+        return $this->payment_status === 'unpaid';
     }
 }
