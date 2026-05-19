@@ -28,7 +28,7 @@
                 </h1>
 
                 <p class="text-gray-600 mt-1">
-                    Administrator widzi wszystkie wizyty zapisane w systemie, może je filtrować i zarządzać ich statusem.
+                    Administrator widzi wszystkie wizyty zapisane w systemie, może je filtrować i zarządzać ich statusem oraz sprawdzać płatności.
                 </p>
             </div>
 
@@ -95,6 +95,9 @@
                                 class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                             >
                                 <option value="">Wszystkie</option>
+                                <option value="pending_payment" @selected(request('status') === 'pending_payment')>
+                                    Oczekuje na płatność
+                                </option>
                                 <option value="pending" @selected(request('status') === 'pending')>
                                     Oczekująca
                                 </option>
@@ -148,30 +151,15 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Data
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Pacjent
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Lekarz
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Usługa
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Klinika
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Długość
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Status
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Akcje
-                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pacjent</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lekarz</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usługa</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klinika</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Długość</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Płatność</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
                             </tr>
                         </thead>
 
@@ -207,7 +195,11 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->status === 'pending')
+                                        @if ($appointment->status === 'pending_payment')
+                                            <span class="px-2 py-1 rounded text-xs bg-orange-100 text-orange-700">
+                                                Oczekuje na płatność
+                                            </span>
+                                        @elseif ($appointment->status === 'pending')
                                             <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
                                                 Oczekująca
                                             </span>
@@ -231,8 +223,37 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
+                                        @if ($appointment->payment_status === 'paid')
+                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                                Opłacona
+                                            </span>
+
+                                            @if ($appointment->payment_method)
+                                                <br>
+                                                <span class="text-xs text-gray-500">
+                                                    @if ($appointment->payment_method === 'blik')
+                                                        BLIK
+                                                    @elseif ($appointment->payment_method === 'card')
+                                                        Karta bankowa
+                                                    @else
+                                                        {{ $appointment->payment_method }}
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                                Nieopłacona
+                                            </span>
+                                            <br>
+                                            <span class="text-xs text-gray-500">
+                                                {{ number_format($appointment->payment_amount ?? $appointment->service->price, 2) }} zł
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
                                         <div class="flex flex-wrap gap-2">
-                                            @if ($appointment->status === 'pending')
+                                            @if ($appointment->status === 'pending' && $appointment->payment_status === 'paid')
                                                 <form method="POST" action="{{ route('admin.appointments.confirm', $appointment) }}">
                                                     @csrf
                                                     @method('PATCH')
@@ -273,6 +294,12 @@
                                                         Anuluj
                                                     </button>
                                                 </form>
+                                            @endif
+
+                                            @if ($appointment->status === 'pending_payment')
+                                                <span class="text-gray-400 text-xs">
+                                                    Czeka na płatność
+                                                </span>
                                             @endif
 
                                             @if (in_array($appointment->status, ['cancelled', 'completed']))

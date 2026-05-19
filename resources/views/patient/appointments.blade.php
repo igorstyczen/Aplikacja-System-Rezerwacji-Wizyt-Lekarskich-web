@@ -38,6 +38,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usługa</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klinika</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Płatność</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
                             </tr>
                         </thead>
@@ -70,7 +71,11 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->status === 'cancelled')
+                                        @if ($appointment->status === 'pending_payment')
+                                            <span class="px-2 py-1 rounded text-xs bg-orange-100 text-orange-700">
+                                                Oczekuje na płatność
+                                            </span>
+                                        @elseif ($appointment->status === 'cancelled')
                                             <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
                                                 Anulowana
                                             </span>
@@ -94,7 +99,45 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-sm">
+                                        @if ($appointment->payment_status === 'paid')
+                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                                Opłacona
+                                            </span>
+
+                                            @if ($appointment->payment_method)
+                                                <br>
+                                                <span class="text-xs text-gray-500">
+                                                    @if ($appointment->payment_method === 'blik')
+                                                        BLIK
+                                                    @elseif ($appointment->payment_method === 'card')
+                                                        Karta bankowa
+                                                    @else
+                                                        {{ $appointment->payment_method }}
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                                Nieopłacona
+                                            </span>
+                                            <br>
+                                            <span class="text-xs text-gray-500">
+                                                {{ number_format($appointment->payment_amount ?? $appointment->service->price, 2) }} zł
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-6 py-4 text-sm">
                                         <div class="flex flex-wrap gap-2">
+                                            @if ($appointment->status === 'pending_payment' && $appointment->payment_status !== 'paid')
+                                                <a
+                                                    href="{{ route('payments.show', $appointment) }}"
+                                                    class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                                                >
+                                                    Opłać
+                                                </a>
+                                            @endif
+
                                             @if (! in_array($appointment->status, ['cancelled', 'completed']))
                                                 <form method="POST" action="{{ route('appointments.cancel', $appointment) }}">
                                                     @csrf
