@@ -76,6 +76,12 @@ class DoctorDashboardController extends Controller
             ]);
         }
 
+        if ($appointment->payment_status !== 'paid') {
+            return back()->withErrors([
+                'payment' => 'Nie można potwierdzić wizyty, która nie została opłacona.',
+            ]);
+        }
+
         $appointment->update([
             'status' => 'confirmed',
         ]);
