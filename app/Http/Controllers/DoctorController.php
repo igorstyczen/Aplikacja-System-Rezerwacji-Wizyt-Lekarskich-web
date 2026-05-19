@@ -19,6 +19,19 @@ class DoctorController extends Controller
             'images',
         ]);
 
-        return view('doctors.show', compact('doctor'));
+        $availableSlots = $doctor->availabilitySlots()
+            ->with('clinic')
+            ->where('status', 'available')
+            ->where('start_time', '>=', now())
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy(function ($slot) {
+                return $slot->start_time->format('Y-m-d');
+            });
+
+        return view('doctors.show', [
+            'doctor' => $doctor,
+            'availableSlots' => $availableSlots,
+        ]);
     }
 }

@@ -151,64 +151,127 @@
             </div>
 
             <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                    Wolne terminy
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                    Umów wizytę
                 </h3>
 
-                @php
-                    $availableSlots = $doctor->availabilitySlots->where('status', 'available');
-                @endphp
+                <p class="text-sm text-gray-500 mb-6">
+                    Wybierz usługę, a następnie dostępny termin wizyty.
+                </p>
 
-                @if ($availableSlots->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach ($availableSlots as $slot)
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <p class="font-semibold text-gray-900">
-                                    {{ $slot->start_time->format('d.m.Y') }}
-                                </p>
+                @if ($doctor->services->count() > 0 && $availableSlots->count() > 0)
+                    <form method="POST" action="{{ route('appointments.store') }}" id="bookingForm">
+                        @csrf
 
-                                <p class="text-gray-600">
-                                    {{ $slot->start_time->format('H:i') }} - {{ $slot->end_time->format('H:i') }}
-                                </p>
+                        <div class="mb-6">
+                            <label for="service_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                Wybierz usługę
+                            </label>
 
-                                <p class="text-sm text-gray-500 mt-1">
-                                    {{ $slot->clinic->name ?? 'Brak kliniki' }}
-                                </p>
+                            <select
+                                id="service_id"
+                                name="service_id"
+                                required
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            >
+                                <option value="">Wybierz usługę</option>
 
-                                @php
-                                    $slotServices = $doctor->services->where('clinic_id', $slot->clinic_id);
-                                @endphp
+                                @foreach ($doctor->services as $service)
+                                    <option
+                                        value="{{ $service->id }}"
+                                        data-clinic-id="{{ $service->clinic_id }}"
+                                    >
+                                        {{ $service->name }} — {{ number_format($service->price, 2) }} zł — {{ $service->duration_minutes }} min
+                                        @if ($service->clinic)
+                                            — {{ $service->clinic->name }}
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                                @if ($slotServices->count() > 0)
-                                    <form method="POST" action="{{ route('appointments.store') }}" class="mt-4">
-                                        @csrf
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-gray-900 mb-4">
+                                Wybierz termin
+                            </h4>
 
-                                        <input type="hidden" name="slot_id" value="{{ $slot->id }}">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                @foreach ($availableSlots->take(8) as $date => $slots)
+                                    @php
+                                        $firstSlot = $slots->first();
+                                    @endphp
 
-                                        <label class="block text-sm text-gray-700 mb-1">
-                                            Wybierz usługę:
-                                        </label>
+                                    <div class="border border-gray-200 rounded-xl p-4 day-card">
+                                        <div class="text-center border-b border-gray-100 pb-3 mb-3">
+                                            <p class="font-semibold text-gray-900">
+                                                {{ $firstSlot->start_time->translatedFormat('D') }}
+                                            </p>
 
-                                        <select name="service_id" class="w-full border-gray-300 rounded-md text-sm mb-3">
-                                            @foreach ($slotServices as $service)
-                                                <option value="{{ $service->id }}">
-                                                    {{ $service->name }} — {{ number_format($service->price, 2) }} zł
-                                                </option>
+                                            <p class="text-sm text-gray-500">
+                                                {{ $firstSlot->start_time->format('d.m') }}
+                                            </p>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            @foreach ($slots as $index => $slot)
+                                                <label
+                                                    class="slot-option block cursor-pointer"
+                                                    data-clinic-id="{{ $slot->clinic_id }}"
+                                                    data-extra="{{ $index >= 4 ? '1' : '0' }}"
+                                                    style="{{ $index >= 4 ? 'display: none;' : '' }}"
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="slot_id"
+                                                        value="{{ $slot->id }}"
+                                                        required
+                                                        style="position: absolute; opacity: 0; pointer-events: none;"
+                                                    >
+
+                                                    <div
+                                                        class="slot-button"
+                                                        style="text-align: center; padding: 10px 16px; border-radius: 9999px; background: #dcfce7; color: #064e3b; font-weight: 700; border: 2px solid transparent;"
+                                                    >
+                                                        {{ $slot->start_time->format('H:i') }}
+                                                    </div>
+
+                                                    <p class="text-xs text-gray-400 text-center mt-1">
+                                                        {{ $slot->clinic->name ?? 'Brak kliniki' }}
+                                                    </p>
+                                                </label>
                                             @endforeach
-                                        </select>
+                                        </div>
 
-                                        <input type="submit"
-                                            value="Umów wizytę"
-                                            style="display: block; width: 100%; margin-top: 12px; padding: 10px 16px; background-color: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
-                                    </form>
-                                @else
-                                    <p class="mt-3 text-sm text-gray-500">
-                                        Brak usług dla tej kliniki.
-                                    </p>
-                                @endif
+                                        @if ($slots->count() > 4)
+                                            <button
+                                                type="button"
+                                                class="show-more-slots w-full text-sm text-emerald-700 font-semibold mt-4 hover:text-emerald-900"
+                                            >
+                                                Pokaż więcej godzin
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+
+                        <div style="margin-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
+                            <p class="text-sm text-gray-500">
+                                Po kliknięciu system utworzy rezerwację wybranego terminu.
+                            </p>
+
+                            <button
+                                type="submit"
+                                style="padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;"
+                            >
+                                Zarezerwuj wizytę
+                            </button>
+                        </div>
+                    </form>
+                @elseif ($doctor->services->count() === 0)
+                    <p class="text-gray-500">
+                        Ten lekarz nie ma jeszcze dodanych usług.
+                    </p>
                 @else
                     <p class="text-gray-500">
                         Brak wolnych terminów.
@@ -262,4 +325,105 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const serviceSelect = document.getElementById('service_id');
+            const slotOptions = document.querySelectorAll('.slot-option');
+            const bookingForm = document.getElementById('bookingForm');
+
+            function clearSelectedSlots() {
+                document.querySelectorAll('.slot-button').forEach(function (button) {
+                    button.style.background = '#dcfce7';
+                    button.style.color = '#064e3b';
+                    button.style.borderColor = 'transparent';
+                });
+            }
+
+            slotOptions.forEach(function (slotOption) {
+                slotOption.addEventListener('click', function () {
+                    if (slotOption.dataset.availableForService === '0') {
+                        return;
+                    }
+
+                    const input = slotOption.querySelector('input[type="radio"]');
+                    const button = slotOption.querySelector('.slot-button');
+
+                    input.checked = true;
+
+                    clearSelectedSlots();
+
+                    button.style.background = '#059669';
+                    button.style.color = 'white';
+                    button.style.borderColor = '#047857';
+                });
+            });
+
+            function filterSlotsByService() {
+                const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+                const selectedClinicId = selectedOption ? selectedOption.dataset.clinicId : null;
+
+                clearSelectedSlots();
+
+                slotOptions.forEach(function (slotOption) {
+                    const slotClinicId = slotOption.dataset.clinicId;
+                    const isExtra = slotOption.dataset.extra === '1';
+                    const input = slotOption.querySelector('input[type="radio"]');
+
+                    input.checked = false;
+
+                    if (!selectedClinicId || selectedClinicId === slotClinicId) {
+                        slotOption.dataset.availableForService = '1';
+
+                        if (!isExtra || slotOption.dataset.expanded === '1') {
+                            slotOption.style.display = 'block';
+                        }
+                    } else {
+                        slotOption.dataset.availableForService = '0';
+                        slotOption.style.display = 'none';
+                    }
+                });
+            }
+
+            if (serviceSelect) {
+                serviceSelect.addEventListener('change', filterSlotsByService);
+                filterSlotsByService();
+            }
+
+            document.querySelectorAll('.show-more-slots').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const dayCard = button.closest('.day-card');
+                    const hiddenSlots = dayCard.querySelectorAll('.slot-option[data-extra="1"]');
+
+                    hiddenSlots.forEach(function (slotOption) {
+                        slotOption.dataset.expanded = '1';
+
+                        if (slotOption.dataset.availableForService !== '0') {
+                            slotOption.style.display = 'block';
+                        }
+                    });
+
+                    button.style.display = 'none';
+                });
+            });
+
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', function (event) {
+                    const serviceId = serviceSelect.value;
+                    const selectedSlot = bookingForm.querySelector('input[name="slot_id"]:checked');
+
+                    if (!serviceId) {
+                        event.preventDefault();
+                        alert('Najpierw wybierz usługę.');
+                        return;
+                    }
+
+                    if (!selectedSlot) {
+                        event.preventDefault();
+                        alert('Najpierw wybierz termin wizyty.');
+                    }
+                });
+            }
+        });
+    </script>
 </x-app-layout>
