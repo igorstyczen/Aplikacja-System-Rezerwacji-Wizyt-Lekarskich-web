@@ -110,6 +110,22 @@ Route::delete('/admin/help-tags/{helpTag}', [AdminDictionaryController::class, '
     ->middleware(['auth', 'role:admin'])
     ->name('admin.help-tags.delete');
 
+Route::get('/admin/clinics', [AdminDashboardController::class, 'clinics'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics');
+
+Route::post('/admin/clinics', [AdminDashboardController::class, 'storeClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.store');
+
+Route::put('/admin/clinics/{clinic}', [AdminDashboardController::class, 'updateClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.update');
+
+Route::delete('/admin/clinics/{clinic}', [AdminDashboardController::class, 'deleteClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.delete');
+
 Route::get('/appointments/{appointment}/review', [ReviewController::class, 'create'])
     ->middleware(['auth', 'role:patient,admin'])
     ->name('reviews.create');

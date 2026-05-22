@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Clinic;
 
 class AdminDashboardController extends Controller
 {
@@ -272,6 +273,123 @@ class AdminDashboardController extends Controller
         }
 
         return back()->with('success', 'Weryfikacja lekarza została cofnięta.');
+    }
+
+    public function clinics(Request $request)
+    {
+        $query = Clinic::with('doctors');
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('city')) {
+            $query->where('city', 'like', '%' . $request->city . '%');
+        }
+
+        if ($request->filled('doctor')) {
+            $query->whereHas('doctors', function ($doctorQuery) use ($request) {
+                $doctorQuery
+                    ->where('first_name', 'like', '%' . $request->doctor . '%')
+                    ->orWhere('last_name', 'like', '%' . $request->doctor . '%');
+            });
+        }
+
+        $clinics = $query
+            ->orderBy('city')
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
+
+        $doctors = Doctor::query()
+            ->where('is_active', true)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+
+        return view('admin.clinics', [
+            'clinics' => $clinics,
+            'doctors' => $doctors,
+        ]);
+    }
+
+    public function storeClinic(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'details' => ['nullable', 'string', 'max:2000'],
+            'doctors' => ['nullable', 'array'],
+            'doctors.*' => ['integer', 'exists:doctors,id'],
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $clinic = Clinic::create([
+                'doctor_id' => null,
+                'name' => $request->name,
+                'address' => $request->address,
+                'city' => $request->city,
+                'details' => $request->details,
+            ]);
+
+            $clinic->doctors()->sync($request->input('doctors', []));
+        });
+
+        return back()->with('success', 'Klinika została dodana.');
+    }
+
+    public function updateClinic(Request $request, Clinic $clinic)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'details' => ['nullable', 'string', 'max:2000'],
+            'doctors' => ['nullable', 'array'],
+            'doctors.*' => ['integer', 'exists:doctors,id'],
+        ]);
+
+        DB::transaction(function () use ($request, $clinic) {
+            $clinic->update([
+                'name' => $request->name,
+                'address' => $request->address,
+                'city' => $request->city,
+                'details' => $request->details,
+            ]);
+
+            $clinic->doctors()->sync($request->input('doctors', []));
+        });
+
+        return back()->with('success', 'Klinika została zaktualizowana.');
+    }
+
+    public function deleteClinic(Clinic $clinic)
+    {
+        if ($clinic->services()->exists()) {
+            return back()->withErrors([
+                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane usługi.',
+            ]);
+        }
+
+        if ($clinic->availabilitySlots()->exists()) {
+            return back()->withErrors([
+                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane terminy w grafiku.',
+            ]);
+        }
+
+        if ($clinic->appointments()->exists()) {
+            return back()->withErrors([
+                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane wizyty.',
+            ]);
+        }
+
+        DB::transaction(function () use ($clinic) {
+            $clinic->doctors()->detach();
+            $clinic->delete();
+        });
+
+        return back()->with('success', 'Klinika została usunięta.');
     }
 
     public function appointments(Request $request)

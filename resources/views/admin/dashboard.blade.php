@@ -76,6 +76,18 @@
                             Obszary problemów pacjentów.
                         </p>
                     </a>
+
+                    <a
+                        href="{{ route('admin.clinics') }}"
+                        class="block p-4 bg-cyan-50 border border-cyan-100 rounded-lg hover:bg-cyan-100"
+                    >
+                        <p class="font-semibold text-cyan-900">
+                            Kliniki
+                        </p>
+                        <p class="text-sm text-cyan-700 mt-1">
+                            Placówki i przypisanie lekarzy.
+                        </p>
+                    </a>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
