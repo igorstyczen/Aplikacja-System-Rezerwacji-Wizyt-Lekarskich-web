@@ -7,7 +7,77 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    Panel administratora
+                </h1>
 
+                <p class="text-gray-600 mb-4">
+                    Szybki dostęp do najważniejszych sekcji administracyjnych.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <a
+                        href="{{ route('admin.users') }}"
+                        class="block p-4 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100"
+                    >
+                        <p class="font-semibold text-blue-900">
+                            Użytkownicy
+                        </p>
+                        <p class="text-sm text-blue-700 mt-1">
+                            Zarządzanie kontami i rolami.
+                        </p>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.doctors') }}"
+                        class="block p-4 bg-green-50 border border-green-100 rounded-lg hover:bg-green-100"
+                    >
+                        <p class="font-semibold text-green-900">
+                            Lekarze
+                        </p>
+                        <p class="text-sm text-green-700 mt-1">
+                            Profile, weryfikacja i aktywność.
+                        </p>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.appointments') }}"
+                        class="block p-4 bg-purple-50 border border-purple-100 rounded-lg hover:bg-purple-100"
+                    >
+                        <p class="font-semibold text-purple-900">
+                            Wizyty
+                        </p>
+                        <p class="text-sm text-purple-700 mt-1">
+                            Statusy wizyt i płatności.
+                        </p>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.specializations') }}"
+                        class="block p-4 bg-orange-50 border border-orange-100 rounded-lg hover:bg-orange-100"
+                    >
+                        <p class="font-semibold text-orange-900">
+                            Specjalizacje
+                        </p>
+                        <p class="text-sm text-orange-700 mt-1">
+                            Słownik specjalizacji lekarzy.
+                        </p>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.help-tags') }}"
+                        class="block p-4 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100"
+                    >
+                        <p class="font-semibold text-pink-900">
+                            Tagi pomocy
+                        </p>
+                        <p class="text-sm text-pink-700 mt-1">
+                            Obszary problemów pacjentów.
+                        </p>
+                    </a>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <p class="text-sm text-gray-500">Użytkownicy</p>
