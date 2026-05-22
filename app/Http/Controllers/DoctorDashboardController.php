@@ -8,6 +8,8 @@ use App\Models\Doctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\DoctorSpecialization;
+use App\Models\HelpTag;
 
 class DoctorDashboardController extends Controller
 {
@@ -329,14 +331,73 @@ class DoctorDashboardController extends Controller
         if (! $doctor) {
             return view('doctor.profile', [
                 'doctor' => null,
+                'availableSpecializations' => collect(),
+                'helpTags' => collect(),
                 'message' => 'Nie masz profilu lekarza.',
             ]);
         }
 
+        $doctor->load([
+            'specializations',
+            'helpTags',
+        ]);
+
+        $availableSpecializations = DoctorSpecialization::query()
+            ->select('specialization_name')
+            ->distinct()
+            ->orderBy('specialization_name')
+            ->pluck('specialization_name');
+
+        $helpTags = HelpTag::query()
+            ->orderBy('tag_name')
+            ->get();
+
         return view('doctor.profile', [
             'doctor' => $doctor,
+            'availableSpecializations' => $availableSpecializations,
+            'helpTags' => $helpTags,
             'message' => null,
         ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'is_for_adults' => ['nullable', 'boolean'],
+            'is_for_children' => ['nullable', 'boolean'],
+            'specializations' => ['nullable', 'array'],
+            'specializations.*' => ['string', 'max:255'],
+            'help_tags' => ['nullable', 'array'],
+            'help_tags.*' => ['integer', 'exists:help_tags,id'],
+        ]);
+
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($request, $doctor) {
+            $doctor->update([
+                'bio' => $request->bio,
+                'is_for_adults' => $request->boolean('is_for_adults'),
+                'is_for_children' => $request->boolean('is_for_children'),
+            ]);
+
+            $doctor->specializations()->delete();
+
+            foreach ($request->input('specializations', []) as $specializationName) {
+                DoctorSpecialization::create([
+                    'doctor_id' => $doctor->id,
+                    'specialization_name' => $specializationName,
+                ]);
+            }
+
+            $doctor->helpTags()->sync($request->input('help_tags', []));
+        });
+
+        return back()->with('success', 'Profil lekarza został zaktualizowany.');
     }
 
     public function updatePhoto(Request $request)

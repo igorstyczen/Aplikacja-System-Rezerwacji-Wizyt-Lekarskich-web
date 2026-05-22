@@ -130,6 +130,10 @@ Route::get('/doctor/profile', [DoctorDashboardController::class, 'profile'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.profile');
 
+Route::patch('/doctor/profile', [DoctorDashboardController::class, 'updateProfile'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile.update');
+
 Route::post('/doctor/profile/photo', [DoctorDashboardController::class, 'updatePhoto'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.profile.photo');

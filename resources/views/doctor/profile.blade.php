@@ -51,16 +51,152 @@
                             </h1>
 
                             <p class="text-gray-600 mt-1">
-                                Tutaj możesz zmienić swoje zdjęcie profilowe widoczne dla pacjentów.
+                                Tutaj możesz edytować informacje widoczne dla pacjentów.
                             </p>
+                        </div>
+                    </div>
+                </div>
 
-                            @if ($doctor->photo_url)
-                                <p class="text-xs text-gray-500 mt-2">
-                                    Aktualna ścieżka: {{ $doctor->photo_url }}
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                        Dane profilu lekarza
+                    </h2>
+
+                    <form method="POST" action="{{ route('doctor.profile.update') }}" class="space-y-6">
+                        @csrf
+                        @method('PATCH')
+
+                        <div>
+                            <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">
+                                Opis / bio
+                            </label>
+
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                rows="5"
+                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                placeholder="Napisz krótki opis doświadczenia, specjalizacji i sposobu pracy z pacjentami."
+                            >{{ old('bio', $doctor->bio) }}</textarea>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">
+                                Przyjmowani pacjenci
+                            </h3>
+
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="is_for_adults"
+                                        value="1"
+                                        @checked(old('is_for_adults', $doctor->is_for_adults))
+                                        class="rounded border-gray-300"
+                                    >
+                                    <span class="text-sm text-gray-700">
+                                        Przyjmuję dorosłych
+                                    </span>
+                                </label>
+
+                                <label class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="is_for_children"
+                                        value="1"
+                                        @checked(old('is_for_children', $doctor->is_for_children))
+                                        class="rounded border-gray-300"
+                                    >
+                                    <span class="text-sm text-gray-700">
+                                        Przyjmuję dzieci
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">
+                                Specjalizacje
+                            </h3>
+
+                            @php
+                                $doctorSpecializations = $doctor->specializations
+                                    ->pluck('specialization_name')
+                                    ->toArray();
+
+                                $selectedSpecializations = old('specializations', $doctorSpecializations);
+                            @endphp
+
+                            @if ($availableSpecializations->count() > 0)
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    @foreach ($availableSpecializations as $specialization)
+                                        <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
+                                            <input
+                                                type="checkbox"
+                                                name="specializations[]"
+                                                value="{{ $specialization }}"
+                                                @checked(in_array($specialization, $selectedSpecializations))
+                                                class="rounded border-gray-300"
+                                            >
+
+                                            <span class="text-sm text-gray-700">
+                                                {{ $specialization }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-sm text-gray-500">
+                                    Brak dostępnych specjalizacji. Administrator powinien dodać specjalizacje w systemie.
                                 </p>
                             @endif
                         </div>
-                    </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">
+                                Tagi / obszary pomocy
+                            </h3>
+
+                            @php
+                                $doctorHelpTags = $doctor->helpTags
+                                    ->pluck('id')
+                                    ->toArray();
+
+                                $selectedHelpTags = old('help_tags', $doctorHelpTags);
+                            @endphp
+
+                            @if ($helpTags->count() > 0)
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    @foreach ($helpTags as $tag)
+                                        <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
+                                            <input
+                                                type="checkbox"
+                                                name="help_tags[]"
+                                                value="{{ $tag->id }}"
+                                                @checked(in_array($tag->id, $selectedHelpTags))
+                                                class="rounded border-gray-300"
+                                            >
+
+                                            <span class="text-sm text-gray-700">
+                                                {{ $tag->tag_name }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-sm text-gray-500">
+                                    Brak dostępnych tagów. Administrator powinien dodać tagi w systemie.
+                                </p>
+                            @endif
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                        >
+                            Zapisz profil
+                        </button>
+                    </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-sm">
