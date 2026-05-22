@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NfzComparisonController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -86,6 +87,12 @@ Route::post('/appointments/{appointment}/review', [ReviewController::class, 'sto
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
+
+Route::get('/nfz-comparison', [NfzComparisonController::class, 'index'])
+    ->name('nfz.comparison');
+
+Route::get('/nfz-comparison/compare', [NfzComparisonController::class, 'compare'])
+    ->name('nfz.compare');
 
 Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
     ->middleware(['auth', 'role:doctor,admin'])
