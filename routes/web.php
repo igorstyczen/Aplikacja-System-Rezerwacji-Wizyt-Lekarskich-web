@@ -98,6 +98,22 @@ Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.schedule');
 
+Route::post('/doctor/schedule', [DoctorDashboardController::class, 'storeScheduleSlots'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.store');
+
+Route::get('/doctor/schedule/{slot}/edit', [DoctorDashboardController::class, 'editScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.edit');
+
+Route::put('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'updateScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.update');
+
+Route::delete('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'deleteScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.destroy');
+
 Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.appointments');

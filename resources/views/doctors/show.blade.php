@@ -159,7 +159,7 @@
                     Wybierz usługę, a następnie dostępny termin wizyty.
                 </p>
 
-                @if ($doctor->services->count() > 0 && $availableSlots->count() > 0)
+                @if ($doctor->services->count() > 0 && $availabilitySlots->count() > 0)
                     <form method="POST" action="{{ route('appointments.store') }}" id="bookingForm">
                         @csrf
 
@@ -191,24 +191,56 @@
                         </div>
 
                         <div class="mb-4">
-                            <h4 class="font-semibold text-gray-900 mb-4">
-                                Wybierz termin
-                            </h4>
+                            <div class="flex items-center justify-between gap-4 mb-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">
+                                        Wybierz termin
+                                    </h4>
 
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                @foreach ($availableSlots->take(8) as $date => $slots)
+                                    <p class="text-sm text-gray-500">
+                                        Tydzień:
+                                        {{ $weekStart->format('d.m.Y') }}
+                                        -
+                                        {{ $weekEnd->format('d.m.Y') }}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    @if ($week > 0)
+                                        <a
+                                            href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week - 1]) }}"
+                                            class="px-3 py-2 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
+                                        >
+                                            ← Poprzedni tydzień
+                                        </a>
+                                    @endif
+
+                                    @if ($week < 4)
+                                        <a
+                                            href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week + 1]) }}"
+                                            class="px-3 py-2 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
+                                        >
+                                            Następny tydzień →
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
+                                @foreach ($availabilitySlots as $date => $slots)
                                     @php
-                                        $firstSlot = $slots->first();
+                                        $day = \Carbon\Carbon::parse($date);
+                                        $dayId = 'day-' . $day->format('Ymd');
                                     @endphp
 
                                     <div class="border border-gray-200 rounded-xl p-4 day-card">
                                         <div class="text-center border-b border-gray-100 pb-3 mb-3">
                                             <p class="font-semibold text-gray-900">
-                                                {{ $firstSlot->start_time->translatedFormat('D') }}
+                                                {{ ucfirst($day->locale('pl')->isoFormat('dddd')) }}
                                             </p>
 
                                             <p class="text-sm text-gray-500">
-                                                {{ $firstSlot->start_time->format('d.m') }}
+                                                {{ $day->format('d.m') }}
                                             </p>
                                         </div>
 
@@ -218,6 +250,7 @@
                                                     class="slot-option block cursor-pointer"
                                                     data-clinic-id="{{ $slot->clinic_id }}"
                                                     data-extra="{{ $index >= 4 ? '1' : '0' }}"
+                                                    data-day-id="{{ $dayId }}"
                                                     style="{{ $index >= 4 ? 'display: none;' : '' }}"
                                                 >
                                                     <input
@@ -246,6 +279,7 @@
                                             <button
                                                 type="button"
                                                 class="show-more-slots w-full text-sm text-emerald-700 font-semibold mt-4 hover:text-emerald-900"
+                                                data-day-id="{{ $dayId }}"
                                             >
                                                 Pokaż więcej godzin
                                             </button>
@@ -257,7 +291,7 @@
 
                         <div style="margin-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
                             <p class="text-sm text-gray-500">
-                                Po kliknięciu system utworzy rezerwację wybranego terminu.
+                                Po kliknięciu system wstępnie zablokuje wybrany termin i przeniesie Cię do płatności.
                             </p>
 
                             <button
@@ -273,9 +307,31 @@
                         Ten lekarz nie ma jeszcze dodanych usług.
                     </p>
                 @else
-                    <p class="text-gray-500">
-                        Brak wolnych terminów.
-                    </p>
+                    <div class="flex items-center justify-between gap-4">
+                        <p class="text-gray-500">
+                            Brak wolnych terminów w tym tygodniu.
+                        </p>
+
+                        <div class="flex gap-2">
+                            @if ($week > 0)
+                                <a
+                                    href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week - 1]) }}"
+                                    class="px-3 py-2 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
+                                >
+                                    ← Poprzedni tydzień
+                                </a>
+                            @endif
+
+                            @if ($week < 4)
+                                <a
+                                    href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week + 1]) }}"
+                                    class="px-3 py-2 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
+                                >
+                                    Następny tydzień →
+                                </a>
+                            @endif
+                        </div>
+                    </div>
                 @endif
             </div>
 
@@ -360,6 +416,10 @@
             });
 
             function filterSlotsByService() {
+                if (!serviceSelect) {
+                    return;
+                }
+
                 const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
                 const selectedClinicId = selectedOption ? selectedOption.dataset.clinicId : null;
 
@@ -395,15 +455,28 @@
                     const dayCard = button.closest('.day-card');
                     const hiddenSlots = dayCard.querySelectorAll('.slot-option[data-extra="1"]');
 
-                    hiddenSlots.forEach(function (slotOption) {
-                        slotOption.dataset.expanded = '1';
+                    const isExpanded = button.dataset.expanded === '1';
 
-                        if (slotOption.dataset.availableForService !== '0') {
-                            slotOption.style.display = 'block';
+                    hiddenSlots.forEach(function (slotOption) {
+                        if (isExpanded) {
+                            slotOption.dataset.expanded = '0';
+                            slotOption.style.display = 'none';
+                        } else {
+                            slotOption.dataset.expanded = '1';
+
+                            if (slotOption.dataset.availableForService !== '0') {
+                                slotOption.style.display = 'block';
+                            }
                         }
                     });
 
-                    button.style.display = 'none';
+                    if (isExpanded) {
+                        button.dataset.expanded = '0';
+                        button.textContent = 'Pokaż więcej godzin';
+                    } else {
+                        button.dataset.expanded = '1';
+                        button.textContent = 'Pokaż mniej godzin';
+                    }
                 });
             });
 
