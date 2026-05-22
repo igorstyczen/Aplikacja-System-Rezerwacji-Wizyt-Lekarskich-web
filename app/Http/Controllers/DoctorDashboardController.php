@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\DoctorSpecialization;
 use App\Models\HelpTag;
+use App\Models\Specialization;
+use App\Models\Service;
 
 class DoctorDashboardController extends Controller
 {
@@ -322,6 +324,128 @@ class DoctorDashboardController extends Controller
         ]);
 
         return back()->with('success', 'Wizyta została zakończona.');
+    }
+
+    public function services()
+    {
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            return view('doctor.services', [
+                'doctor' => null,
+                'services' => collect(),
+                'clinics' => collect(),
+                'message' => 'Nie masz profilu lekarza.',
+            ]);
+        }
+
+        $doctor->load('clinics');
+
+        $services = Service::with('clinic')
+            ->where('doctor_id', $doctor->id)
+            ->orderBy('name')
+            ->get();
+
+        return view('doctor.services', [
+            'doctor' => $doctor,
+            'services' => $services,
+            'clinics' => $doctor->clinics,
+            'message' => null,
+        ]);
+    }
+
+    public function storeService(Request $request)
+    {
+        $request->validate([
+            'clinic_id' => ['required', 'exists:clinics,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999'],
+            'duration_minutes' => ['required', 'integer', 'min:10', 'max:240'],
+        ]);
+
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            abort(403);
+        }
+
+        $clinicBelongsToDoctor = $doctor->clinics()
+            ->where('clinics.id', $request->clinic_id)
+            ->exists();
+
+        if (! $clinicBelongsToDoctor) {
+            return back()->withErrors([
+                'clinic_id' => 'Nie możesz dodać usługi do kliniki, która nie jest przypisana do Twojego profilu.',
+            ]);
+        }
+
+        Service::create([
+            'doctor_id' => $doctor->id,
+            'clinic_id' => $request->clinic_id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'duration_minutes' => $request->duration_minutes,
+        ]);
+
+        return back()->with('success', 'Usługa została dodana.');
+    }
+
+    public function updateService(Request $request, Service $service)
+    {
+        $request->validate([
+            'clinic_id' => ['required', 'exists:clinics,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999'],
+            'duration_minutes' => ['required', 'integer', 'min:10', 'max:240'],
+        ]);
+
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor || $service->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
+        $clinicBelongsToDoctor = $doctor->clinics()
+            ->where('clinics.id', $request->clinic_id)
+            ->exists();
+
+        if (! $clinicBelongsToDoctor) {
+            return back()->withErrors([
+                'clinic_id' => 'Nie możesz przypisać usługi do kliniki, która nie jest przypisana do Twojego profilu.',
+            ]);
+        }
+
+        $service->update([
+            'clinic_id' => $request->clinic_id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'duration_minutes' => $request->duration_minutes,
+        ]);
+
+        return back()->with('success', 'Usługa została zaktualizowana.');
+    }
+
+    public function deleteService(Service $service)
+    {
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor || $service->doctor_id !== $doctor->id) {
+            abort(403);
+        }
+
+        if ($service->appointments()->exists()) {
+            return back()->withErrors([
+                'service' => 'Nie można usunąć usługi, która została już użyta w wizycie.',
+            ]);
+        }
+
+        $service->delete();
+
+        return back()->with('success', 'Usługa została usunięta.');
     }
 
     public function profile()

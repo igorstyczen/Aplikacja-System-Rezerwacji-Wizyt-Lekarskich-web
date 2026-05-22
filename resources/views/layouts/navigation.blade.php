@@ -50,6 +50,10 @@
                                 Mój grafik
                             </x-nav-link>
 
+                            <x-nav-link :href="route('doctor.services')" :active="request()->routeIs('doctor.services')">
+                                Moje usługi
+                            </x-nav-link>
+
                             <x-nav-link :href="route('doctor.profile')" :active="request()->routeIs('doctor.profile')">
                                 Profil lekarza
                             </x-nav-link>
@@ -159,9 +163,13 @@
                         Mój grafik
                     </x-responsive-nav-link>
 
-                    <x-nav-link :href="route('doctor.profile')" :active="request()->routeIs('doctor.profile')">
+                    <x-responsive-nav-link :href="route('doctor.services')" :active="request()->routeIs('doctor.services')">
+                        Moje usługi
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('doctor.profile')" :active="request()->routeIs('doctor.profile')">
                         Profil lekarza
-                    </x-nav-link>
+                    </x-responsive-nav-link>
 
                     <x-responsive-nav-link :href="route('doctor.appointments')" :active="request()->routeIs('doctor.appointments')">
                         Wizyty pacjentów
