@@ -12,6 +12,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NfzComparisonController;
+use App\Http\Controllers\AdminDictionaryController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -77,6 +78,38 @@ Route::patch('/admin/users/{user}/toggle-active', [AdminDashboardController::cla
     ->middleware(['auth', 'role:admin'])
     ->name('admin.users.toggle-active');
 
+Route::get('/admin/specializations', [AdminDictionaryController::class, 'specializations'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations');
+
+Route::post('/admin/specializations', [AdminDictionaryController::class, 'storeSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.store');
+
+Route::put('/admin/specializations/{specialization}', [AdminDictionaryController::class, 'updateSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.update');
+
+Route::delete('/admin/specializations/{specialization}', [AdminDictionaryController::class, 'deleteSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.delete');
+
+Route::get('/admin/help-tags', [AdminDictionaryController::class, 'helpTags'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags');
+
+Route::post('/admin/help-tags', [AdminDictionaryController::class, 'storeHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.store');
+
+Route::put('/admin/help-tags/{helpTag}', [AdminDictionaryController::class, 'updateHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.update');
+
+Route::delete('/admin/help-tags/{helpTag}', [AdminDictionaryController::class, 'deleteHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.delete');
+
 Route::get('/appointments/{appointment}/review', [ReviewController::class, 'create'])
     ->middleware(['auth', 'role:patient,admin'])
     ->name('reviews.create');
@@ -113,6 +146,22 @@ Route::put('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'update
 Route::delete('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'deleteScheduleSlot'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.schedule.destroy');
+
+Route::get('/doctor/services', [DoctorDashboardController::class, 'services'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services');
+
+Route::post('/doctor/services', [DoctorDashboardController::class, 'storeService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.store');
+
+Route::put('/doctor/services/{service}', [DoctorDashboardController::class, 'updateService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.update');
+
+Route::delete('/doctor/services/{service}', [DoctorDashboardController::class, 'deleteService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.delete');
 
 Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
     ->middleware(['auth', 'role:doctor,admin'])
