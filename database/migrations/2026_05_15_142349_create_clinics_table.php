@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('clinics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('doctor_id')->constrained('doctors')->cascadeOnDelete();
+            $table->foreignId('doctor_id')->nullable()->constrained('doctors')->nullOnDelete();
             $table->string('name');
             $table->string('address');
             $table->string('city');

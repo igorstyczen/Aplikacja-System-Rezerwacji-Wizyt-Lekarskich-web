@@ -20,7 +20,11 @@ return new class extends Migration
         }
 
         if (Schema::hasColumn('clinics', 'doctor_id')) {
-            DB::statement('ALTER TABLE clinics MODIFY doctor_id BIGINT UNSIGNED NULL');
+            $driver = Schema::getConnection()->getDriverName();
+
+            if (in_array($driver, ['mysql', 'mariadb'])) {
+                DB::statement('ALTER TABLE clinics MODIFY doctor_id BIGINT UNSIGNED NULL');
+            }
         }
 
         if (Schema::hasTable('clinic_doctor') && Schema::hasColumn('clinics', 'doctor_id')) {
@@ -51,7 +55,11 @@ return new class extends Migration
         Schema::dropIfExists('clinic_doctor');
 
         if (Schema::hasColumn('clinics', 'doctor_id')) {
-            DB::statement('ALTER TABLE clinics MODIFY doctor_id BIGINT UNSIGNED NOT NULL');
+            $driver = Schema::getConnection()->getDriverName();
+
+            if (in_array($driver, ['mysql', 'mariadb'])) {
+                DB::statement('ALTER TABLE clinics MODIFY doctor_id BIGINT UNSIGNED NOT NULL');
+            }
         }
     }
 };
