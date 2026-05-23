@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\AvailabilitySlot;
+use App\Models\Clinic;
 use App\Models\Doctor;
+use App\Models\DoctorSpecialization;
+use App\Models\HelpTag;
+use App\Models\Service;
+use App\Models\Specialization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\DoctorSpecialization;
-use App\Models\HelpTag;
-use App\Models\Specialization;
-use App\Models\Service;
 
 class DoctorDashboardController extends Controller
 {
@@ -28,7 +29,10 @@ class DoctorDashboardController extends Controller
             ]);
         }
 
-        $doctor->load('clinics');
+        $clinics = Clinic::query()
+            ->orderBy('city')
+            ->orderBy('name')
+            ->get();
 
         $slots = AvailabilitySlot::with('clinic')
             ->where('doctor_id', $doctor->id)
@@ -38,7 +42,7 @@ class DoctorDashboardController extends Controller
         return view('doctor.schedule', [
             'doctor' => $doctor,
             'slots' => $slots,
-            'clinics' => $doctor->clinics,
+            'clinics' => $clinics,
             'message' => null,
         ]);
     }
@@ -60,27 +64,10 @@ class DoctorDashboardController extends Controller
             abort(403);
         }
 
-        $clinicBelongsToDoctor = $doctor->clinics()
-            ->where('clinics.id', $request->clinic_id)
-            ->exists();
-
-        if (! $clinicBelongsToDoctor) {
-            return back()->withErrors([
-                'clinic_id' => 'Nie możesz dodać terminu do kliniki, która nie jest przypisana do Twojego profilu.',
-            ]);
-        }
+        $doctor->clinics()->syncWithoutDetaching([$request->clinic_id]);
 
         $baseDate = \Carbon\Carbon::parse($request->date);
         $duration = (int) $request->slot_duration;
-
-        /*
-            Jeżeli repeat_weekly jest zaznaczone:
-            - tworzymy terminy dla wybranego dnia
-            - oraz dla tego samego dnia tygodnia przez kolejne 4 tygodnie
-
-            Czyli np. poniedziałek:
-            25.05, 01.06, 08.06, 15.06, 22.06
-        */
         $weeksToCreate = $request->boolean('repeat_weekly') ? 4 : 0;
 
         $createdSlots = 0;
@@ -100,7 +87,6 @@ class DoctorDashboardController extends Controller
                     $slotEnd = $current->copy()->addMinutes($duration);
 
                     $exists = AvailabilitySlot::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $request->clinic_id)
                         ->where(function ($query) use ($slotStart, $slotEnd) {
                             $query->where('start_time', '<', $slotEnd)
                                 ->where('end_time', '>', $slotStart);
@@ -161,12 +147,15 @@ class DoctorDashboardController extends Controller
                 ]);
         }
 
-        $doctor->load('clinics');
+        $clinics = Clinic::query()
+            ->orderBy('city')
+            ->orderBy('name')
+            ->get();
 
         return view('doctor.edit-schedule-slot', [
             'doctor' => $doctor,
             'slot' => $slot,
-            'clinics' => $doctor->clinics,
+            'clinics' => $clinics,
         ]);
     }
 
@@ -193,15 +182,7 @@ class DoctorDashboardController extends Controller
                 ]);
         }
 
-        $clinicBelongsToDoctor = $doctor->clinics()
-            ->where('clinics.id', $request->clinic_id)
-            ->exists();
-
-        if (! $clinicBelongsToDoctor) {
-            return back()->withErrors([
-                'clinic_id' => 'Nie możesz przypisać terminu do kliniki, która nie jest przypisana do Twojego profilu.',
-            ]);
-        }
+        $doctor->clinics()->syncWithoutDetaching([$request->clinic_id]);
 
         $slotStart = \Carbon\Carbon::parse($request->date . ' ' . $request->start_time);
         $slotEnd = \Carbon\Carbon::parse($request->date . ' ' . $request->end_time);
@@ -339,7 +320,10 @@ class DoctorDashboardController extends Controller
             ]);
         }
 
-        $doctor->load('clinics');
+        $clinics = Clinic::query()
+            ->orderBy('city')
+            ->orderBy('name')
+            ->get();
 
         $services = Service::with('clinic')
             ->where('doctor_id', $doctor->id)
@@ -349,7 +333,7 @@ class DoctorDashboardController extends Controller
         return view('doctor.services', [
             'doctor' => $doctor,
             'services' => $services,
-            'clinics' => $doctor->clinics,
+            'clinics' => $clinics,
             'message' => null,
         ]);
     }
@@ -370,15 +354,7 @@ class DoctorDashboardController extends Controller
             abort(403);
         }
 
-        $clinicBelongsToDoctor = $doctor->clinics()
-            ->where('clinics.id', $request->clinic_id)
-            ->exists();
-
-        if (! $clinicBelongsToDoctor) {
-            return back()->withErrors([
-                'clinic_id' => 'Nie możesz dodać usługi do kliniki, która nie jest przypisana do Twojego profilu.',
-            ]);
-        }
+        $doctor->clinics()->syncWithoutDetaching([$request->clinic_id]);
 
         Service::create([
             'doctor_id' => $doctor->id,
@@ -408,15 +384,7 @@ class DoctorDashboardController extends Controller
             abort(403);
         }
 
-        $clinicBelongsToDoctor = $doctor->clinics()
-            ->where('clinics.id', $request->clinic_id)
-            ->exists();
-
-        if (! $clinicBelongsToDoctor) {
-            return back()->withErrors([
-                'clinic_id' => 'Nie możesz przypisać usługi do kliniki, która nie jest przypisana do Twojego profilu.',
-            ]);
-        }
+        $doctor->clinics()->syncWithoutDetaching([$request->clinic_id]);
 
         $service->update([
             'clinic_id' => $request->clinic_id,
@@ -466,11 +434,9 @@ class DoctorDashboardController extends Controller
             'helpTags',
         ]);
 
-        $availableSpecializations = DoctorSpecialization::query()
-            ->select('specialization_name')
-            ->distinct()
-            ->orderBy('specialization_name')
-            ->pluck('specialization_name');
+        $availableSpecializations = Specialization::query()
+            ->orderBy('name')
+            ->get();
 
         $helpTags = HelpTag::query()
             ->orderBy('tag_name')
@@ -491,7 +457,7 @@ class DoctorDashboardController extends Controller
             'is_for_adults' => ['nullable', 'boolean'],
             'is_for_children' => ['nullable', 'boolean'],
             'specializations' => ['nullable', 'array'],
-            'specializations.*' => ['string', 'max:255'],
+            'specializations.*' => ['integer', 'exists:specializations,id'],
             'help_tags' => ['nullable', 'array'],
             'help_tags.*' => ['integer', 'exists:help_tags,id'],
         ]);
@@ -511,11 +477,16 @@ class DoctorDashboardController extends Controller
 
             $doctor->specializations()->delete();
 
-            foreach ($request->input('specializations', []) as $specializationName) {
-                DoctorSpecialization::create([
-                    'doctor_id' => $doctor->id,
-                    'specialization_name' => $specializationName,
-                ]);
+            foreach ($request->input('specializations', []) as $specializationId) {
+                $specialization = Specialization::find($specializationId);
+
+                if ($specialization) {
+                    DoctorSpecialization::create([
+                        'doctor_id' => $doctor->id,
+                        'specialization_id' => $specialization->id,
+                        'specialization_name' => $specialization->name,
+                    ]);
+                }
             }
 
             $doctor->helpTags()->sync($request->input('help_tags', []));

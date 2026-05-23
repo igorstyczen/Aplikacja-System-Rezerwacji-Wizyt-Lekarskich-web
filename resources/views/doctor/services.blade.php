@@ -68,6 +68,10 @@
                                             </option>
                                         @endforeach
                                     </select>
+
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Po wybraniu kliniki system automatycznie przypisze Cię do tej kliniki.
+                                    </p>
                                 </div>
 
                                 <div>
@@ -148,7 +152,7 @@
                         </form>
                     @else
                         <p class="text-gray-600">
-                            Nie masz przypisanej żadnej kliniki. Najpierw administrator musi przypisać klinikę do Twojego profilu.
+                            Brak klinik w systemie. Administrator musi najpierw dodać przynajmniej jedną klinikę.
                         </p>
                     @endif
                 </div>
@@ -185,6 +189,10 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+
+                                                <p class="text-xs text-gray-500 mt-1">
+                                                    Zmiana kliniki automatycznie przypisze Cię do wybranej kliniki.
+                                                </p>
                                             </div>
 
                                             <div>
