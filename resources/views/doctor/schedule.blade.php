@@ -173,8 +173,7 @@
                         </form>
                     @else
                         <p class="text-gray-600">
-                            Nie masz przypisanej żadnej kliniki. Najpierw administrator musi przypisać klinikę do Twojego profilu.
-                        </p>
+                            Brak klinik w systemie. Administrator musi najpierw dodać przynajmniej jedną klinikę.                        </p>
                     @endif
                 </div>
             @endif
