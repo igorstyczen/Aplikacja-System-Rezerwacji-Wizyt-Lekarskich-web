@@ -11,30 +11,37 @@ class NfzApiService
 
     public function searchQueues(string $benefit, string $locality, string $province, int $case = 1): array
     {
-        $response = Http::timeout(15)
-            ->acceptJson()
-            ->get($this->baseUrl . '/queues', [
-                'page' => 1,
-                'limit' => 10,
-                'format' => 'json',
-                'case' => $case,
-                'province' => $province,
-                'benefit' => $benefit,
-                'locality' => $locality,
-            ]);
-
-        if (! $response->successful()) {
+        try {
+            $response = Http::timeout(15)
+                ->acceptJson()
+                ->get($this->baseUrl . '/queues', [
+                    'page' => 1,
+                    'limit' => 25,
+                    'format' => 'json',
+                    'case' => $case,
+                    'province' => $province,
+                    'benefit' => $benefit,
+                    'locality' => $locality,
+                ]);
+        } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Nie udało się pobrać danych z API NFZ.',
+                'message' => 'Nie udało się połączyć z API NFZ.',
                 'items' => [],
                 'nearest' => null,
             ];
         }
 
-        $data = $response->json('data', []);
+        if (! $response->successful()) {
+            return [
+                'success' => false,
+                'message' => 'API NFZ nie zwróciło poprawnej odpowiedzi.',
+                'items' => [],
+                'nearest' => null,
+            ];
+        }
 
-        $items = collect($data)
+        $items = collect($response->json('data', []))
             ->map(function ($item) {
                 $attributes = $item['attributes'] ?? [];
 
@@ -55,17 +62,17 @@ class NfzApiService
                 ];
             })
             ->filter(fn ($item) => ! empty($item['date']))
-            ->sortBy('date')
+            ->sortBy(function ($item) {
+                return Carbon::parse($item['date']);
+            })
             ->values()
             ->all();
-
-        $nearest = $items[0] ?? null;
 
         return [
             'success' => true,
             'message' => null,
             'items' => $items,
-            'nearest' => $nearest,
+            'nearest' => $items[0] ?? null,
         ];
     }
 
