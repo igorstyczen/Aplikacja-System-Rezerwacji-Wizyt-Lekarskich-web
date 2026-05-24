@@ -121,7 +121,8 @@
 
                             @php
                                 $doctorSpecializations = $doctor->specializations
-                                    ->pluck('specialization_name')
+                                    ->pluck('specialization_id')
+                                    ->filter()
                                     ->toArray();
 
                                 $selectedSpecializations = old('specializations', $doctorSpecializations);
@@ -134,13 +135,13 @@
                                             <input
                                                 type="checkbox"
                                                 name="specializations[]"
-                                                value="{{ $specialization }}"
-                                                @checked(in_array($specialization, $selectedSpecializations))
+                                                value="{{ $specialization->id }}"
+                                                @checked(in_array($specialization->id, $selectedSpecializations))
                                                 class="rounded border-gray-300"
                                             >
 
                                             <span class="text-sm text-gray-700">
-                                                {{ $specialization }}
+                                                {{ $specialization->name }}
                                             </span>
                                         </label>
                                     @endforeach
