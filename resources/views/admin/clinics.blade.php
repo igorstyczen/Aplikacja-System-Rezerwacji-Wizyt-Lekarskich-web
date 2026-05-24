@@ -5,45 +5,53 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1180px; margin: 0 auto;">
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #2563eb; font-size: 14px; font-weight: 800; margin-bottom: 8px;">
+                    Panel administratora
+                </p>
+
+                <h1 style="font-size: 30px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                     Zarządzanie klinikami
                 </h1>
 
-                <p class="text-gray-600">
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7;">
                     Administrator dodaje kliniki i przypisuje do nich wielu lekarzy.
                     Lekarz później wybiera przypisane kliniki przy tworzeniu usług oraz grafiku.
                 </p>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Dodaj klinikę
                 </h2>
 
-                <form method="POST" action="{{ route('admin.clinics.store') }}" class="space-y-4">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
+                    Dodaj nową placówkę i opcjonalnie przypisz do niej lekarzy.
+                </p>
+
+                <form method="POST" action="{{ route('admin.clinics.store') }}" style="display: flex; flex-direction: column; gap: 24px;">
                     @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Nazwa kliniki
                             </label>
 
@@ -53,12 +61,12 @@
                                 value="{{ old('name') }}"
                                 placeholder="np. Klinika Ortopedyczna"
                                 required
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Miasto
                             </label>
 
@@ -68,12 +76,12 @@
                                 value="{{ old('city') }}"
                                 placeholder="np. Kraków"
                                 required
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Adres
                             </label>
 
@@ -83,13 +91,13 @@
                                 value="{{ old('address') }}"
                                 placeholder="np. Jana Dekerta 18/2"
                                 required
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                             Szczegóły
                         </label>
 
@@ -97,90 +105,115 @@
                             name="details"
                             rows="3"
                             placeholder="Dodatkowe informacje o klinice."
-                            class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-size: 14px; resize: vertical;"
                         >{{ old('details') }}</textarea>
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">
+                        <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 12px;">
                             Przypisz lekarzy do kliniki
                         </h3>
 
                         @if ($doctors->count() > 0)
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
                                 @foreach ($doctors as $doctor)
-                                    <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
+                                    <label style="display: flex; align-items: center; gap: 10px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; background: #f9fafb; cursor: pointer;">
                                         <input
                                             type="checkbox"
                                             name="doctors[]"
                                             value="{{ $doctor->id }}"
                                             @checked(in_array($doctor->id, old('doctors', [])))
-                                            class="rounded border-gray-300"
                                         >
 
-                                        <span class="text-sm text-gray-700">
+                                        <span style="font-size: 14px; font-weight: 700; color: #374151;">
                                             Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
                                         </span>
                                     </label>
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-sm text-gray-500">
+                            <p style="font-size: 14px; color: #6b7280;">
                                 Brak lekarzy w systemie.
                             </p>
                         @endif
                     </div>
 
-                    <button
-                        type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                    >
-                        Dodaj klinikę
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 18px; padding-top: 4px;">
+                        <button
+                            type="submit"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 8px 16px rgba(37, 99, 235, 0.18);"
+                        >
+                            Dodaj klinikę
+                        </button>
+                    </div>
                 </form>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Filtry
                 </h2>
 
-                <form method="GET" action="{{ route('admin.clinics') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <input
-                        type="text"
-                        name="name"
-                        value="{{ request('name') }}"
-                        placeholder="Nazwa kliniki"
-                        class="border-gray-300 rounded-md shadow-sm text-sm"
-                    >
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                    Wyszukaj klinikę po nazwie, mieście lub przypisanym lekarzu.
+                </p>
 
-                    <input
-                        type="text"
-                        name="city"
-                        value="{{ request('city') }}"
-                        placeholder="Miasto"
-                        class="border-gray-300 rounded-md shadow-sm text-sm"
-                    >
+                <form method="GET" action="{{ route('admin.clinics') }}" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px;">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Nazwa kliniki
+                            </label>
 
-                    <input
-                        type="text"
-                        name="doctor"
-                        value="{{ request('doctor') }}"
-                        placeholder="Lekarz"
-                        class="border-gray-300 rounded-md shadow-sm text-sm"
-                    >
+                            <input
+                                type="text"
+                                name="name"
+                                value="{{ request('name') }}"
+                                placeholder="np. Przychodnia"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                        </div>
 
-                    <div class="flex gap-2">
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Miasto
+                            </label>
+
+                            <input
+                                type="text"
+                                name="city"
+                                value="{{ request('city') }}"
+                                placeholder="np. Rzeszów"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Lekarz
+                            </label>
+
+                            <input
+                                type="text"
+                                name="doctor"
+                                value="{{ request('doctor') }}"
+                                placeholder="np. Kowalski"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 18px;">
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 22px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
                         >
                             Filtruj
                         </button>
 
                         <a
                             href="{{ route('admin.clinics') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 22px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 10px; text-decoration: none;"
                         >
                             Wyczyść
                         </a>
@@ -188,152 +221,179 @@
                 </form>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                @if ($clinics->count() > 0)
-                    <div class="divide-y divide-gray-200">
-                        @foreach ($clinics as $clinic)
-                            @php
-                                $assignedDoctors = $clinic->doctors->pluck('id')->toArray();
-                            @endphp
+            @if ($clinics->count() > 0)
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    @foreach ($clinics as $clinic)
+                        @php
+                            $assignedDoctors = $clinic->doctors->pluck('id')->toArray();
+                        @endphp
 
-                            <div class="p-6">
-                                <form method="POST" action="{{ route('admin.clinics.update', $clinic) }}" class="space-y-4">
-                                    @csrf
-                                    @method('PUT')
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px;">
+                                <div>
+                                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 8px;">
+                                        {{ $clinic->name }}
+                                    </h2>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Nazwa kliniki
-                                            </label>
+                                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 4px;">
+                                        {{ $clinic->address }}, {{ $clinic->city }}
+                                    </p>
 
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value="{{ $clinic->name }}"
-                                                required
-                                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                                            >
-                                        </div>
+                                    @if ($clinic->details)
+                                        <p style="font-size: 14px; color: #6b7280;">
+                                            {{ $clinic->details }}
+                                        </p>
+                                    @endif
+                                </div>
 
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Miasto
-                                            </label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; max-width: 420px;">
+                                    @forelse ($clinic->doctors as $assignedDoctor)
+                                        <span style="padding: 6px 10px; background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                            Dr {{ $assignedDoctor->first_name }} {{ $assignedDoctor->last_name }}
+                                        </span>
+                                    @empty
+                                        <span style="padding: 6px 10px; background: #f3f4f6; color: #6b7280; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                            Brak przypisanych lekarzy
+                                        </span>
+                                    @endforelse
+                                </div>
+                            </div>
 
-                                            <input
-                                                type="text"
-                                                name="city"
-                                                value="{{ $clinic->city }}"
-                                                required
-                                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                                            >
-                                        </div>
+                            <form method="POST" action="{{ route('admin.clinics.update', $clinic) }}" style="display: flex; flex-direction: column; gap: 22px;">
+                                @csrf
+                                @method('PUT')
 
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Adres
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                name="address"
-                                                value="{{ $clinic->address }}"
-                                                required
-                                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                                            >
-                                        </div>
-                                    </div>
-
+                                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px;">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                                            Szczegóły
+                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                            Nazwa kliniki
                                         </label>
 
-                                        <textarea
-                                            name="details"
-                                            rows="3"
-                                            class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                                        >{{ $clinic->details }}</textarea>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value="{{ $clinic->name }}"
+                                            required
+                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                                        >
                                     </div>
 
                                     <div>
-                                        <h3 class="text-sm font-medium text-gray-700 mb-2">
-                                            Przypisani lekarze
-                                        </h3>
+                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                            Miasto
+                                        </label>
 
-                                        @if ($doctors->count() > 0)
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                                @foreach ($doctors as $doctor)
-                                                    <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="doctors[]"
-                                                            value="{{ $doctor->id }}"
-                                                            @checked(in_array($doctor->id, $assignedDoctors))
-                                                            class="rounded border-gray-300"
-                                                        >
-
-                                                        <span class="text-sm text-gray-700">
-                                                            Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
-                                                        </span>
-                                                    </label>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <p class="text-sm text-gray-500">
-                                                Brak lekarzy w systemie.
-                                            </p>
-                                        @endif
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-3 items-center">
-                                        <button
-                                            type="submit"
-                                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            value="{{ $clinic->city }}"
+                                            required
+                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                                         >
-                                            Zapisz zmiany
-                                        </button>
-                                </form>
-
-                                        @if (
-                                            ! $clinic->services()->exists()
-                                            && ! $clinic->availabilitySlots()->exists()
-                                            && ! $clinic->appointments()->exists()
-                                        )
-                                            <form method="POST" action="{{ route('admin.clinics.delete', $clinic) }}">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    onclick="return confirm('Czy na pewno chcesz usunąć tę klinikę?')"
-                                                    class="px-4 py-2 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200"
-                                                >
-                                                    Usuń
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="text-sm text-gray-400">
-                                                Nie można usunąć — klinika jest używana w systemie.
-                                            </span>
-                                        @endif
                                     </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="p-6">
-                        <p class="text-gray-600">
-                            Brak klinik do wyświetlenia.
-                        </p>
-                    </div>
-                @endif
-            </div>
 
-            <div class="mt-6">
-                {{ $clinics->links() }}
-            </div>
+                                    <div>
+                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                            Adres
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value="{{ $clinic->address }}"
+                                            required
+                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                        Szczegóły
+                                    </label>
+
+                                    <textarea
+                                        name="details"
+                                        rows="3"
+                                        style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-size: 14px; resize: vertical;"
+                                    >{{ $clinic->details }}</textarea>
+                                </div>
+
+                                <div>
+                                    <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 12px;">
+                                        Przypisani lekarze
+                                    </h3>
+
+                                    @if ($doctors->count() > 0)
+                                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+                                            @foreach ($doctors as $doctor)
+                                                <label style="display: flex; align-items: center; gap: 10px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; background: #f9fafb; cursor: pointer;">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="doctors[]"
+                                                        value="{{ $doctor->id }}"
+                                                        @checked(in_array($doctor->id, $assignedDoctors))
+                                                    >
+
+                                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                                        Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
+                                                    </span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <p style="font-size: 14px; color: #6b7280;">
+                                            Brak lekarzy w systemie.
+                                        </p>
+                                    @endif
+                                </div>
+
+                                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding-top: 4px;">
+                                    <button
+                                        type="submit"
+                                        style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 22px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
+                                    >
+                                        Zapisz zmiany
+                                    </button>
+                            </form>
+
+                                    @if (
+                                        ! $clinic->services()->exists()
+                                        && ! $clinic->availabilitySlots()->exists()
+                                        && ! $clinic->appointments()->exists()
+                                    )
+                                        <form method="POST" action="{{ route('admin.clinics.delete', $clinic) }}">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button
+                                                type="submit"
+                                                onclick="return confirm('Czy na pewno chcesz usunąć tę klinikę?')"
+                                                style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 22px; background: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
+                                            >
+                                                Usuń klinikę
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span style="font-size: 14px; color: #9ca3af;">
+                                            Nie można usunąć — klinika jest używana w systemie.
+                                        </span>
+                                    @endif
+                                </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div style="margin-top: 28px;">
+                    {{ $clinics->links() }}
+                </div>
+            @else
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <p style="color: #6b7280;">
+                        Brak klinik do wyświetlenia.
+                    </p>
+                </div>
+            @endif
 
         </div>
     </div>
