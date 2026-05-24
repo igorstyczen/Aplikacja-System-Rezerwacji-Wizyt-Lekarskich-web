@@ -108,17 +108,17 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
+                    <div style="display: flex; align-items: center; gap: 18px; margin-top: 18px;">
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 22px; background: #2563eb; color: white; font-size: 14px; font-weight: 800; border-radius: 10px; border: none; cursor: pointer;"
                         >
                             Filtruj
                         </button>
 
                         <a
                             href="{{ route('admin.doctors') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 22px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 700; border-radius: 10px; text-decoration: none;"
                         >
                             Wyczyść
                         </a>

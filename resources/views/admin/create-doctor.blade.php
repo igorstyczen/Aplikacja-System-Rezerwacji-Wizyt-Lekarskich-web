@@ -1,233 +1,336 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Dodaj lekarza
             </h2>
 
-            <a href="{{ route('admin.doctors') }}" class="text-sm text-blue-600 hover:text-blue-800">
+            <a href="{{ route('admin.doctors') }}" style="font-size: 14px; color: #2563eb; text-decoration: none;">
                 ← Wróć do listy lekarzy
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1050px; margin: 0 auto;">
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 34px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #2563eb; font-size: 14px; font-weight: 800; margin-bottom: 8px;">
+                    Panel administratora
+                </p>
+
+                <h1 style="font-size: 30px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                     Nowy lekarz
                 </h1>
 
-                <p class="text-gray-600 mt-1">
-                    Formularz tworzy jednocześnie konto użytkownika z rolą doctor oraz profil lekarza.
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7;">
+                    Formularz tworzy konto użytkownika z rolą lekarza oraz kompletny profil lekarza ze specjalizacjami i tagami pomocy.
                 </p>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <form method="POST" action="{{ route('admin.doctors.store') }}" enctype="multipart/form-data">
-                    @csrf
+            <form method="POST" action="{{ route('admin.doctors.store') }}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 28px;">
+                @csrf
 
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                         Dane konta użytkownika
                     </h2>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
+                        Te dane służą do logowania lekarza do systemu.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Nazwa użytkownika
                             </label>
 
                             <input
                                 type="text"
-                                id="name"
                                 name="name"
                                 value="{{ old('name') }}"
                                 required
                                 placeholder="np. Jan Kowalski"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Email
                             </label>
 
                             <input
                                 type="email"
-                                id="email"
                                 name="email"
                                 value="{{ old('email') }}"
                                 required
-                                placeholder="np. doktor3@test.pl"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                placeholder="np. doktor@test.pl"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Numer telefonu
                             </label>
 
                             <input
                                 type="text"
-                                id="phone"
                                 name="phone"
                                 value="{{ old('phone') }}"
-                                placeholder="np. 123456789"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                maxlength="25"
+                                pattern="^(\+|00)?[0-9\s\-]{9,20}$"
+                                placeholder="np. 500 600 700 albo +48 500 600 700"
+                                title="Podaj poprawny numer telefonu, np. 500 600 700, +48 500 600 700 albo +380 123 456 789."
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
+
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                                Dozwolone formaty: 500 600 700, +48 500 600 700, +380 123 456 789 lub 0048 500 600 700.
+                            </p>
                         </div>
 
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Hasło
                             </label>
 
                             <input
                                 type="password"
-                                id="password"
                                 name="password"
                                 required
                                 placeholder="minimum 8 znaków"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
                     </div>
+                </div>
 
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                         Dane profilu lekarza
                     </h2>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
+                        Te informacje będą widoczne dla pacjentów.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Imię lekarza
                             </label>
 
                             <input
                                 type="text"
-                                id="first_name"
                                 name="first_name"
                                 value="{{ old('first_name') }}"
                                 required
                                 placeholder="np. Jan"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Nazwisko lekarza
                             </label>
 
                             <input
                                 type="text"
-                                id="last_name"
                                 name="last_name"
                                 value="{{ old('last_name') }}"
                                 required
                                 placeholder="np. Kowalski"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">
+                    <div style="margin-top: 28px;">
+                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 10px;">
                             Opis lekarza
                         </label>
 
                         <textarea
-                            id="bio"
                             name="bio"
-                            rows="5"
-                            class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                            rows="7"
                             placeholder="Opis lekarza widoczny na profilu..."
+                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-size: 14px; resize: vertical;"
                         >{{ old('bio') }}</textarea>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="photo" class="block text-sm font-medium text-gray-700 mb-1">
+                    <div style="margin-top: 28px;">
+                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 10px;">
                             Zdjęcie lekarza
                         </label>
 
                         <input
                             type="file"
-                            id="photo"
                             name="photo"
                             accept="image/jpeg,image/png,image/webp"
-                            class="w-full border border-gray-300 rounded-md shadow-sm text-sm p-2"
+                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px; background: white;"
                         >
 
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
                             Dozwolone formaty: JPG, PNG, WEBP. Maksymalnie 2 MB.
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input
-                                type="checkbox"
-                                name="is_for_adults"
-                                value="1"
-                                @checked(old('is_for_adults', true))
-                                class="rounded border-gray-300"
-                            >
-                            Przyjmuje dorosłych
-                        </label>
+                    <div style="margin-top: 28px;">
+                        <p style="font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 12px;">
+                            Ustawienia profilu
+                        </p>
 
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input
-                                type="checkbox"
-                                name="is_for_children"
-                                value="1"
-                                @checked(old('is_for_children'))
-                                class="rounded border-gray-300"
-                            >
-                            Przyjmuje dzieci
-                        </label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                            <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
+                                <input
+                                    type="checkbox"
+                                    name="is_for_adults"
+                                    value="1"
+                                    @checked(old('is_for_adults', true))
+                                >
 
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input
-                                type="checkbox"
-                                name="is_verified"
-                                value="1"
-                                @checked(old('is_verified'))
-                                class="rounded border-gray-300"
-                            >
-                            Lekarz zweryfikowany
-                        </label>
+                                <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                    Przyjmuje dorosłych
+                                </span>
+                            </label>
+
+                            <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
+                                <input
+                                    type="checkbox"
+                                    name="is_for_children"
+                                    value="1"
+                                    @checked(old('is_for_children'))
+                                >
+
+                                <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                    Przyjmuje dzieci
+                                </span>
+                            </label>
+
+                            <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
+                                <input
+                                    type="checkbox"
+                                    name="is_verified"
+                                    value="1"
+                                    @checked(old('is_verified', true))
+                                >
+
+                                <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                    Lekarz zweryfikowany
+                                </span>
+                            </label>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="flex gap-3">
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                        >
-                            Dodaj lekarza
-                        </button>
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                        Specjalizacje
+                    </h2>
 
-                        <a
-                            href="{{ route('admin.doctors') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
-                        >
-                            Anuluj
-                        </a>
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                        Wybierz jedną lub kilka specjalizacji lekarza.
+                    </p>
+
+                    @if ($specializations->count() > 0)
+                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+                            @foreach ($specializations as $specialization)
+                                <label style="display: flex; align-items: center; gap: 12px; border: 1px solid #e5e7eb; border-radius: 14px; padding: 15px 16px; background: #f9fafb; cursor: pointer;">
+                                    <input
+                                        type="checkbox"
+                                        name="specializations[]"
+                                        value="{{ $specialization->id }}"
+                                        @checked(in_array($specialization->id, old('specializations', [])))
+                                    >
+
+                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                        {{ $specialization->name }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        <p style="font-size: 14px; color: #b91c1c;">
+                            Brak specjalizacji w systemie. Najpierw dodaj specjalizacje w słowniku admina.
+                        </p>
+                    @endif
+                </div>
+
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                        Tagi / obszary pomocy
+                    </h2>
+
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                        Wybierz problemy lub obszary pomocy, po których pacjent będzie mógł znaleźć lekarza.
+                    </p>
+
+                    @if ($helpTags->count() > 0)
+                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+                            @foreach ($helpTags as $tag)
+                                <label style="display: flex; align-items: center; gap: 12px; border: 1px solid #e5e7eb; border-radius: 14px; padding: 15px 16px; background: #f9fafb; cursor: pointer;">
+                                    <input
+                                        type="checkbox"
+                                        name="help_tags[]"
+                                        value="{{ $tag->id }}"
+                                        @checked(in_array($tag->id, old('help_tags', [])))
+                                    >
+
+                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                        {{ $tag->tag_name }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        <p style="font-size: 14px; color: #b91c1c;">
+                            Brak tagów w systemie. Najpierw dodaj tagi w słowniku admina.
+                        </p>
+                    @endif
+                </div>
+
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 28px 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+                        <div>
+                            <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                                Gotowe?
+                            </h2>
+
+                            <p style="font-size: 14px; color: #6b7280;">
+                                Po zapisaniu lekarz będzie widoczny zgodnie z ustawieniami weryfikacji.
+                            </p>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <a
+                                href="{{ route('admin.doctors') }}"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 13px 22px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 12px; text-decoration: none;"
+                            >
+                                Anuluj
+                            </a>
+
+                            <button
+                                type="submit"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 13px 26px; background: #2563eb; color: white; font-size: 15px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);"
+                            >
+                                Dodaj lekarza
+                            </button>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
 
         </div>
     </div>
