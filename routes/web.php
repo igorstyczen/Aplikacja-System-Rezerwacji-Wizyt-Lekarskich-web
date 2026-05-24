@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NfzComparisonController;
 use App\Http\Controllers\AdminDictionaryController;
+use App\Http\Controllers\DoctorApplicationController;
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
@@ -45,6 +46,18 @@ Route::get('/admin/doctors/{doctor}/edit', [AdminDashboardController::class, 'ed
 Route::put('/admin/doctors/{doctor}', [AdminDashboardController::class, 'updateDoctor'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.doctors.update');
+
+Route::get('/admin/doctor-applications', [AdminDashboardController::class, 'doctorApplications'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications');
+
+Route::patch('/admin/doctor-applications/{doctorApplication}/approve', [AdminDashboardController::class, 'approveDoctorApplication'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications.approve');
+
+Route::patch('/admin/doctor-applications/{doctorApplication}/reject', [AdminDashboardController::class, 'rejectDoctorApplication'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications.reject');
 
 Route::get('/admin/users/{user}/edit', [AdminDashboardController::class, 'editUser'])
     ->middleware(['auth', 'role:admin'])
@@ -137,11 +150,20 @@ Route::post('/appointments/{appointment}/review', [ReviewController::class, 'sto
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
-Route::get('/nfz-comparison', [NfzComparisonController::class, 'index'])
-    ->name('nfz.comparison');
+Route::get('/nfz-comparison', function () {
+    return redirect()->route('home');
+})->name('nfz.comparison');
 
 Route::get('/nfz-comparison/compare', [NfzComparisonController::class, 'compare'])
     ->name('nfz.compare');
+
+Route::get('/doctor-application', [DoctorApplicationController::class, 'create'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('doctor-applications.create');
+
+Route::post('/doctor-application', [DoctorApplicationController::class, 'store'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('doctor-applications.store');
 
 Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
     ->middleware(['auth', 'role:doctor,admin'])
