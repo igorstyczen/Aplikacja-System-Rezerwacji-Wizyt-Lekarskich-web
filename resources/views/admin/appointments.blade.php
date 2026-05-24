@@ -5,42 +5,51 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1280px; margin: 0 auto;">
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #2563eb; font-size: 14px; font-weight: 800; margin-bottom: 8px;">
+                    Panel administratora
+                </p>
+
+                <h1 style="font-size: 30px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                     Lista wszystkich wizyt
                 </h1>
 
-                <p class="text-gray-600 mt-1">
-                    Administrator widzi wszystkie wizyty zapisane w systemie, może je filtrować i zarządzać ich statusem oraz sprawdzać płatności.
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7;">
+                    Administrator widzi wszystkie wizyty zapisane w systemie, może je filtrować,
+                    sprawdzać płatności oraz zarządzać statusem wizyt.
                 </p>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Filtry
                 </h2>
 
-                <form method="GET" action="{{ route('admin.appointments') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                    Wyszukaj wizyty po pacjencie, lekarzu, klinice, statusie lub dacie.
+                </p>
+
+                <form method="GET" action="{{ route('admin.appointments') }}" style="display: flex; flex-direction: column; gap: 22px;">
+                    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px;">
                         <div>
-                            <label for="patient" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="patient" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Pacjent
                             </label>
 
@@ -50,12 +59,12 @@
                                 name="patient"
                                 value="{{ request('patient') }}"
                                 placeholder="np. Piotr"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="doctor" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="doctor" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Lekarz
                             </label>
 
@@ -65,12 +74,12 @@
                                 name="doctor"
                                 value="{{ request('doctor') }}"
                                 placeholder="np. Jan"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="clinic" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="clinic" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Klinika / miasto
                             </label>
 
@@ -80,19 +89,19 @@
                                 name="clinic"
                                 value="{{ request('clinic') }}"
                                 placeholder="np. Rzeszów"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="status" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Status
                             </label>
 
                             <select
                                 id="status"
                                 name="status"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="">Wszystkie</option>
                                 <option value="pending_payment" @selected(request('status') === 'pending_payment')>
@@ -114,7 +123,7 @@
                         </div>
 
                         <div>
-                            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="date_from" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Data wizyty od
                             </label>
 
@@ -123,22 +132,22 @@
                                 id="date_from"
                                 name="date_from"
                                 value="{{ request('date_from') }}"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px; font-size: 14px;"
                             >
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
+                    <div style="display: flex; align-items: center; gap: 18px; padding-top: 4px;">
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
                         >
                             Filtruj
                         </button>
 
                         <a
                             href="{{ route('admin.appointments') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 10px; text-decoration: none;"
                         >
                             Wyczyść
                         </a>
@@ -147,180 +156,192 @@
             </div>
 
             @if ($appointments->count() > 0)
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pacjent</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lekarz</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usługa</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klinika</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Długość</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Płatność</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($appointments as $appointment)
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 1150px;">
+                            <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
                                 <tr>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        {{ $appointment->date->format('d.m.Y H:i') }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $appointment->patient->first_name }} {{ $appointment->patient->last_name }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $appointment->doctor->first_name }} {{ $appointment->doctor->last_name }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $appointment->service->name }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $appointment->clinic->name }}
-                                        <br>
-                                        <span class="text-gray-500">
-                                            {{ $appointment->clinic->city }}
-                                        </span>
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $appointment->length }} min
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->status === 'pending_payment')
-                                            <span class="px-2 py-1 rounded text-xs bg-orange-100 text-orange-700">
-                                                Oczekuje na płatność
-                                            </span>
-                                        @elseif ($appointment->status === 'pending')
-                                            <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
-                                                Oczekująca
-                                            </span>
-                                        @elseif ($appointment->status === 'confirmed')
-                                            <span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-700">
-                                                Potwierdzona
-                                            </span>
-                                        @elseif ($appointment->status === 'cancelled')
-                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
-                                                Anulowana
-                                            </span>
-                                        @elseif ($appointment->status === 'completed')
-                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                                                Zakończona
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
-                                                {{ $appointment->status }}
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($appointment->payment_status === 'paid')
-                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                                                Opłacona
-                                            </span>
-
-                                            @if ($appointment->payment_method)
-                                                <br>
-                                                <span class="text-xs text-gray-500">
-                                                    @if ($appointment->payment_method === 'blik')
-                                                        BLIK
-                                                    @elseif ($appointment->payment_method === 'card')
-                                                        Karta bankowa
-                                                    @else
-                                                        {{ $appointment->payment_method }}
-                                                    @endif
-                                                </span>
-                                            @endif
-                                        @else
-                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
-                                                Nieopłacona
-                                            </span>
-                                            <br>
-                                            <span class="text-xs text-gray-500">
-                                                {{ number_format($appointment->payment_amount ?? $appointment->service->price, 2) }} zł
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="flex flex-wrap gap-2">
-                                            @if ($appointment->status === 'pending' && $appointment->payment_status === 'paid')
-                                                <form method="POST" action="{{ route('admin.appointments.confirm', $appointment) }}">
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <button
-                                                        type="submit"
-                                                        class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
-                                                    >
-                                                        Potwierdź
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            @if ($appointment->status === 'confirmed')
-                                                <form method="POST" action="{{ route('admin.appointments.complete', $appointment) }}">
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <button
-                                                        type="submit"
-                                                        class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
-                                                    >
-                                                        Zakończ
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            @if (! in_array($appointment->status, ['cancelled', 'completed']))
-                                                <form method="POST" action="{{ route('admin.appointments.cancel', $appointment) }}">
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <button
-                                                        type="submit"
-                                                        onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
-                                                        class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
-                                                    >
-                                                        Anuluj
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            @if ($appointment->status === 'pending_payment')
-                                                <span class="text-gray-400 text-xs">
-                                                    Czeka na płatność
-                                                </span>
-                                            @endif
-
-                                            @if (in_array($appointment->status, ['cancelled', 'completed']))
-                                                <span class="text-gray-400 text-xs">
-                                                    Brak akcji
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </td>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Data</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Pacjent</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Lekarz</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Usługa</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Klinika</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Czas</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Status</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Płatność</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Akcje</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($appointments as $appointment)
+                                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                                        <td style="padding: 18px; font-size: 14px; color: #111827; font-weight: 700; white-space: nowrap;">
+                                            {{ $appointment->date->format('d.m.Y') }}
+                                            <br>
+                                            <span style="font-size: 12px; color: #6b7280; font-weight: 600;">
+                                                {{ $appointment->date->format('H:i') }}
+                                            </span>
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            <strong>{{ $appointment->patient->first_name }} {{ $appointment->patient->last_name }}</strong>
+                                            @if ($appointment->patient->phone)
+                                                <br>
+                                                <span style="font-size: 12px; color: #6b7280;">
+                                                    {{ $appointment->patient->phone }}
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            Dr {{ $appointment->doctor->first_name }} {{ $appointment->doctor->last_name }}
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $appointment->service->name }}
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $appointment->clinic->name }}
+                                            <br>
+                                            <span style="font-size: 12px; color: #6b7280;">
+                                                {{ $appointment->clinic->city }}
+                                            </span>
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151; white-space: nowrap;">
+                                            {{ $appointment->length }} min
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            @if ($appointment->status === 'pending_payment')
+                                                <span style="padding: 6px 10px; background: #ffedd5; color: #c2410c; border-radius: 999px; font-size: 12px; font-weight: 900; white-space: nowrap;">
+                                                    Oczekuje na płatność
+                                                </span>
+                                            @elseif ($appointment->status === 'pending')
+                                                <span style="padding: 6px 10px; background: #dbeafe; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Oczekująca
+                                                </span>
+                                            @elseif ($appointment->status === 'confirmed')
+                                                <span style="padding: 6px 10px; background: #fef3c7; color: #92400e; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Potwierdzona
+                                                </span>
+                                            @elseif ($appointment->status === 'cancelled')
+                                                <span style="padding: 6px 10px; background: #fee2e2; color: #991b1b; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Anulowana
+                                                </span>
+                                            @elseif ($appointment->status === 'completed')
+                                                <span style="padding: 6px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Zakończona
+                                                </span>
+                                            @else
+                                                <span style="padding: 6px 10px; background: #f3f4f6; color: #374151; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    {{ $appointment->status }}
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            @if ($appointment->payment_status === 'paid')
+                                                <span style="padding: 6px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Opłacona
+                                                </span>
+
+                                                @if ($appointment->payment_method)
+                                                    <br>
+                                                    <span style="display: inline-block; margin-top: 6px; font-size: 12px; color: #6b7280;">
+                                                        @if ($appointment->payment_method === 'blik')
+                                                            BLIK
+                                                        @elseif ($appointment->payment_method === 'card')
+                                                            Karta bankowa
+                                                        @else
+                                                            {{ $appointment->payment_method }}
+                                                        @endif
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span style="padding: 6px 10px; background: #fee2e2; color: #991b1b; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Nieopłacona
+                                                </span>
+                                                <br>
+                                                <span style="display: inline-block; margin-top: 6px; font-size: 12px; color: #6b7280;">
+                                                    {{ number_format($appointment->payment_amount ?? $appointment->service->price, 2) }} zł
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 135px;">
+                                                @if ($appointment->status === 'pending' && $appointment->payment_status === 'paid')
+                                                    <form method="POST" action="{{ route('admin.appointments.confirm', $appointment) }}">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button
+                                                            type="submit"
+                                                            style="width: 100%; padding: 8px 12px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                        >
+                                                            Potwierdź
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                @if ($appointment->status === 'confirmed')
+                                                    <form method="POST" action="{{ route('admin.appointments.complete', $appointment) }}">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button
+                                                            type="submit"
+                                                            style="width: 100%; padding: 8px 12px; background: #dcfce7; color: #166534; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                        >
+                                                            Zakończ
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                @if (! in_array($appointment->status, ['cancelled', 'completed']))
+                                                    <form method="POST" action="{{ route('admin.appointments.cancel', $appointment) }}">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button
+                                                            type="submit"
+                                                            onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?')"
+                                                            style="width: 100%; padding: 8px 12px; background: #fee2e2; color: #b91c1c; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                        >
+                                                            Anuluj
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                @if ($appointment->status === 'pending_payment')
+                                                    <span style="font-size: 12px; color: #9ca3af; font-weight: 700;">
+                                                        Czeka na płatność
+                                                    </span>
+                                                @endif
+
+                                                @if (in_array($appointment->status, ['cancelled', 'completed']))
+                                                    <span style="font-size: 12px; color: #9ca3af; font-weight: 700;">
+                                                        Brak akcji
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="mt-6">
+                <div style="margin-top: 28px;">
                     {{ $appointments->links() }}
                 </div>
             @else
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <p class="text-gray-600">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <p style="color: #6b7280;">
                         Brak wizyt spełniających wybrane filtry.
                     </p>
                 </div>
