@@ -268,10 +268,21 @@ class AdminDashboardController extends Controller
         $doctor->load([
             'user',
             'specializations',
+            'helpTags',
         ]);
+
+        $specializations = Specialization::query()
+            ->orderBy('name')
+            ->get();
+
+        $helpTags = HelpTag::query()
+            ->orderBy('tag_name')
+            ->get();
 
         return view('admin.edit-doctor', [
             'doctor' => $doctor,
+            'specializations' => $specializations,
+            'helpTags' => $helpTags,
         ]);
     }
 
@@ -280,28 +291,56 @@ class AdminDashboardController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'bio' => ['nullable', 'string', 'max:2000'],
+            'bio' => ['nullable', 'string', 'max:3000'],
+
+            'specializations' => ['required', 'array', 'min:1'],
+            'specializations.*' => ['integer', 'exists:specializations,id'],
+
+            'help_tags' => ['nullable', 'array'],
+            'help_tags.*' => ['integer', 'exists:help_tags,id'],
+
             'is_for_adults' => ['nullable', 'boolean'],
             'is_for_children' => ['nullable', 'boolean'],
             'is_verified' => ['nullable', 'boolean'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'specializations.required' => 'Wybierz przynajmniej jedną specjalizację.',
+            'specializations.min' => 'Wybierz przynajmniej jedną specjalizację.',
         ]);
 
-        $data = [
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'bio' => $request->bio,
-            'is_for_adults' => $request->boolean('is_for_adults'),
-            'is_for_children' => $request->boolean('is_for_children'),
-            'is_verified' => $request->boolean('is_verified'),
-        ];
+        DB::transaction(function () use ($request, $doctor) {
+            $data = [
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'bio' => $request->bio,
+                'is_for_adults' => $request->boolean('is_for_adults'),
+                'is_for_children' => $request->boolean('is_for_children'),
+                'is_verified' => $request->boolean('is_verified'),
+            ];
 
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('doctor-avatars', 'public');
-            $data['photo_url'] = 'storage/' . $path;
-        }
+            if ($request->hasFile('photo')) {
+                $path = $request->file('photo')->store('doctor-avatars', 'public');
+                $data['photo_url'] = 'storage/' . $path;
+            }
 
-        $doctor->update($data);
+            $doctor->update($data);
+
+            $doctor->specializations()->delete();
+
+            foreach ($request->input('specializations', []) as $specializationId) {
+                $specialization = Specialization::find($specializationId);
+
+                if ($specialization) {
+                    DoctorSpecialization::create([
+                        'doctor_id' => $doctor->id,
+                        'specialization_id' => $specialization->id,
+                        'specialization_name' => $specialization->name,
+                    ]);
+                }
+            }
+
+            $doctor->helpTags()->sync($request->input('help_tags', []));
+        });
 
         return redirect()
             ->route('admin.doctors')
