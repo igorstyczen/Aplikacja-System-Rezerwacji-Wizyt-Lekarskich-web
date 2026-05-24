@@ -13,6 +13,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Clinic;
+use App\Models\DoctorApplication;
+use App\Models\DoctorSpecialization;
+use App\Models\Specialization;
 
 class AdminDashboardController extends Controller
 {
@@ -391,6 +394,78 @@ class AdminDashboardController extends Controller
 
         return back()->with('success', 'Klinika została usunięta.');
     }
+
+    public function doctorApplications()
+    {
+        $applications = DoctorApplication::with('user')
+            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('admin.doctor-applications', [
+            'applications' => $applications,
+        ]);
+    }
+
+    public function approveDoctorApplication(DoctorApplication $doctorApplication)
+    {
+        if ($doctorApplication->status !== 'pending') {
+            return back()->withErrors([
+                'application' => 'To zgłoszenie zostało już rozpatrzone.',
+            ]);
+        }
+
+        DB::transaction(function () use ($doctorApplication) {
+            $user = $doctorApplication->user;
+
+            $user->update([
+                'role' => 'doctor',
+                'phone' => $doctorApplication->phone,
+            ]);
+
+            Doctor::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'first_name' => $doctorApplication->first_name,
+                    'last_name' => $doctorApplication->last_name,
+                    'bio' => $doctorApplication->bio,
+                    'is_verified' => true,
+                    'is_for_adults' => $doctorApplication->is_for_adults,
+                    'is_for_children' => $doctorApplication->is_for_children,
+                ]
+            );
+
+            $doctorApplication->update([
+                'status' => 'approved',
+                'reviewed_at' => now(),
+                'admin_note' => 'Zgłoszenie zaakceptowane.',
+            ]);
+        });
+
+        return back()->with('success', 'Zgłoszenie zostało zaakceptowane. Użytkownik otrzymał profil lekarza.');
+    }
+
+    public function rejectDoctorApplication(Request $request, DoctorApplication $doctorApplication)
+    {
+        $request->validate([
+            'admin_note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($doctorApplication->status !== 'pending') {
+            return back()->withErrors([
+                'application' => 'To zgłoszenie zostało już rozpatrzone.',
+            ]);
+        }
+
+        $doctorApplication->update([
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+            'admin_note' => $request->admin_note ?: 'Zgłoszenie odrzucone.',
+        ]);
+
+        return back()->with('success', 'Zgłoszenie zostało odrzucone.');
+    }
+
 
     public function appointments(Request $request)
     {

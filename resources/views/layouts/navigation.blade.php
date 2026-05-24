@@ -37,6 +37,10 @@
                                 Lekarze
                             </x-nav-link>
 
+                            <x-nav-link :href="route('admin.doctor-applications')" :active="request()->routeIs('admin.doctor-applications')">
+                                Zgłoszenia lekarzy
+                            </x-nav-link>
+
                             <x-nav-link :href="route('admin.appointments')" :active="request()->routeIs('admin.appointments')">
                                 Wizyty
                             </x-nav-link>
@@ -162,6 +166,10 @@
 
                     <x-responsive-nav-link :href="route('admin.doctors')" :active="request()->routeIs('admin.doctors')">
                         Lekarze
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.doctor-applications')" :active="request()->routeIs('admin.doctor-applications')">
+                        Zgłoszenia lekarzy
                     </x-responsive-nav-link>
 
                     <x-responsive-nav-link :href="route('admin.appointments')" :active="request()->routeIs('admin.appointments')">
