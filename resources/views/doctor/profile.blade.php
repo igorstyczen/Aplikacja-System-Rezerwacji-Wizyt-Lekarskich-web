@@ -5,211 +5,248 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1050px; margin: 0 auto;">
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
             @if ($message)
-                <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ $message }}
                 </div>
             @endif
 
             @if ($doctor)
-                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <div class="flex items-center gap-6">
-                        <div style="width: 112px; height: 112px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 34px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                    <div style="display: flex; align-items: center; gap: 28px;">
+                        <div style="width: 120px; height: 120px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             @if ($doctor->photo_url)
                                 <img
                                     src="{{ asset($doctor->photo_url) }}"
                                     alt="Zdjęcie lekarza"
-                                    style="width: 112px; height: 112px; object-fit: cover; object-position: center 20%; display: block;"
+                                    style="width: 120px; height: 120px; object-fit: cover; object-position: center 20%; display: block;"
                                 >
                             @else
-                                <span class="text-gray-500 text-3xl font-bold">
+                                <span style="color: #6b7280; font-size: 32px; font-weight: 900;">
                                     {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
                                 </span>
                             @endif
                         </div>
 
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900">
+                            <p style="color: #059669; font-size: 14px; font-weight: 900; margin-bottom: 8px;">
+                                Panel lekarza
+                            </p>
+
+                            <h1 style="font-size: 32px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                                 Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
                             </h1>
 
-                            <p class="text-gray-600 mt-1">
-                                Tutaj możesz edytować informacje widoczne dla pacjentów.
+                            <p style="color: #4b5563; font-size: 15px; line-height: 1.7; max-width: 720px;">
+                                Tutaj możesz edytować informacje widoczne dla pacjentów:
+                                opis, specjalizacje, tagi pomocy, przyjmowanych pacjentów oraz zdjęcie profilowe.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
-                        Dane profilu lekarza
-                    </h2>
+                <form method="POST" action="{{ route('doctor.profile.update') }}" style="display: flex; flex-direction: column; gap: 28px;">
+                    @csrf
+                    @method('PATCH')
 
-                    <form method="POST" action="{{ route('doctor.profile.update') }}" class="space-y-6">
-                        @csrf
-                        @method('PATCH')
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Dane profilu lekarza
+                        </h2>
+
+                        <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
+                            Te informacje będą widoczne dla pacjentów na publicznym profilu lekarza.
+                        </p>
 
                         <div>
-                            <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="bio" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 10px;">
                                 Opis / bio
                             </label>
 
                             <textarea
                                 id="bio"
                                 name="bio"
-                                rows="5"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                rows="7"
                                 placeholder="Napisz krótki opis doświadczenia, specjalizacji i sposobu pracy z pacjentami."
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-size: 14px; resize: vertical;"
                             >{{ old('bio', $doctor->bio) }}</textarea>
+
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                                Opis powinien krótko wyjaśniać pacjentowi, w czym możesz pomóc.
+                            </p>
                         </div>
 
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">
+                        <div style="margin-top: 28px;">
+                            <p style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 12px;">
                                 Przyjmowani pacjenci
-                            </h3>
+                            </p>
 
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-2">
+                            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                                <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
                                     <input
                                         type="checkbox"
                                         name="is_for_adults"
                                         value="1"
                                         @checked(old('is_for_adults', $doctor->is_for_adults))
-                                        class="rounded border-gray-300"
                                     >
-                                    <span class="text-sm text-gray-700">
+
+                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
                                         Przyjmuję dorosłych
                                     </span>
                                 </label>
 
-                                <label class="flex items-center gap-2">
+                                <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
                                     <input
                                         type="checkbox"
                                         name="is_for_children"
                                         value="1"
                                         @checked(old('is_for_children', $doctor->is_for_children))
-                                        class="rounded border-gray-300"
                                     >
-                                    <span class="text-sm text-gray-700">
+
+                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
                                         Przyjmuję dzieci
                                     </span>
                                 </label>
                             </div>
                         </div>
+                    </div>
 
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">
-                                Specjalizacje
-                            </h3>
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Specjalizacje
+                        </h2>
 
-                            @php
-                                $doctorSpecializations = $doctor->specializations
-                                    ->pluck('specialization_id')
-                                    ->filter()
-                                    ->toArray();
+                        <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                            Wybierz specjalizacje, które będą widoczne na Twoim profilu oraz w filtrach wyszukiwania.
+                        </p>
 
-                                $selectedSpecializations = old('specializations', $doctorSpecializations);
-                            @endphp
+                        @php
+                            $doctorSpecializations = $doctor->specializations
+                                ->pluck('specialization_id')
+                                ->filter()
+                                ->toArray();
 
-                            @if ($availableSpecializations->count() > 0)
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    @foreach ($availableSpecializations as $specialization)
-                                        <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
-                                            <input
-                                                type="checkbox"
-                                                name="specializations[]"
-                                                value="{{ $specialization->id }}"
-                                                @checked(in_array($specialization->id, $selectedSpecializations))
-                                                class="rounded border-gray-300"
-                                            >
+                            $selectedSpecializations = old('specializations', $doctorSpecializations);
+                        @endphp
 
-                                            <span class="text-sm text-gray-700">
-                                                {{ $specialization->name }}
-                                            </span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p class="text-sm text-gray-500">
-                                    Brak dostępnych specjalizacji. Administrator powinien dodać specjalizacje w systemie.
+                        @if ($availableSpecializations->count() > 0)
+                            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+                                @foreach ($availableSpecializations as $specialization)
+                                    <label style="display: flex; align-items: center; gap: 12px; border: 1px solid #e5e7eb; border-radius: 14px; padding: 15px 16px; background: #f9fafb; cursor: pointer;">
+                                        <input
+                                            type="checkbox"
+                                            name="specializations[]"
+                                            value="{{ $specialization->id }}"
+                                            @checked(in_array($specialization->id, $selectedSpecializations))
+                                        >
+
+                                        <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                            {{ $specialization->name }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <p style="font-size: 14px; color: #6b7280;">
+                                Brak dostępnych specjalizacji. Administrator powinien dodać specjalizacje w systemie.
+                            </p>
+                        @endif
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Tagi / obszary pomocy
+                        </h2>
+
+                        <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                            Tagi pomagają pacjentom znaleźć lekarza po problemie, np. ból głowy, gorączka, depresja.
+                        </p>
+
+                        @php
+                            $doctorHelpTags = $doctor->helpTags
+                                ->pluck('id')
+                                ->toArray();
+
+                            $selectedHelpTags = old('help_tags', $doctorHelpTags);
+                        @endphp
+
+                        @if ($helpTags->count() > 0)
+                            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+                                @foreach ($helpTags as $tag)
+                                    <label style="display: flex; align-items: center; gap: 12px; border: 1px solid #e5e7eb; border-radius: 14px; padding: 15px 16px; background: #f9fafb; cursor: pointer;">
+                                        <input
+                                            type="checkbox"
+                                            name="help_tags[]"
+                                            value="{{ $tag->id }}"
+                                            @checked(in_array($tag->id, $selectedHelpTags))
+                                        >
+
+                                        <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                            {{ $tag->tag_name }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <p style="font-size: 14px; color: #6b7280;">
+                                Brak dostępnych tagów. Administrator powinien dodać tagi w systemie.
+                            </p>
+                        @endif
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+                            <div>
+                                <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                                    Zapisz zmiany profilu?
+                                </h2>
+
+                                <p style="font-size: 14px; color: #6b7280;">
+                                    Zmiany będą widoczne dla pacjentów po zapisaniu.
                                 </p>
-                            @endif
+                            </div>
+
+                            <button
+                                type="submit"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 13px 26px; background: #2563eb; color: white; font-size: 15px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);"
+                            >
+                                Zapisz profil
+                            </button>
                         </div>
+                    </div>
+                </form>
 
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">
-                                Tagi / obszary pomocy
-                            </h3>
-
-                            @php
-                                $doctorHelpTags = $doctor->helpTags
-                                    ->pluck('id')
-                                    ->toArray();
-
-                                $selectedHelpTags = old('help_tags', $doctorHelpTags);
-                            @endphp
-
-                            @if ($helpTags->count() > 0)
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    @foreach ($helpTags as $tag)
-                                        <label class="flex items-center gap-2 border border-gray-200 rounded p-2">
-                                            <input
-                                                type="checkbox"
-                                                name="help_tags[]"
-                                                value="{{ $tag->id }}"
-                                                @checked(in_array($tag->id, $selectedHelpTags))
-                                                class="rounded border-gray-300"
-                                            >
-
-                                            <span class="text-sm text-gray-700">
-                                                {{ $tag->tag_name }}
-                                            </span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            @else
-                                <p class="text-sm text-gray-500">
-                                    Brak dostępnych tagów. Administrator powinien dodać tagi w systemie.
-                                </p>
-                            @endif
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                        >
-                            Zapisz profil
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-top: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                         Zmień zdjęcie profilowe
                     </h2>
 
-                    <form method="POST" action="{{ route('doctor.profile.photo') }}" enctype="multipart/form-data">
+                    <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                        Zdjęcie będzie widoczne dla pacjentów na Twoim profilu oraz na liście lekarzy.
+                    </p>
+
+                    <form method="POST" action="{{ route('doctor.profile.photo') }}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 22px;">
                         @csrf
 
-                        <div class="mb-6">
-                            <label for="photo" class="block text-sm font-medium text-gray-700 mb-1">
+                        <div>
+                            <label for="photo" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Zdjęcie lekarza
                             </label>
 
@@ -219,20 +256,22 @@
                                 name="photo"
                                 accept="image/jpeg,image/png,image/webp"
                                 required
-                                class="w-full border border-gray-300 rounded-md shadow-sm text-sm p-2"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px; background: white;"
                             >
 
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
                                 Dozwolone formaty: JPG, PNG, WEBP. Maksymalnie 2 MB.
                             </p>
                         </div>
 
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                        >
-                            Zapisz zdjęcie
-                        </button>
+                        <div>
+                            <button
+                                type="submit"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 26px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 8px 16px rgba(37, 99, 235, 0.18);"
+                            >
+                                Zapisz zdjęcie
+                            </button>
+                        </div>
                     </form>
                 </div>
             @endif
