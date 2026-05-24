@@ -46,6 +46,10 @@
                             <x-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
                                 Moje wizyty
                             </x-nav-link>
+
+                            <x-nav-link :href="route('doctor-applications.create')" :active="request()->routeIs('doctor-applications.*')">
+                                Załóż profil lekarza
+                            </x-nav-link>
                         @endif
 
                         @if (Auth::user()->role === 'doctor')
@@ -168,6 +172,10 @@
                 @if (Auth::user()->role === 'patient')
                     <x-responsive-nav-link :href="route('patient.appointments')" :active="request()->routeIs('patient.appointments')">
                         Moje wizyty
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('doctor-applications.create')" :active="request()->routeIs('doctor-applications.*')">
+                        Załóż profil lekarza
                     </x-responsive-nav-link>
                 @endif
 
