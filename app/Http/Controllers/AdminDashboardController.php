@@ -16,6 +16,7 @@ use App\Models\Clinic;
 use App\Models\DoctorApplication;
 use App\Models\DoctorSpecialization;
 use App\Models\Specialization;
+use App\Models\HelpTag;
 
 class AdminDashboardController extends Controller
 {
@@ -168,7 +169,18 @@ class AdminDashboardController extends Controller
 
     public function createDoctor()
     {
-        return view('admin.create-doctor');
+        $specializations = Specialization::query()
+            ->orderBy('name')
+            ->get();
+
+        $helpTags = HelpTag::query()
+            ->orderBy('tag_name')
+            ->get();
+
+        return view('admin.create-doctor', [
+            'specializations' => $specializations,
+            'helpTags' => $helpTags,
+        ]);
     }
 
     public function storeDoctor(Request $request)
@@ -176,15 +188,32 @@ class AdminDashboardController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:25',
+                'regex:/^(\+|00)?[0-9\s\-]{9,20}$/',
+            ],
             'password' => ['required', 'string', 'min:8'],
+
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'bio' => ['nullable', 'string', 'max:2000'],
+            'bio' => ['nullable', 'string', 'max:3000'],
+
+            'specializations' => ['required', 'array', 'min:1'],
+            'specializations.*' => ['integer', 'exists:specializations,id'],
+
+            'help_tags' => ['nullable', 'array'],
+            'help_tags.*' => ['integer', 'exists:help_tags,id'],
+
             'is_for_adults' => ['nullable', 'boolean'],
             'is_for_children' => ['nullable', 'boolean'],
             'is_verified' => ['nullable', 'boolean'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'phone.regex' => 'Podaj poprawny numer telefonu, np. 500 600 700, +48 500 600 700 albo +380 123 456 789.',
+            'specializations.required' => 'Wybierz przynajmniej jedną specjalizację.',
+            'specializations.min' => 'Wybierz przynajmniej jedną specjalizację.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -212,7 +241,21 @@ class AdminDashboardController extends Controller
                 $doctorData['photo_url'] = 'storage/' . $path;
             }
 
-            Doctor::create($doctorData);
+            $doctor = Doctor::create($doctorData);
+
+            foreach ($request->input('specializations', []) as $specializationId) {
+                $specialization = Specialization::find($specializationId);
+
+                if ($specialization) {
+                    DoctorSpecialization::create([
+                        'doctor_id' => $doctor->id,
+                        'specialization_id' => $specialization->id,
+                        'specialization_name' => $specialization->name,
+                    ]);
+                }
+            }
+
+            $doctor->helpTags()->sync($request->input('help_tags', []));
         });
 
         return redirect()
@@ -402,8 +445,13 @@ class AdminDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        $specializations = Specialization::query()
+            ->orderBy('name')
+            ->get();
+
         return view('admin.doctor-applications', [
             'applications' => $applications,
+            'specializations' => $specializations,
         ]);
     }
 
@@ -423,7 +471,7 @@ class AdminDashboardController extends Controller
                 'phone' => $doctorApplication->phone,
             ]);
 
-            Doctor::updateOrCreate(
+            $doctor = Doctor::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'first_name' => $doctorApplication->first_name,
@@ -434,6 +482,43 @@ class AdminDashboardController extends Controller
                     'is_for_children' => $doctorApplication->is_for_children,
                 ]
             );
+
+            $doctor->specializations()->delete();
+
+            $rawSpecializationIds = $doctorApplication->specialization_ids;
+
+            if (is_string($rawSpecializationIds)) {
+                $rawSpecializationIds = json_decode($rawSpecializationIds, true) ?? [];
+            }
+
+            foreach ($rawSpecializationIds ?? [] as $specializationId) {
+                $specialization = Specialization::find($specializationId);
+
+                if ($specialization) {
+                    DoctorSpecialization::create([
+                        'doctor_id' => $doctor->id,
+                        'specialization_id' => $specialization->id,
+                        'specialization_name' => $specialization->name,
+                    ]);
+                }
+            }
+
+            $clinic = Clinic::query()
+                ->where('city', $doctorApplication->clinic_city)
+                ->where('address', $doctorApplication->clinic_address)
+                ->first();
+
+            if (! $clinic) {
+                $clinic = Clinic::create([
+                    'doctor_id' => null,
+                    'name' => $doctorApplication->clinic_name,
+                    'city' => $doctorApplication->clinic_city,
+                    'address' => $doctorApplication->clinic_address,
+                    'details' => $doctorApplication->clinic_details,
+                ]);
+            }
+
+            $doctor->clinics()->syncWithoutDetaching([$clinic->id]);
 
             $doctorApplication->update([
                 'status' => 'approved',
