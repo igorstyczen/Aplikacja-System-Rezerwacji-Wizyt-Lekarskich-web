@@ -1,145 +1,234 @@
 <x-app-layout>
+    @php
+        $specializations = isset($specializations)
+            ? collect($specializations)
+            : \App\Models\Specialization::query()->orderBy('name')->get();
+    @endphp
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Zgłoszenia lekarzy
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1180px; margin: 0 auto;">
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #059669; font-size: 14px; font-weight: 800; margin-bottom: 8px;">
+                    Panel administratora
+                </p>
+
+                <h1 style="font-size: 30px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                     Zgłoszenia o profil lekarza
                 </h1>
 
-                <p class="text-gray-600">
-                    Administrator może zaakceptować lub odrzucić zgłoszenie użytkownika, który chce zostać lekarzem.
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7;">
+                    Tutaj administrator może zaakceptować lub odrzucić zgłoszenia użytkowników, którzy chcą zostać lekarzami.
                 </p>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                @if ($applications->count() > 0)
-                    <div class="divide-y divide-gray-200">
-                        @foreach ($applications as $application)
-                            <div class="p-6">
-                                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                                    <div>
-                                        <h2 class="text-lg font-semibold text-gray-900">
+            @if ($applications->count() > 0)
+                <div style="display: flex; flex-direction: column; gap: 22px;">
+                    @foreach ($applications as $application)
+                        @php
+                            $rawSpecializationIds = $application->specialization_ids;
+
+                            if (is_string($rawSpecializationIds)) {
+                                $rawSpecializationIds = json_decode($rawSpecializationIds, true) ?? [];
+                            }
+
+                            $selectedSpecializationIds = collect($rawSpecializationIds ?? [])
+                                ->map(fn ($id) => (int) $id)
+                                ->values();
+
+                            $applicationSpecializations = collect($specializations)
+                                ->filter(fn ($specialization) => $selectedSpecializationIds->contains((int) $specialization->id))
+                                ->pluck('name')
+                                ->values();
+                        @endphp
+
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 28px; align-items: start;">
+
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin: 0;">
                                             Dr {{ $application->first_name }} {{ $application->last_name }}
                                         </h2>
 
-                                        <p class="text-sm text-gray-500">
-                                            Użytkownik: {{ $application->user->name }} — {{ $application->user->email }}
-                                        </p>
-
-                                        @if ($application->phone)
-                                            <p class="text-sm text-gray-500">
-                                                Telefon: {{ $application->phone }}
-                                            </p>
-                                        @endif
-
-                                        <p class="text-sm text-gray-700 mt-3">
-                                            {{ $application->bio }}
-                                        </p>
-
-                                        <div class="flex flex-wrap gap-2 mt-3">
-                                            @if ($application->is_for_adults)
-                                                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                                    Dorośli
-                                                </span>
-                                            @endif
-
-                                            @if ($application->is_for_children)
-                                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
-                                                    Dzieci
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        @if ($application->admin_note)
-                                            <p class="text-sm text-gray-500 mt-3">
-                                                Notatka admina: {{ $application->admin_note }}
-                                            </p>
-                                        @endif
-                                    </div>
-
-                                    <div class="min-w-[220px]">
                                         @if ($application->status === 'pending')
-                                            <span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold mb-3">
+                                            <span style="padding: 5px 10px; background: #fef3c7; color: #92400e; border-radius: 999px; font-size: 12px; font-weight: 800;">
                                                 Oczekuje
                                             </span>
-
-                                            <form method="POST" action="{{ route('admin.doctor-applications.approve', $application) }}" class="mb-3">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <button
-                                                    type="submit"
-                                                    style="width: 100%; padding: 9px 16px; background: #059669; color: white; font-size: 14px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;"
-                                                >
-                                                    Akceptuj
-                                                </button>
-                                            </form>
-
-                                            <form method="POST" action="{{ route('admin.doctor-applications.reject', $application) }}" class="space-y-2">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <textarea
-                                                    name="admin_note"
-                                                    rows="2"
-                                                    placeholder="Powód odrzucenia"
-                                                    class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                                                ></textarea>
-
-                                                <button
-                                                    type="submit"
-                                                    style="width: 100%; padding: 9px 16px; background: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;"
-                                                >
-                                                    Odrzuć
-                                                </button>
-                                            </form>
                                         @elseif ($application->status === 'approved')
-                                            <span class="inline-block px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                                            <span style="padding: 5px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 800;">
                                                 Zaakceptowane
                                             </span>
                                         @else
-                                            <span class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">
+                                            <span style="padding: 5px 10px; background: #fee2e2; color: #991b1b; border-radius: 999px; font-size: 12px; font-weight: 800;">
                                                 Odrzucone
                                             </span>
                                         @endif
                                     </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="p-6">
-                        <p class="text-gray-600">
-                            Brak zgłoszeń.
-                        </p>
-                    </div>
-                @endif
-            </div>
 
-            <div class="mt-6">
-                {{ $applications->links() }}
-            </div>
+                                    <p style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">
+                                        Użytkownik: {{ $application->user->name }} — {{ $application->user->email }}
+                                    </p>
+
+                                    <p style="font-size: 14px; color: #6b7280; margin-bottom: 18px;">
+                                        Telefon: {{ $application->phone ?? 'Brak' }}
+                                    </p>
+
+                                    <div style="margin-bottom: 18px;">
+                                        <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 8px;">
+                                            Specjalizacje
+                                        </h3>
+
+                                        @if ($applicationSpecializations->count() > 0)
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                @foreach ($applicationSpecializations as $specializationName)
+                                                    <span style="padding: 6px 10px; background: #ecfdf5; color: #047857; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                                        {{ $specializationName }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <p style="font-size: 14px; color: #9ca3af;">
+                                                Brak wybranych specjalizacji.
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <div style="margin-bottom: 18px;">
+                                        <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 8px;">
+                                            Opis / bio
+                                        </h3>
+
+                                        <p style="font-size: 14px; color: #4b5563; line-height: 1.7;">
+                                            {{ $application->bio }}
+                                        </p>
+                                    </div>
+
+                                    <div style="margin-bottom: 18px;">
+                                        <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 8px;">
+                                            Miejsce przyjmowania
+                                        </h3>
+
+                                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 4px;">
+                                            <strong>{{ $application->clinic_name }}</strong>
+                                        </p>
+
+                                        <p style="font-size: 14px; color: #4b5563; margin-bottom: 4px;">
+                                            {{ $application->clinic_address }}, {{ $application->clinic_city }}
+                                        </p>
+
+                                        @if ($application->clinic_details)
+                                            <p style="font-size: 14px; color: #6b7280;">
+                                                {{ $application->clinic_details }}
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                        @if ($application->is_for_adults)
+                                            <span style="padding: 6px 10px; background: #dbeafe; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                                Przyjmuje dorosłych
+                                            </span>
+                                        @endif
+
+                                        @if ($application->is_for_children)
+                                            <span style="padding: 6px 10px; background: #f0fdf4; color: #15803d; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                                Przyjmuje dzieci
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    @if ($application->admin_note)
+                                        <div style="margin-top: 18px; padding: 14px; background: #f9fafb; border-radius: 12px;">
+                                            <p style="font-size: 14px; color: #4b5563;">
+                                                <strong>Notatka admina:</strong> {{ $application->admin_note }}
+                                            </p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    @if ($application->status === 'pending')
+                                        <form method="POST" action="{{ route('admin.doctor-applications.approve', $application) }}" style="margin-bottom: 14px;">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <button
+                                                type="submit"
+                                                style="width: 100%; padding: 12px 18px; background: #059669; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
+                                            >
+                                                Akceptuj zgłoszenie
+                                            </button>
+                                        </form>
+
+                                        <form method="POST" action="{{ route('admin.doctor-applications.reject', $application) }}">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <textarea
+                                                name="admin_note"
+                                                rows="4"
+                                                placeholder="Powód odrzucenia"
+                                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 12px; font-size: 14px; margin-bottom: 10px;"
+                                            ></textarea>
+
+                                            <button
+                                                type="submit"
+                                                style="width: 100%; padding: 12px 18px; background: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
+                                            >
+                                                Odrzuć zgłoszenie
+                                            </button>
+                                        </form>
+                                    @else
+                                        <div style="padding: 16px; background: #f9fafb; border-radius: 14px; text-align: center;">
+                                            <p style="font-size: 14px; color: #6b7280; margin-bottom: 6px;">
+                                                Zgłoszenie rozpatrzone
+                                            </p>
+
+                                            @if ($application->reviewed_at)
+                                                <p style="font-size: 12px; color: #9ca3af;">
+                                                    {{ $application->reviewed_at->format('d.m.Y H:i') }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div style="margin-top: 28px;">
+                    {{ $applications->links() }}
+                </div>
+            @else
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <p style="color: #6b7280;">
+                        Brak zgłoszeń do wyświetlenia.
+                    </p>
+                </div>
+            @endif
 
         </div>
     </div>

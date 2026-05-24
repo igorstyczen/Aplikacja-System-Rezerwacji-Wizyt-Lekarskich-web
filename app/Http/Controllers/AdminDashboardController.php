@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Clinic;
 use App\Models\DoctorApplication;
+use App\Models\DoctorSpecialization;
+use App\Models\Specialization;
 
 class AdminDashboardController extends Controller
 {
@@ -463,6 +465,7 @@ class AdminDashboardController extends Controller
 
         return back()->with('success', 'Zgłoszenie zostało odrzucone.');
     }
+
 
     public function appointments(Request $request)
     {
