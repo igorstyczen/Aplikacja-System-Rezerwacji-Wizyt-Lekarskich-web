@@ -5,76 +5,88 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1280px; margin: 0 auto;">
 
             @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
+                <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 34px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #2563eb; font-size: 14px; font-weight: 900; margin-bottom: 8px;">
+                    Panel administratora
+                </p>
+
+                <h1 style="font-size: 32px; font-weight: 900; color: #111827; margin-bottom: 10px;">
                     Użytkownicy systemu
                 </h1>
 
-                <p class="text-gray-600 mt-1">
-                    Administrator widzi listę kont, może filtrować użytkowników, edytować ich dane, zmieniać role oraz aktywować lub dezaktywować konta.
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7; max-width: 900px;">
+                    Administrator widzi listę kont, może filtrować użytkowników, edytować dane,
+                    zmieniać role oraz aktywować lub dezaktywować konta.
                 </p>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Filtry
                 </h2>
 
-                <form method="GET" action="{{ route('admin.users') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                    Wyszukaj użytkownika po nazwie, adresie email, roli lub dacie utworzenia konta.
+                </p>
+
+                <form method="GET" action="{{ route('admin.users') }}" style="display: flex; flex-direction: column; gap: 22px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="name" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Imię / nazwa
                             </label>
+
                             <input
                                 type="text"
                                 id="name"
                                 name="name"
                                 value="{{ request('name') }}"
                                 placeholder="np. Jan"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="email" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Email
                             </label>
+
                             <input
                                 type="text"
                                 id="email"
                                 name="email"
                                 value="{{ request('email') }}"
                                 placeholder="np. test.pl"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="role" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Rola
                             </label>
+
                             <select
                                 id="role"
                                 name="role"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="">Wszystkie</option>
                                 <option value="admin" @selected(request('role') === 'admin')>admin</option>
@@ -84,30 +96,31 @@
                         </div>
 
                         <div>
-                            <label for="created_from" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="created_from" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Utworzony od
                             </label>
+
                             <input
                                 type="date"
                                 id="created_from"
                                 name="created_from"
                                 value="{{ request('created_from') }}"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px; font-size: 14px;"
                             >
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
+                    <div style="display: flex; align-items: center; gap: 18px;">
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
                         >
                             Filtruj
                         </button>
 
                         <a
                             href="{{ route('admin.users') }}"
-                            class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 12px; text-decoration: none;"
                         >
                             Wyczyść
                         </a>
@@ -116,178 +129,175 @@
             </div>
 
             @if ($users->count() > 0)
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    ID
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Imię / nazwa
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Email
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Telefon
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Aktualna rola
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Status konta
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Zmień rolę
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Data utworzenia
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Akcje
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($users as $user)
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 1180px;">
+                            <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
                                 <tr>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        {{ $user->id }}
-                                    </td>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">ID</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Użytkownik</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Kontakt</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Rola</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Status</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Zmień rolę</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Data utworzenia</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Akcje</th>
+                                </tr>
+                            </thead>
 
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        {{ $user->name }}
-                                    </td>
+                            <tbody>
+                                @foreach ($users as $user)
+                                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                                        <td style="padding: 18px; font-size: 14px; color: #111827; font-weight: 800;">
+                                            #{{ $user->id }}
+                                        </td>
 
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $user->email }}
-                                    </td>
+                                        <td style="padding: 18px; font-size: 14px; color: #111827;">
+                                            <strong>{{ $user->name }}</strong>
 
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $user->phone ?? 'Brak telefonu' }}
-                                    </td>
+                                            @if ($user->id === Auth::id())
+                                                <br>
+                                                <span style="display: inline-block; margin-top: 6px; padding: 5px 9px; background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 11px; font-weight: 900;">
+                                                    To jest Twoje konto
+                                                </span>
+                                            @endif
+                                        </td>
 
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($user->role === 'admin')
-                                            <span class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-700">
-                                                admin
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $user->email }}
+                                            <br>
+                                            <span style="font-size: 12px; color: #6b7280;">
+                                                {{ $user->phone ?? 'Brak telefonu' }}
                                             </span>
-                                        @elseif ($user->role === 'doctor')
-                                            <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
-                                                doctor
-                                            </span>
-                                        @elseif ($user->role === 'patient')
-                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                                                patient
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
-                                                {{ $user->role }}
-                                            </span>
-                                        @endif
-                                    </td>
+                                        </td>
 
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($user->is_active)
-                                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                                                Aktywne
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
-                                                Nieaktywne
-                                            </span>
-                                        @endif
-                                    </td>
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            @if ($user->role === 'admin')
+                                                <span style="padding: 6px 10px; background: #f3e8ff; color: #7e22ce; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    admin
+                                                </span>
+                                            @elseif ($user->role === 'doctor')
+                                                <span style="padding: 6px 10px; background: #dbeafe; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    doctor
+                                                </span>
+                                            @elseif ($user->role === 'patient')
+                                                <span style="padding: 6px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    patient
+                                                </span>
+                                            @else
+                                                <span style="padding: 6px 10px; background: #f3f4f6; color: #374151; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    {{ $user->role }}
+                                                </span>
+                                            @endif
+                                        </td>
 
-                                    <td class="px-6 py-4 text-sm">
-                                        @if ($user->id === Auth::id())
-                                            <span class="text-gray-400 text-xs">
-                                                Nie można zmienić własnej roli
-                                            </span>
-                                        @else
-                                            <form method="POST" action="{{ route('admin.users.update-role', $user) }}" class="flex gap-2 items-center">
-                                                @csrf
-                                                @method('PATCH')
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            @if ($user->is_active)
+                                                <span style="padding: 6px 10px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Aktywne
+                                                </span>
+                                            @else
+                                                <span style="padding: 6px 10px; background: #fee2e2; color: #991b1b; border-radius: 999px; font-size: 12px; font-weight: 900;">
+                                                    Nieaktywne
+                                                </span>
+                                            @endif
+                                        </td>
 
-                                                <select name="role" class="border-gray-300 rounded-md text-sm">
-                                                    <option value="patient" @selected($user->role === 'patient')>
-                                                        patient
-                                                    </option>
-                                                    <option value="doctor" @selected($user->role === 'doctor')>
-                                                        doctor
-                                                    </option>
-                                                    <option value="admin" @selected($user->role === 'admin')>
-                                                        admin
-                                                    </option>
-                                                </select>
-
-                                                <button
-                                                    type="submit"
-                                                    onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
-                                                    class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
-                                                >
-                                                    Zapisz
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ $user->created_at->format('d.m.Y H:i') }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="flex flex-wrap gap-2">
-                                            <a
-                                                href="{{ route('admin.users.edit', $user) }}"
-                                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
-                                            >
-                                                Edytuj
-                                            </a>
-
-                                            @if ($user->id !== Auth::id())
-                                                <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            @if ($user->id === Auth::id())
+                                                <span style="font-size: 12px; color: #9ca3af; font-weight: 700;">
+                                                    Nie można zmienić własnej roli
+                                                </span>
+                                            @else
+                                                <form method="POST" action="{{ route('admin.users.update-role', $user) }}" style="display: flex; align-items: center; gap: 10px;">
                                                     @csrf
                                                     @method('PATCH')
 
-                                                    @if ($user->is_active)
-                                                        <button
-                                                            type="submit"
-                                                            onclick="return confirm('Czy na pewno chcesz dezaktywować tego użytkownika?')"
-                                                            class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
-                                                        >
-                                                            Dezaktywuj
-                                                        </button>
-                                                    @else
-                                                        <button
-                                                            type="submit"
-                                                            class="px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
-                                                        >
-                                                            Aktywuj
-                                                        </button>
-                                                    @endif
+                                                    <select
+                                                        name="role"
+                                                        style="border: 1px solid #d1d5db; border-radius: 10px; padding: 8px 10px; font-size: 13px;"
+                                                    >
+                                                        <option value="patient" @selected($user->role === 'patient')>
+                                                            patient
+                                                        </option>
+                                                        <option value="doctor" @selected($user->role === 'doctor')>
+                                                            doctor
+                                                        </option>
+                                                        <option value="admin" @selected($user->role === 'admin')>
+                                                            admin
+                                                        </option>
+                                                    </select>
+
+                                                    <button
+                                                        type="submit"
+                                                        onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
+                                                        style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                    >
+                                                        Zapisz
+                                                    </button>
                                                 </form>
-                                            @else
-                                                <span class="text-gray-400 text-xs">
-                                                    Brak dezaktywacji
-                                                </span>
                                             @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px; color: #374151; white-space: nowrap;">
+                                            {{ $user->created_at->format('d.m.Y') }}
+                                            <br>
+                                            <span style="font-size: 12px; color: #6b7280;">
+                                                {{ $user->created_at->format('H:i') }}
+                                            </span>
+                                        </td>
+
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 135px;">
+                                                <a
+                                                    href="{{ route('admin.users.edit', $user) }}"
+                                                    style="width: 100%; display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; font-size: 12px; font-weight: 900; text-decoration: none;"
+                                                >
+                                                    Edytuj
+                                                </a>
+
+                                                @if ($user->id !== Auth::id())
+                                                    <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        @if ($user->is_active)
+                                                            <button
+                                                                type="submit"
+                                                                onclick="return confirm('Czy na pewno chcesz dezaktywować tego użytkownika?')"
+                                                                style="width: 100%; padding: 8px 12px; background: #fee2e2; color: #b91c1c; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                            >
+                                                                Dezaktywuj
+                                                            </button>
+                                                        @else
+                                                            <button
+                                                                type="submit"
+                                                                style="width: 100%; padding: 8px 12px; background: #dcfce7; color: #166534; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                            >
+                                                                Aktywuj
+                                                            </button>
+                                                        @endif
+                                                    </form>
+                                                @else
+                                                    <span style="font-size: 12px; color: #9ca3af; font-weight: 700; text-align: center;">
+                                                        Brak dezaktywacji
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="mt-6">
+                <div style="margin-top: 28px;">
                     {{ $users->links() }}
                 </div>
             @else
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <p class="text-gray-600">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <p style="color: #6b7280;">
                         Brak użytkowników do wyświetlenia.
                     </p>
                 </div>
