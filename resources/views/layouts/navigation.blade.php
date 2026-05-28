@@ -19,6 +19,10 @@
                         Strona główna
                     </x-nav-link>
 
+                    <x-nav-link :href="route('nfz.comparison')" :active="request()->routeIs('nfz.*')">
+                        Porównanie NFZ
+                    </x-nav-link>
+
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             Panel
@@ -148,6 +152,10 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 Strona główna
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('nfz.comparison')" :active="request()->routeIs('nfz.*')">
+                Porównanie NFZ
             </x-responsive-nav-link>
 
             @auth

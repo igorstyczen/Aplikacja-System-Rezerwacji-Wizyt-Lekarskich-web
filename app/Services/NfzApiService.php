@@ -12,7 +12,7 @@ class NfzApiService
     public function searchQueues(string $benefit, string $locality, string $province, int $case = 1): array
     {
         try {
-            $response = Http::timeout(15)
+            $response = Http::timeout(7)
                 ->acceptJson()
                 ->get($this->baseUrl . '/queues', [
                     'page' => 1,
@@ -42,31 +42,42 @@ class NfzApiService
         }
 
         $items = collect($response->json('data', []))
-            ->map(function ($item) {
-                $attributes = $item['attributes'] ?? [];
+        ->map(function ($item) {
+            $attributes = $item['attributes'] ?? [];
 
-                $dateValue = data_get($attributes, 'dates.date');
+            $dateValue = data_get($attributes, 'dates.date');
 
-                return [
-                    'id' => $item['id'] ?? null,
-                    'benefit' => $attributes['benefit'] ?? 'Brak danych',
-                    'provider' => $attributes['provider'] ?? 'Brak danych',
-                    'place' => $attributes['place'] ?? 'Brak danych',
-                    'address' => $attributes['address'] ?? 'Brak danych',
-                    'locality' => $attributes['locality'] ?? 'Brak danych',
-                    'phone' => $attributes['phone'] ?? null,
-                    'date' => $dateValue,
-                    'waiting_count' => data_get($attributes, 'statistics.provider-data.awaiting'),
-                    'average_waiting_days' => data_get($attributes, 'statistics.provider-data.average-period')
-                        ?? data_get($attributes, 'statistics.computed-data.average-period'),
-                ];
-            })
-            ->filter(fn ($item) => ! empty($item['date']))
-            ->sortBy(function ($item) {
-                return Carbon::parse($item['date']);
-            })
-            ->values()
-            ->all();
+            return [
+                'id' => $item['id'] ?? null,
+                'benefit' => $attributes['benefit'] ?? 'Brak danych',
+                'provider' => $attributes['provider'] ?? 'Brak danych',
+                'place' => $attributes['place'] ?? 'Brak danych',
+                'address' => $attributes['address'] ?? 'Brak danych',
+                'locality' => $attributes['locality'] ?? 'Brak danych',
+                'phone' => $attributes['phone'] ?? null,
+                'date' => $dateValue,
+                'waiting_count' => data_get($attributes, 'statistics.provider-data.awaiting'),
+                'average_waiting_days' => data_get($attributes, 'statistics.provider-data.average-period')
+                    ?? data_get($attributes, 'statistics.computed-data.average-period'),
+            ];
+        })
+        ->filter(function ($item) {
+            if (empty($item['date'])) {
+                return false;
+            }
+
+            try {
+                return Carbon::parse($item['date'])->startOfDay()
+                    ->greaterThanOrEqualTo(now()->startOfDay());
+            } catch (\Exception $e) {
+                return false;
+            }
+        })
+        ->sortBy(function ($item) {
+            return Carbon::parse($item['date']);
+        })
+        ->values()
+        ->all();
 
         return [
             'success' => true,

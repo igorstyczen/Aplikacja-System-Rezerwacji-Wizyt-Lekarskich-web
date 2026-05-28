@@ -1,270 +1,96 @@
 <x-app-layout>
-    @php
-        $nfzSearched = $nfzSearched ?? false;
-        $privateSlot = $privateSlot ?? null;
-        $nfzResult = $nfzResult ?? null;
-        $differenceDays = $differenceDays ?? null;
-    @endphp
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Lekarze
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1280px; margin: 0 auto;">
 
-            <div class="mb-6 bg-white p-6 rounded-lg shadow-sm">
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">
-                    Platforma rezerwacji wizyt lekarskich
-                </h1>
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 28px; padding: 42px; margin-bottom: 30px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);">
+                <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr); gap: 32px; align-items: center;">
+                    <div>
+                        <p style="color: #059669; font-size: 14px; font-weight: 900; margin-bottom: 10px;">
+                            Platforma rezerwacji wizyt lekarskich
+                        </p>
 
-                <p class="text-gray-600">
-                    Wybierz lekarza, sprawdź dostępne terminy i umów wizytę.
-                </p>
+                        <h1 style="font-size: 40px; line-height: 1.15; font-weight: 900; color: #111827; margin-bottom: 16px;">
+                            Znajdź lekarza i umów wizytę online
+                        </h1>
+
+                        <p style="color: #4b5563; font-size: 16px; line-height: 1.8; max-width: 820px;">
+                            Wybierz lekarza, sprawdź specjalizacje, kliniki, dostępne terminy i zarezerwuj wizytę.
+                            Możesz filtrować lekarzy po mieście, specjalizacji oraz problemie zdrowotnym.
+                        </p>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px;">
+                            <a
+                                href="#search-doctors"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; text-decoration: none; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);"
+                            >
+                                Znajdź lekarza
+                            </a>
+
+                            <a
+                                href="{{ route('nfz.comparison') }}"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #ecfdf5; color: #047857; font-size: 14px; font-weight: 900; border-radius: 12px; text-decoration: none;"
+                            >
+                                Porównaj z NFZ
+                            </a>
+                        </div>
+                    </div>
+
+                    <div style="background: #ecfdf5; border: 1px solid #bbf7d0; border-radius: 24px; padding: 28px;">
+                        <h2 style="font-size: 20px; font-weight: 900; color: #064e3b; margin-bottom: 16px;">
+                            Co możesz zrobić?
+                        </h2>
+
+                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <div style="background: white; border-radius: 16px; padding: 16px;">
+                                <p style="font-size: 14px; font-weight: 900; color: #111827;">
+                                    1. Wyszukaj lekarza
+                                </p>
+                                <p style="font-size: 13px; color: #6b7280; margin-top: 4px;">
+                                    Po specjalizacji, mieście albo tagu.
+                                </p>
+                            </div>
+
+                            <div style="background: white; border-radius: 16px; padding: 16px;">
+                                <p style="font-size: 14px; font-weight: 900; color: #111827;">
+                                    2. Wybierz termin
+                                </p>
+                                <p style="font-size: 13px; color: #6b7280; margin-top: 4px;">
+                                    Sprawdź dostępny grafik lekarza.
+                                </p>
+                            </div>
+
+                            <div style="background: white; border-radius: 16px; padding: 16px;">
+                                <p style="font-size: 14px; font-weight: 900; color: #111827;">
+                                    3. Zarezerwuj wizytę
+                                </p>
+                                <p style="font-size: 13px; color: #6b7280; margin-top: 4px;">
+                                    Potwierdź i opłać wizytę testowo.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-6 bg-white p-6 rounded-lg shadow-sm">
-                <h2 class="text-xl font-bold text-gray-900 mb-2">
-                    Porównaj termin prywatny z NFZ
-                </h2>
-
-                <p class="text-gray-600 mb-4">
-                    Wpisz świadczenie i miasto. System porówna najbliższy prywatny termin w aplikacji z najbliższym terminem zwróconym przez API NFZ.
-                </p>
-
-                <form method="GET" action="{{ route('home') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="nfz_benefit" class="block text-sm font-medium text-gray-700 mb-1">
-                                Świadczenie
-                            </label>
-
-                            <input
-                                type="text"
-                                id="nfz_benefit"
-                                name="nfz_benefit"
-                                value="{{ request('nfz_benefit') }}"
-                                placeholder="np. kardiolog, dermatolog"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                            >
-                        </div>
-
-                        <div>
-                            <label for="nfz_locality" class="block text-sm font-medium text-gray-700 mb-1">
-                                Miasto
-                            </label>
-
-                            <input
-                                type="text"
-                                id="nfz_locality"
-                                name="nfz_locality"
-                                value="{{ request('nfz_locality', request('city')) }}"
-                                placeholder="np. Rzeszów"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                            >
-                        </div>
-
-                        <div>
-                            <label for="nfz_province" class="block text-sm font-medium text-gray-700 mb-1">
-                                Województwo NFZ
-                            </label>
-
-                            <select
-                                id="nfz_province"
-                                name="nfz_province"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                            >
-                                <option value="09" @selected(request('nfz_province', '09') === '09')>Podkarpackie</option>
-                                <option value="06" @selected(request('nfz_province') === '06')>Małopolskie</option>
-                                <option value="07" @selected(request('nfz_province') === '07')>Mazowieckie</option>
-                                <option value="12" @selected(request('nfz_province') === '12')>Śląskie</option>
-                                <option value="03" @selected(request('nfz_province') === '03')>Lubelskie</option>
-                                <option value="02" @selected(request('nfz_province') === '02')>Kujawsko-pomorskie</option>
-                                <option value="04" @selected(request('nfz_province') === '04')>Lubuskie</option>
-                                <option value="05" @selected(request('nfz_province') === '05')>Łódzkie</option>
-                                <option value="08" @selected(request('nfz_province') === '08')>Opolskie</option>
-                                <option value="10" @selected(request('nfz_province') === '10')>Podlaskie</option>
-                                <option value="11" @selected(request('nfz_province') === '11')>Pomorskie</option>
-                                <option value="13" @selected(request('nfz_province') === '13')>Świętokrzyskie</option>
-                                <option value="14" @selected(request('nfz_province') === '14')>Warmińsko-mazurskie</option>
-                                <option value="15" @selected(request('nfz_province') === '15')>Wielkopolskie</option>
-                                <option value="16" @selected(request('nfz_province') === '16')>Zachodniopomorskie</option>
-                                <option value="01" @selected(request('nfz_province') === '01')>Dolnośląskie</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="nfz_case" class="block text-sm font-medium text-gray-700 mb-1">
-                                Typ przypadku
-                            </label>
-
-                            <select
-                                id="nfz_case"
-                                name="nfz_case"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
-                            >
-                                <option value="1" @selected(request('nfz_case', '1') == 1)>Stabilny</option>
-                                <option value="2" @selected(request('nfz_case') == 2)>Pilny</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap items-center pt-4" style="gap: 18px;">
-                        <button
-                            type="submit"
-                            style="display: inline-flex; align-items: center; padding: 10px 20px; background: #16a34a; color: white; font-size: 14px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer;"
-                        >
-                            Porównaj terminy
-                        </button>
-
-                        <a
-                            href="{{ route('home') }}"
-                            style="display: inline-flex; align-items: center; padding: 10px 20px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 600; border-radius: 8px; text-decoration: none;"
-                        >
-                            Wyczyść porównanie
-                        </a>
-                    </div>
-                </form>
-
-                @if ($nfzSearched)
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-900 mb-2">
-                                Najbliższy termin prywatny
-                            </h3>
-
-                            @if ($privateSlot)
-                                <p class="text-sm text-gray-700">
-                                    <strong>Data:</strong>
-                                    {{ \Carbon\Carbon::parse($privateSlot->start_time)->format('d.m.Y H:i') }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Lekarz:</strong>
-                                    Dr {{ $privateSlot->doctor_first_name }} {{ $privateSlot->doctor_last_name }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Usługa:</strong>
-                                    {{ $privateSlot->service_name }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Klinika:</strong>
-                                    {{ $privateSlot->clinic_name }}, {{ $privateSlot->clinic_city }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Cena:</strong>
-                                    {{ number_format($privateSlot->service_price, 2) }} zł
-                                </p>
-
-                                <a
-                                    href="{{ route('doctors.show', $privateSlot->doctor_id) }}"
-                                    class="inline-block mt-3 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                                >
-                                    Przejdź do lekarza
-                                </a>
-                            @else
-                                <p class="text-sm text-gray-500">
-                                    Brak pasującego prywatnego terminu w systemie.
-                                </p>
-                            @endif
-                        </div>
-
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-900 mb-2">
-                                Najbliższy termin NFZ
-                            </h3>
-
-                            @if ($nfzResult && ! $nfzResult['success'])
-                                <p class="text-sm text-red-600">
-                                    {{ $nfzResult['message'] }}
-                                </p>
-                            @elseif ($nfzResult && $nfzResult['nearest'])
-                                <p class="text-sm text-gray-700">
-                                    <strong>Data:</strong>
-                                    {{ \Carbon\Carbon::parse($nfzResult['nearest']['date'])->format('d.m.Y') }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Świadczenie:</strong>
-                                    {{ $nfzResult['nearest']['benefit'] }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Placówka:</strong>
-                                    {{ $nfzResult['nearest']['provider'] }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Miejsce:</strong>
-                                    {{ $nfzResult['nearest']['place'] }}
-                                </p>
-
-                                <p class="text-sm text-gray-700">
-                                    <strong>Adres:</strong>
-                                    {{ $nfzResult['nearest']['address'] }}, {{ $nfzResult['nearest']['locality'] }}
-                                </p>
-
-                                @if ($nfzResult['nearest']['phone'])
-                                    <p class="text-sm text-gray-700">
-                                        <strong>Telefon:</strong>
-                                        {{ $nfzResult['nearest']['phone'] }}
-                                    </p>
-                                @endif
-                            @else
-                                <p class="text-sm text-gray-500">
-                                    Brak znalezionych terminów NFZ dla podanych danych.
-                                </p>
-                            @endif
-                        </div>
-
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-900 mb-2">
-                                Wynik porównania
-                            </h3>
-
-                            @if (! is_null($differenceDays))
-                                @if ($differenceDays > 0)
-                                    <p class="text-green-700 font-semibold">
-                                        Prywatnie szybciej o {{ $differenceDays }} dni.
-                                    </p>
-                                @elseif ($differenceDays < 0)
-                                    <p class="text-blue-700 font-semibold">
-                                        NFZ szybciej o {{ abs($differenceDays) }} dni.
-                                    </p>
-                                @else
-                                    <p class="text-gray-700 font-semibold">
-                                        Terminy są tego samego dnia.
-                                    </p>
-                                @endif
-                            @else
-                                <p class="text-sm text-gray-500">
-                                    Nie można policzyć różnicy, ponieważ brakuje terminu prywatnego albo NFZ.
-                                </p>
-                            @endif
-
-                            @if ($nfzResult && ! empty($nfzResult['items']))
-                                <p class="text-xs text-gray-500 mt-3">
-                                    API NFZ zwróciło {{ count($nfzResult['items']) }} wyników. Pokazano najbliższy termin.
-                                </p>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            <div class="mb-6 bg-white p-6 rounded-lg shadow-sm">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">
+            <div id="search-doctors" style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-bottom: 30px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 24px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Znajdź lekarza
                 </h2>
 
-                <form method="GET" action="{{ route('home') }}" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
+                    Skorzystaj z filtrów, aby znaleźć lekarza według nazwiska, specjalizacji, problemu lub miasta.
+                </p>
+
+                <form method="GET" action="{{ route('home') }}" style="display: flex; flex-direction: column; gap: 24px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="search" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Szukaj lekarza
                             </label>
 
@@ -274,19 +100,19 @@
                                 name="search"
                                 value="{{ request('search') }}"
                                 placeholder="Imię lub nazwisko"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="specialization" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="specialization" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Specjalizacja
                             </label>
 
                             <select
                                 id="specialization"
                                 name="specialization"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="">Wszystkie</option>
 
@@ -299,14 +125,14 @@
                         </div>
 
                         <div>
-                            <label for="tag" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="tag" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Problem / tag
                             </label>
 
                             <select
                                 id="tag"
                                 name="tag"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="">Wszystkie</option>
 
@@ -319,14 +145,14 @@
                         </div>
 
                         <div>
-                            <label for="city" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="city" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Miasto
                             </label>
 
                             <select
                                 id="city"
                                 name="city"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="">Wszystkie</option>
 
@@ -339,104 +165,109 @@
                         </div>
                     </div>
 
-                    <div class="pt-2">
-                        <label class="inline-flex items-center gap-3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px;">
+                        <label style="display: inline-flex; align-items: center; gap: 10px; padding: 13px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 14px; cursor: pointer;">
                             <input
                                 type="checkbox"
                                 name="for_children"
                                 value="1"
                                 @checked(request()->boolean('for_children'))
-                                class="rounded border-gray-300 text-blue-600 shadow-sm"
                             >
 
-                            <span class="text-sm font-medium text-gray-700">
+                            <span style="font-size: 14px; font-weight: 700; color: #374151;">
                                 Przyjmuje dzieci
                             </span>
                         </label>
-                    </div>
 
-                    <div class="flex flex-wrap gap-4 pt-2">
-                        <button
-                            type="submit"
-                            style="display: inline-flex; align-items: center; padding: 9px 18px; background: #2563eb; color: white; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer;"
-                        >
-                            Filtruj
-                        </button>
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px;">
+                            <button
+                                type="submit"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
+                            >
+                                Filtruj
+                            </button>
 
-                        <a
-                            href="{{ route('home') }}"
-                            class="inline-flex items-center px-5 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200"
-                        >
-                            Wyczyść
-                        </a>
+                            <a
+                                href="{{ route('home') }}"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 12px; text-decoration: none;"
+                            >
+                                Wyczyść
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
 
             @if ($doctors->count() > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
                     @foreach ($doctors as $doctor)
-                        <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-                            <div class="flex items-center gap-4 mb-4">
-                                <div style="width: 72px; height: 72px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    @if ($doctor->photo_url)
-                                        <img
-                                            src="{{ asset($doctor->photo_url) }}"
-                                            alt="Zdjęcie lekarza"
-                                            style="width: 72px; height: 72px; object-fit: cover; object-position: center 20%; display: block;"
-                                        >
-                                    @else
-                                        <span class="text-gray-500 text-lg font-bold">
-                                            {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
-                                        </span>
-                                    @endif
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 26px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05); display: flex; flex-direction: column; justify-content: space-between; min-height: 390px; min-width: 0; overflow: hidden;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 18px;">
+                                    <div style="width: 78px; height: 78px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        @if ($doctor->photo_url)
+                                            <img
+                                                src="{{ asset($doctor->photo_url) }}"
+                                                alt="Zdjęcie lekarza"
+                                                style="width: 78px; height: 78px; object-fit: cover; object-position: center 20%; display: block;"
+                                            >
+                                        @else
+                                            <span style="color: #6b7280; font-size: 20px; font-weight: 900;">
+                                                {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <div>
+                                        <h3 style="font-size: 19px; font-weight: 900; color: #111827; margin-bottom: 5px;">
+                                            Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
+                                        </h3>
+
+                                        <p style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+                                            @forelse ($doctor->specializations as $specialization)
+                                                {{ $specialization->specialization_name }}@if (!$loop->last), @endif
+                                            @empty
+                                                Brak specjalizacji
+                                            @endforelse
+                                        </p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">
-                                        {{ $doctor->first_name }} {{ $doctor->last_name }}
-                                    </h3>
-
-                                    <p class="text-sm text-gray-500">
-                                        @forelse ($doctor->specializations as $specialization)
-                                            {{ $specialization->specialization_name }}@if (!$loop->last), @endif
-                                        @empty
-                                            Brak specjalizacji
-                                        @endforelse
-                                    </p>
-                                </div>
-                            </div>
-
-                            <p class="text-gray-600 text-sm mb-4">
-                                {{ \Illuminate\Support\Str::limit($doctor->bio, 120) }}
-                            </p>
-
-                            <div class="mb-4">
-                                <p class="text-sm font-semibold text-gray-700 mb-1">
-                                    Kliniki:
+                                <p style="font-size: 14px; color: #4b5563; line-height: 1.7; margin-bottom: 18px; overflow-wrap: anywhere; word-break: break-word;">
+                                    {{ \Illuminate\Support\Str::limit($doctor->bio ?? 'Brak opisu lekarza.', 125) }}
                                 </p>
 
-                                @forelse ($doctor->clinics as $clinic)
-                                    <p class="text-sm text-gray-600">
-                                        {{ $clinic->name }}, {{ $clinic->city }}
+                                <div style="margin-bottom: 18px;">
+                                    <p style="font-size: 13px; font-weight: 900; color: #374151; margin-bottom: 8px;">
+                                        Kliniki
                                     </p>
-                                @empty
-                                    <p class="text-sm text-gray-500">
-                                        Brak przypisanej kliniki
-                                    </p>
-                                @endforelse
+
+                                    @forelse ($doctor->clinics as $clinic)
+                                        <p style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">
+                                            {{ $clinic->name }}, {{ $clinic->city }}
+                                        </p>
+                                    @empty
+                                        <p style="font-size: 13px; color: #9ca3af;">
+                                            Brak przypisanej kliniki
+                                        </p>
+                                    @endforelse
+                                </div>
+
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;">
+                                    @forelse ($doctor->helpTags as $tag)
+                                        <span style="padding: 6px 10px; background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 11px; font-weight: 900;">
+                                            {{ $tag->tag_name }}
+                                        </span>
+                                    @empty
+                                        <span style="padding: 6px 10px; background: #f3f4f6; color: #6b7280; border-radius: 999px; font-size: 11px; font-weight: 800;">
+                                            Brak tagów
+                                        </span>
+                                    @endforelse
+                                </div>
                             </div>
 
-                            <div class="mb-4 flex flex-wrap gap-2">
-                                @foreach ($doctor->helpTags as $tag)
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                        {{ $tag->tag_name }}
-                                    </span>
-                                @endforeach
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm text-gray-500">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid #f3f4f6; padding-top: 18px;">
+                                <div style="font-size: 13px; color: #6b7280; font-weight: 800;">
                                     @if ($doctor->is_for_children)
                                         Dorośli i dzieci
                                     @else
@@ -446,7 +277,7 @@
 
                                 <a
                                     href="{{ route('doctors.show', $doctor) }}"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                                    style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: #2563eb; color: white; font-size: 13px; font-weight: 900; border-radius: 10px; text-decoration: none;"
                                 >
                                     Zobacz profil
                                 </a>
@@ -455,16 +286,17 @@
                     @endforeach
                 </div>
 
-                <div class="mt-8">
+                <div style="margin-top: 30px;">
                     {{ $doctors->links() }}
                 </div>
             @else
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <p class="text-gray-600">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <p style="color: #6b7280;">
                         Brak lekarzy do wyświetlenia.
                     </p>
                 </div>
             @endif
+
         </div>
     </div>
 </x-app-layout>
