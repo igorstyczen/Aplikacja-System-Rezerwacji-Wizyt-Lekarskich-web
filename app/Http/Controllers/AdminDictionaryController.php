@@ -78,11 +78,28 @@ class AdminDictionaryController extends Controller
         return back()->with('success', 'Specjalizacja została usunięta.');
     }
 
-    public function helpTags()
+    public function helpTags(Request $request)
     {
-        $helpTags = HelpTag::withCount('doctors')
-            ->orderBy('tag_name')
-            ->paginate(20);
+        $query = HelpTag::withCount('doctors')
+            ->orderBy('tag_name');
+
+        if ($request->filled('tag_name')) {
+            $query->where('tag_name', 'like', '%' . $request->tag_name . '%');
+        }
+
+        if ($request->filled('usage')) {
+            if ($request->usage === 'used') {
+                $query->has('doctors');
+            }
+
+            if ($request->usage === 'unused') {
+                $query->doesntHave('doctors');
+            }
+        }
+
+        $helpTags = $query
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.help-tags', [
             'helpTags' => $helpTags,
@@ -91,8 +108,22 @@ class AdminDictionaryController extends Controller
 
     public function storeHelpTag(Request $request)
     {
+        $request->merge([
+            'tag_name' => trim($request->tag_name),
+        ]);
+
+        $existingTag = HelpTag::where('tag_name', $request->tag_name)->first();
+
+        if ($existingTag) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'tag_name' => 'Taki tag już istnieje.',
+                ]);
+        }
+
         $request->validate([
-            'tag_name' => ['required', 'string', 'max:255', 'unique:help_tags,tag_name'],
+            'tag_name' => ['required', 'string', 'max:255'],
         ]);
 
         HelpTag::create([
@@ -104,13 +135,24 @@ class AdminDictionaryController extends Controller
 
     public function updateHelpTag(Request $request, HelpTag $helpTag)
     {
+        $request->merge([
+            'tag_name' => trim($request->tag_name),
+        ]);
+
+        $existingTag = HelpTag::where('tag_name', $request->tag_name)
+            ->where('id', '!=', $helpTag->id)
+            ->first();
+
+        if ($existingTag) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'tag_name' => 'Taki tag już istnieje.',
+                ]);
+        }
+
         $request->validate([
-            'tag_name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('help_tags', 'tag_name')->ignore($helpTag->id),
-            ],
+            'tag_name' => ['required', 'string', 'max:255'],
         ]);
 
         $helpTag->update([
