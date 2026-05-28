@@ -10,11 +10,28 @@ use Illuminate\Validation\Rule;
 
 class AdminDictionaryController extends Controller
 {
-    public function specializations()
+    public function specializations(Request $request)
     {
-        $specializations = Specialization::withCount('doctorSpecializations')
-            ->orderBy('name')
-            ->paginate(20);
+        $query = Specialization::withCount('doctorSpecializations')
+            ->orderBy('name');
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('usage')) {
+            if ($request->usage === 'used') {
+                $query->has('doctorSpecializations');
+            }
+
+            if ($request->usage === 'unused') {
+                $query->doesntHave('doctorSpecializations');
+            }
+        }
+
+        $specializations = $query
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.specializations', [
             'specializations' => $specializations,

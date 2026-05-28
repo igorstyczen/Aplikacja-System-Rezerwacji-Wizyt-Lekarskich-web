@@ -39,6 +39,71 @@
 
             <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
                 <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                    Filtry
+                </h2>
+
+                <p style="font-size: 14px; color: #6b7280; margin-bottom: 22px;">
+                    Wyszukaj specjalizację po nazwie albo sprawdź, które specjalizacje są używane przez lekarzy.
+                </p>
+
+                <form method="GET" action="{{ route('admin.specializations') }}" style="display: flex; flex-direction: column; gap: 22px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px;">
+                        <div>
+                            <label for="name" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Nazwa specjalizacji
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value="{{ request('name') }}"
+                                placeholder="np. Dermatolog"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="usage" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Przypisanie do lekarzy
+                            </label>
+
+                            <select
+                                id="usage"
+                                name="usage"
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                                <option value="">Wszystkie</option>
+                                <option value="used" @selected(request('usage') === 'used')>
+                                    Używane przez lekarzy
+                                </option>
+                                <option value="unused" @selected(request('usage') === 'unused')>
+                                    Nieprzypisane do lekarzy
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 18px;">
+                        <button
+                            type="submit"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
+                        >
+                            Filtruj
+                        </button>
+
+                        <a
+                            href="{{ route('admin.specializations') }}"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 24px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 12px; text-decoration: none;"
+                        >
+                            Wyczyść
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                     Dodaj specjalizację
                 </h2>
 
@@ -146,7 +211,7 @@
                 @else
                     <div style="padding: 32px;">
                         <p style="color: #6b7280;">
-                            Brak specjalizacji w słowniku.
+                            Brak specjalizacji spełniających wybrane filtry.
                         </p>
                     </div>
                 @endif
