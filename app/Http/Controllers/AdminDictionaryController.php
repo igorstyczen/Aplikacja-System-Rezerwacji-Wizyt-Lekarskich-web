@@ -23,6 +23,10 @@ class AdminDictionaryController extends Controller
 
     public function storeSpecialization(Request $request)
     {
+        $request->merge([
+            'name' => trim($request->name),
+        ]);
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:specializations,name'],
         ]);
@@ -36,6 +40,10 @@ class AdminDictionaryController extends Controller
 
     public function updateSpecialization(Request $request, Specialization $specialization)
     {
+        $request->merge([
+            'name' => trim($request->name),
+        ]);
+
         $request->validate([
             'name' => [
                 'required',
