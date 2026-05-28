@@ -1,57 +1,75 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Porównanie terminów prywatnych i NFZ
-        </h2>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Porównanie NFZ
+            </h2>
+
+            <a href="{{ route('home') }}" style="font-size: 14px; color: #2563eb; font-weight: 700; text-decoration: none;">
+                ← Wróć do strony głównej
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div style="padding: 40px 16px;">
+        <div style="max-width: 1280px; margin: 0 auto;">
 
             @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded mb-6">
+                <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;">
                     @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
+                        <p style="margin: 0 0 6px 0;">{{ $error }}</p>
                     @endforeach
                 </div>
             @endif
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
-                    Porównanie dostępności terminów
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 34px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
+                <p style="color: #16a34a; font-size: 14px; font-weight: 900; margin-bottom: 8px;">
+                    Moduł NFZ
+                </p>
+
+                <h1 style="font-size: 34px; font-weight: 900; color: #111827; margin-bottom: 12px;">
+                    Porównaj termin prywatny z terminem NFZ
                 </h1>
 
-                <p class="text-gray-600 mt-2">
-                    Moduł pobiera publiczne dane z API NFZ i porównuje najbliższy termin refundowany
-                    z najbliższym prywatnym terminem dostępnym w systemie.
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.7; max-width: 900px;">
+                    Wybierz świadczenie NFZ, miasto, województwo i typ przypadku.
+                    System porówna najbliższy termin publiczny z API NFZ z najbliższym prywatnym terminem dostępnym w aplikacji.
                 </p>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                <form method="GET" action="{{ route('nfz.compare') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                    Dane do porównania
+                </h2>
+
+                <p style="font-size: 14px; color: #6b7280; line-height: 1.7; margin-bottom: 24px;">
+                    Pole „Świadczenie NFZ” używa oficjalnej nazwy wysyłanej do API NFZ.
+                    Dla prywatnych terminów system używa uproszczonego hasła, np. „dermatolog”.
+                </p>
+
+                <form method="GET" action="{{ route('nfz.compare') }}" style="display: flex; flex-direction: column; gap: 24px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;">
                         <div>
-                            <label for="benefit" class="block text-sm font-medium text-gray-700 mb-1">
-                                Świadczenie / usługa
+                            <label for="benefit" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Świadczenie NFZ
                             </label>
 
-                            <input
-                                type="text"
+                            <select
                                 id="benefit"
                                 name="benefit"
-                                value="{{ request('benefit', 'poradnia kardiologiczna') }}"
-                                placeholder="np. poradnia kardiologiczna"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                 required
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
-
-                            <p class="text-xs text-gray-500 mt-1">
-                                Wpisz nazwę świadczenia NFZ albo podobną nazwę prywatnej usługi.
-                            </p>
+                                @foreach ($benefits as $benefitKey => $benefitData)
+                                    <option value="{{ $benefitKey }}" @selected(request('benefit', 'kardiolog') === $benefitKey)>
+                                        {{ $benefitData['label'] }} — {{ $benefitData['nfz_display'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div>
-                            <label for="locality" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="locality" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Miasto
                             </label>
 
@@ -61,21 +79,21 @@
                                 name="locality"
                                 value="{{ request('locality', 'Rzeszów') }}"
                                 placeholder="np. Rzeszów"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                 required
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                         </div>
 
                         <div>
-                            <label for="province" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="province" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Województwo NFZ
                             </label>
 
                             <select
                                 id="province"
                                 name="province"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                 required
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="01" @selected(request('province') === '01')>Dolnośląskie</option>
                                 <option value="02" @selected(request('province') === '02')>Kujawsko-pomorskie</option>
@@ -97,15 +115,15 @@
                         </div>
 
                         <div>
-                            <label for="case" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="case" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
                                 Typ przypadku
                             </label>
 
                             <select
                                 id="case"
                                 name="case"
-                                class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                 required
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
                             >
                                 <option value="1" @selected(request('case', '1') === '1')>
                                     Stabilny
@@ -117,68 +135,77 @@
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                    >
-                        Porównaj terminy
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 18px;">
+                        <button
+                            type="submit"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 26px; background: #16a34a; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 8px 16px rgba(22, 163, 74, 0.18);"
+                        >
+                            Porównaj terminy
+                        </button>
+
+                        <a
+                            href="{{ route('nfz.comparison') }}"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 26px; background: #f3f4f6; color: #374151; font-size: 14px; font-weight: 800; border-radius: 12px; text-decoration: none;"
+                        >
+                            Wyczyść
+                        </a>
+                    </div>
                 </form>
             </div>
 
             @if ($searched)
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-bottom: 28px;">
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 18px;">
                             Najbliższy termin prywatny
                         </h2>
 
                         @if ($privateSlot)
-                            <div class="space-y-2 text-sm text-gray-700">
-                                <p>
-                                    <strong>Data:</strong>
-                                    {{ \Carbon\Carbon::parse($privateSlot->start_time)->format('d.m.Y H:i') }}
-                                </p>
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Data:</strong>
+                                {{ \Carbon\Carbon::parse($privateSlot->start_time)->format('d.m.Y H:i') }}
+                            </p>
 
-                                <p>
-                                    <strong>Lekarz:</strong>
-                                    Dr {{ $privateSlot->doctor_first_name }} {{ $privateSlot->doctor_last_name }}
-                                </p>
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Lekarz:</strong>
+                                Dr {{ $privateSlot->doctor_first_name }} {{ $privateSlot->doctor_last_name }}
+                            </p>
 
-                                <p>
-                                    <strong>Usługa:</strong>
-                                    {{ $privateSlot->service_name }}
-                                </p>
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Usługa:</strong>
+                                {{ $privateSlot->service_name }}
+                            </p>
 
-                                <p>
-                                    <strong>Klinika:</strong>
-                                    {{ $privateSlot->clinic_name }}, {{ $privateSlot->clinic_city }}
-                                </p>
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Klinika:</strong>
+                                {{ $privateSlot->clinic_name }}, {{ $privateSlot->clinic_city }}
+                            </p>
 
-                                <p>
-                                    <strong>Cena:</strong>
-                                    {{ number_format($privateSlot->service_price, 2) }} zł
-                                </p>
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 16px;">
+                                <strong>Cena:</strong>
+                                {{ number_format($privateSlot->service_price, 2) }} zł
+                            </p>
 
-                                <p>
-                                    <strong>Czas trwania:</strong>
-                                    {{ $privateSlot->service_duration }} min
-                                </p>
-                            </div>
+                            <a
+                                href="{{ route('doctors.show', $privateSlot->doctor_id) }}"
+                                style="display: inline-flex; align-items: center; justify-content: center; padding: 9px 16px; background: #2563eb; color: white; font-size: 13px; font-weight: 900; border-radius: 10px; text-decoration: none;"
+                            >
+                                Przejdź do lekarza
+                            </a>
                         @else
-                            <p class="text-gray-600">
+                            <p style="font-size: 14px; color: #6b7280;">
                                 Brak pasującego prywatnego terminu w systemie.
                             </p>
                         @endif
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 18px;">
                             Najbliższy termin NFZ
                         </h2>
 
                         @if (! $nfzResult['success'])
-                            <p class="text-red-700">
+                            <p style="font-size: 14px; color: #b91c1c;">
                                 {{ $nfzResult['message'] }}
                             </p>
                         @elseif ($nfzResult['nearest'])
@@ -186,143 +213,133 @@
                                 $nearest = $nfzResult['nearest'];
                             @endphp
 
-                            <div class="space-y-2 text-sm text-gray-700">
-                                <p>
-                                    <strong>Data:</strong>
-                                    {{ \Carbon\Carbon::parse($nearest['date'])->format('d.m.Y') }}
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Data:</strong>
+                                {{ \Carbon\Carbon::parse($nearest['date'])->format('d.m.Y') }}
+                            </p>
+
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Świadczenie:</strong>
+                                {{ $nearest['benefit'] }}
+                            </p>
+
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Placówka:</strong>
+                                {{ $nearest['provider'] }}
+                            </p>
+
+                            <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                <strong>Adres:</strong>
+                                {{ $nearest['address'] }}, {{ $nearest['locality'] }}
+                            </p>
+
+                            @if ($nearest['phone'])
+                                <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                    <strong>Telefon:</strong>
+                                    {{ $nearest['phone'] }}
                                 </p>
+                            @endif
 
-                                <p>
-                                    <strong>Świadczenie:</strong>
-                                    {{ $nearest['benefit'] }}
+                            @if ($nearest['waiting_count'] !== null)
+                                <p style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+                                    <strong>Liczba oczekujących:</strong>
+                                    {{ $nearest['waiting_count'] }}
                                 </p>
-
-                                <p>
-                                    <strong>Placówka:</strong>
-                                    {{ $nearest['provider'] }}
-                                </p>
-
-                                <p>
-                                    <strong>Miejsce:</strong>
-                                    {{ $nearest['place'] }}
-                                </p>
-
-                                <p>
-                                    <strong>Adres:</strong>
-                                    {{ $nearest['address'] }}, {{ $nearest['locality'] }}
-                                </p>
-
-                                @if ($nearest['phone'])
-                                    <p>
-                                        <strong>Telefon:</strong>
-                                        {{ $nearest['phone'] }}
-                                    </p>
-                                @endif
-
-                                @if ($nearest['waiting_count'] !== null)
-                                    <p>
-                                        <strong>Liczba oczekujących:</strong>
-                                        {{ $nearest['waiting_count'] }}
-                                    </p>
-                                @endif
-
-                                @if ($nearest['average_waiting_days'] !== null)
-                                    <p>
-                                        <strong>Średni czas oczekiwania:</strong>
-                                        {{ $nearest['average_waiting_days'] }} dni
-                                    </p>
-                                @endif
-                            </div>
+                            @endif
                         @else
-                            <p class="text-gray-600">
+                            <p style="font-size: 14px; color: #6b7280;">
                                 Brak znalezionych terminów NFZ dla podanych danych.
+                            </p>
+                        @endif
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 18px;">
+                            Wynik porównania
+                        </h2>
+
+                        @if ($privateSlot && $nfzResult['nearest'] && $differenceDays !== null)
+                            @if ($differenceDays > 0)
+                                <p style="font-size: 20px; color: #15803d; font-weight: 900;">
+                                    Prywatnie szybciej o {{ $differenceDays }} dni.
+                                </p>
+                            @elseif ($differenceDays < 0)
+                                <p style="font-size: 20px; color: #1d4ed8; font-weight: 900;">
+                                    NFZ szybciej o {{ abs($differenceDays) }} dni.
+                                </p>
+                            @else
+                                <p style="font-size: 20px; color: #374151; font-weight: 900;">
+                                    Terminy są tego samego dnia.
+                                </p>
+                            @endif
+                        @else
+                            <p style="font-size: 14px; color: #6b7280;">
+                                Nie można policzyć różnicy, ponieważ brakuje terminu prywatnego albo terminu NFZ.
+                            </p>
+                        @endif
+
+                        @if ($nfzResult['success'] && count($nfzResult['items']) > 0)
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 16px;">
+                                API NFZ zwróciło {{ count($nfzResult['items']) }} wyników. Poniżej pokazano listę najbliższych terminów.
                             </p>
                         @endif
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
-                        Wynik porównania
-                    </h2>
-
-                    @if ($privateSlot && $nfzResult['nearest'] && $differenceDays !== null)
-                        @if ($differenceDays > 0)
-                            <p class="text-green-700 font-semibold">
-                                Prywatny termin jest szybszy o {{ $differenceDays }} dni.
-                            </p>
-                        @elseif ($differenceDays < 0)
-                            <p class="text-yellow-700 font-semibold">
-                                Termin NFZ jest szybszy o {{ abs($differenceDays) }} dni.
-                            </p>
-                        @else
-                            <p class="text-blue-700 font-semibold">
-                                Termin prywatny i NFZ wypadają tego samego dnia.
-                            </p>
-                        @endif
-                    @else
-                        <p class="text-gray-600">
-                            Nie można policzyć różnicy, ponieważ brakuje terminu prywatnego albo terminu NFZ.
-                        </p>
-                    @endif
-                </div>
-
                 @if ($nfzResult['success'] && count($nfzResult['items']) > 0)
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div class="p-6 border-b border-gray-200">
-                            <h2 class="text-lg font-semibold text-gray-900">
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <div style="padding: 26px 30px; border-bottom: 1px solid #e5e7eb;">
+                            <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
                                 Wyniki NFZ
                             </h2>
+
+                            <p style="font-size: 14px; color: #6b7280;">
+                                Lista terminów zwróconych przez API NFZ.
+                            </p>
                         </div>
 
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Data
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Placówka
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Miejscowość
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Oczekujących
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($nfzResult['items'] as $item)
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                                <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
                                     <tr>
-                                        <td class="px-6 py-4 text-sm text-gray-900">
-                                            {{ \Carbon\Carbon::parse($item['date'])->format('d.m.Y') }}
-                                        </td>
-
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            {{ $item['provider'] }}
-                                            <br>
-                                            <span class="text-gray-500">
-                                                {{ $item['place'] }}
-                                            </span>
-                                        </td>
-
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            {{ $item['locality'] }}
-                                            <br>
-                                            <span class="text-gray-500">
-                                                {{ $item['address'] }}
-                                            </span>
-                                        </td>
-
-                                        <td class="px-6 py-4 text-sm text-gray-700">
-                                            {{ $item['waiting_count'] ?? 'Brak danych' }}
-                                        </td>
+                                        <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Data</th>
+                                        <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Placówka</th>
+                                        <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Miejscowość</th>
+                                        <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Oczekujących</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+
+                                <tbody>
+                                    @foreach ($nfzResult['items'] as $item)
+                                        <tr style="border-bottom: 1px solid #f3f4f6;">
+                                            <td style="padding: 18px; font-size: 14px; color: #111827; font-weight: 800;">
+                                                {{ \Carbon\Carbon::parse($item['date'])->format('d.m.Y') }}
+                                            </td>
+
+                                            <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                                <strong>{{ $item['provider'] }}</strong>
+                                                <br>
+                                                <span style="font-size: 12px; color: #6b7280;">
+                                                    {{ $item['place'] }}
+                                                </span>
+                                            </td>
+
+                                            <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                                {{ $item['locality'] }}
+                                                <br>
+                                                <span style="font-size: 12px; color: #6b7280;">
+                                                    {{ $item['address'] }}
+                                                </span>
+                                            </td>
+
+                                            <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                                {{ $item['waiting_count'] ?? 'Brak danych' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 @endif
             @endif

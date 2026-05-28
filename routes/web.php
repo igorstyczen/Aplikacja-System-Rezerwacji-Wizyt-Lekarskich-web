@@ -150,9 +150,8 @@ Route::post('/appointments/{appointment}/review', [ReviewController::class, 'sto
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
 
-Route::get('/nfz-comparison', function () {
-    return redirect()->route('home');
-})->name('nfz.comparison');
+Route::get('/nfz-comparison', [NfzComparisonController::class, 'index'])
+    ->name('nfz.comparison');
 
 Route::get('/nfz-comparison/compare', [NfzComparisonController::class, 'compare'])
     ->name('nfz.compare');
