@@ -22,6 +22,8 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
+        $this->autoCompletePastAppointments();
+
         $usersCount = User::count();
         $doctorsCount = Doctor::count();
         $patientsCount = Patient::count();
@@ -488,9 +490,14 @@ class AdminDashboardController extends Controller
             ->orderBy('name')
             ->get();
 
+        $helpTags = HelpTag::query()
+            ->orderBy('tag_name')
+            ->get();
+
         return view('admin.doctor-applications', [
             'applications' => $applications,
             'specializations' => $specializations,
+            'helpTags' => $helpTags,
         ]);
     }
 
@@ -542,6 +549,14 @@ class AdminDashboardController extends Controller
                 }
             }
 
+            $rawHelpTagIds = $doctorApplication->help_tag_ids;
+
+            if (is_string($rawHelpTagIds)) {
+                $rawHelpTagIds = json_decode($rawHelpTagIds, true) ?? [];
+            }
+
+            $doctor->helpTags()->sync($rawHelpTagIds ?? []);
+
             $clinic = Clinic::query()
                 ->where('city', $doctorApplication->clinic_city)
                 ->where('address', $doctorApplication->clinic_address)
@@ -590,9 +605,20 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Zgłoszenie zostało odrzucone.');
     }
 
+    private function autoCompletePastAppointments(): void
+    {
+        Appointment::whereIn('status', ['pending', 'confirmed'])
+            ->where('date', '<', now())
+            ->where('payment_status', 'paid')
+            ->update([
+                'status' => 'completed',
+            ]);
+    }
 
     public function appointments(Request $request)
     {
+        $this->autoCompletePastAppointments();
+
         $query = Appointment::with([
             'patient',
             'doctor',

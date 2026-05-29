@@ -32,7 +32,7 @@
                 </h1>
 
                 <p style="color: #4b5563; font-size: 15px; line-height: 1.7; max-width: 760px;">
-                    Wypełnij dane zawodowe, wybierz specjalizację i podaj miejsce przyjmowania pacjentów.
+                    Wypełnij dane zawodowe, wybierz specjalizacje, tagi pomocy i podaj miejsce przyjmowania pacjentów.
                     Administrator sprawdzi zgłoszenie i po akceptacji otrzymasz dostęp do panelu lekarza.
                 </p>
             </div>
@@ -207,6 +207,39 @@
                         @else
                             <p style="font-size: 14px; color: #b91c1c;">
                                 Brak specjalizacji w systemie. Administrator musi najpierw dodać specjalizacje.
+                            </p>
+                        @endif
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Tagi / obszary pomocy
+                        </h2>
+
+                        <p style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">
+                            Wybierz problemy lub obszary, w których pomagasz pacjentom. Tagi ułatwiają pacjentom wyszukanie lekarza.
+                        </p>
+
+                        @if ($helpTags->count() > 0)
+                            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+                                @foreach ($helpTags as $tag)
+                                    <label style="display: flex; align-items: center; gap: 12px; border: 1px solid #e5e7eb; border-radius: 14px; padding: 15px 16px; background: #f9fafb; cursor: pointer;">
+                                        <input
+                                            type="checkbox"
+                                            name="help_tags[]"
+                                            value="{{ $tag->id }}"
+                                            @checked(in_array($tag->id, old('help_tags', [])))
+                                        >
+
+                                        <span style="font-size: 14px; font-weight: 700; color: #374151;">
+                                            {{ $tag->tag_name }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <p style="font-size: 14px; color: #9ca3af;">
+                                Brak tagów w systemie. Administrator może dodać je w panelu admina.
                             </p>
                         @endif
                     </div>

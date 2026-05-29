@@ -3,6 +3,10 @@
         $specializations = isset($specializations)
             ? collect($specializations)
             : \App\Models\Specialization::query()->orderBy('name')->get();
+
+        $helpTags = isset($helpTags)
+            ? collect($helpTags)
+            : \App\Models\HelpTag::query()->orderBy('tag_name')->get();
     @endphp
 
     <x-slot name="header">
@@ -60,6 +64,21 @@
                                 ->filter(fn ($specialization) => $selectedSpecializationIds->contains((int) $specialization->id))
                                 ->pluck('name')
                                 ->values();
+
+                            $rawHelpTagIds = $application->help_tag_ids;
+
+                            if (is_string($rawHelpTagIds)) {
+                                $rawHelpTagIds = json_decode($rawHelpTagIds, true) ?? [];
+                            }
+
+                            $selectedHelpTagIds = collect($rawHelpTagIds ?? [])
+                                ->map(fn ($id) => (int) $id)
+                                ->values();
+
+                            $applicationHelpTags = collect($helpTags)
+                                ->filter(fn ($tag) => $selectedHelpTagIds->contains((int) $tag->id))
+                                ->pluck('tag_name')
+                                ->values();
                         @endphp
 
                         <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
@@ -116,10 +135,30 @@
 
                                     <div style="margin-bottom: 18px;">
                                         <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 8px;">
+                                            Tagi / obszary pomocy
+                                        </h3>
+
+                                        @if ($applicationHelpTags->count() > 0)
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                @foreach ($applicationHelpTags as $tagName)
+                                                    <span style="padding: 6px 10px; background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 800;">
+                                                        {{ $tagName }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <p style="font-size: 14px; color: #9ca3af;">
+                                                Brak wybranych tagów.
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <div style="margin-bottom: 18px;">
+                                        <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 8px;">
                                             Opis / bio
                                         </h3>
 
-                                        <p style="font-size: 14px; color: #4b5563; line-height: 1.7;">
+                                        <p style="font-size: 14px; color: #4b5563; line-height: 1.7; overflow-wrap: anywhere; word-break: break-word;">
                                             {{ $application->bio }}
                                         </p>
                                     </div>
