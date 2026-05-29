@@ -301,9 +301,13 @@
                             <div style="display: flex; flex-direction: column; gap: 14px;">
                                 @foreach ($availabilitySlots as $date => $slots)
                                     @php
-                                        $day = \Carbon\Carbon::parse($date);
+                                        $day = \Carbon\Carbon::parse($date)->startOfDay();
                                         $dayId = 'day-' . $day->format('Ymd');
                                     @endphp
+
+                                    @if ($day->lt(\Carbon\Carbon::today()))
+                                        @continue
+                                    @endif
 
                                     <div class="day-card" style="border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; background: #f9fafb;">
                                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;">

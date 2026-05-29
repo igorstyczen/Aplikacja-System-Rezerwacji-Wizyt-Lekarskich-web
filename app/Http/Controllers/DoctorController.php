@@ -20,11 +20,12 @@ class DoctorController extends Controller
             $week = 4;
         }
 
-        $weekStart = Carbon::today()
-            ->startOfWeek(Carbon::MONDAY)
-            ->addWeeks($week);
-
-        $weekEnd = $weekStart->copy()->endOfWeek(Carbon::SUNDAY);
+        /*
+         * Dla aktualnego tygodnia nie zaczynamy od poniedziałku,
+         * tylko od dzisiejszej daty. Dzięki temu nie pokazujemy minionych dni.
+         */
+        $weekStart = Carbon::today()->addWeeks($week)->startOfDay();
+        $weekEnd = $weekStart->copy()->addDays(6)->endOfDay();
 
         $doctor->load([
             'specializations',
@@ -39,6 +40,7 @@ class DoctorController extends Controller
         $availabilitySlots = $doctor->availabilitySlots()
             ->with('clinic')
             ->where('status', 'available')
+            ->where('start_time', '>=', now())
             ->whereBetween('start_time', [
                 $weekStart->copy()->startOfDay(),
                 $weekEnd->copy()->endOfDay(),
