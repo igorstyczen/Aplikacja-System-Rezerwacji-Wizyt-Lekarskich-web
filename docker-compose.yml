@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: medical_app
+    ports:
+      - "8000:80"
+    volumes:
+      # Kod z Windows — tylko app/, routes, resources itd.
+      - .:/var/www/html
+      # Ciężkie katalogi w wolumenach Linux (szybsze I/O niż bind mount z Windows)
+      - medical_vendor:/var/www/html/vendor
+      - medical_bootstrap_cache:/var/www/html/bootstrap/cache
+      - medical_storage_framework:/var/www/html/storage/framework
+      - medical_node_modules:/var/www/html/node_modules
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: medical_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: medical_booking
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    volumes:
+      - medical_db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: medical_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+
+volumes:
+  medical_db_data:
+  medical_vendor:
+  medical_bootstrap_cache:
+  medical_storage_framework:
+  medical_node_modules:

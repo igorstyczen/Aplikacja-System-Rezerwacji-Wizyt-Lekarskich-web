@@ -1,0 +1,257 @@
+<?php
+
+use App\Http\Controllers\DoctorDashboardController;
+use App\Http\Controllers\PatientDashboardController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardRedirectController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NfzComparisonController;
+use App\Http\Controllers\AdminDictionaryController;
+use App\Http\Controllers\DoctorApplicationController;
+
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.dashboard');
+
+Route::get('/admin/users', [AdminDashboardController::class, 'users'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users');
+
+Route::get('/admin/doctors', [AdminDashboardController::class, 'doctors'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors');
+
+Route::patch('/admin/doctors/{doctor}/toggle-verification', [AdminDashboardController::class, 'toggleDoctorVerification'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.toggle-verification');
+
+Route::get('/admin/doctors/create', [AdminDashboardController::class, 'createDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.create');
+
+Route::post('/admin/doctors', [AdminDashboardController::class, 'storeDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.store');
+
+Route::get('/admin/doctors/{doctor}/edit', [AdminDashboardController::class, 'editDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.edit');
+
+Route::put('/admin/doctors/{doctor}', [AdminDashboardController::class, 'updateDoctor'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctors.update');
+
+Route::get('/admin/doctor-applications', [AdminDashboardController::class, 'doctorApplications'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications');
+
+Route::patch('/admin/doctor-applications/{doctorApplication}/approve', [AdminDashboardController::class, 'approveDoctorApplication'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications.approve');
+
+Route::patch('/admin/doctor-applications/{doctorApplication}/reject', [AdminDashboardController::class, 'rejectDoctorApplication'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.doctor-applications.reject');
+
+Route::get('/admin/users/{user}/edit', [AdminDashboardController::class, 'editUser'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.edit');
+
+Route::put('/admin/users/{user}', [AdminDashboardController::class, 'updateUser'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.update');
+
+Route::get('/admin/appointments', [AdminDashboardController::class, 'appointments'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments');
+
+Route::patch('/admin/appointments/{appointment}/confirm', [AdminDashboardController::class, 'confirmAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.confirm');
+
+Route::patch('/admin/appointments/{appointment}/complete', [AdminDashboardController::class, 'completeAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.complete');
+
+Route::patch('/admin/appointments/{appointment}/cancel', [AdminDashboardController::class, 'cancelAppointment'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.appointments.cancel');
+
+Route::patch('/admin/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.update-role');
+
+Route::patch('/admin/users/{user}/toggle-active', [AdminDashboardController::class, 'toggleUserActive'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.users.toggle-active');
+
+Route::get('/admin/specializations', [AdminDictionaryController::class, 'specializations'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations');
+
+Route::post('/admin/specializations', [AdminDictionaryController::class, 'storeSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.store');
+
+Route::put('/admin/specializations/{specialization}', [AdminDictionaryController::class, 'updateSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.update');
+
+Route::delete('/admin/specializations/{specialization}', [AdminDictionaryController::class, 'deleteSpecialization'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.specializations.delete');
+
+Route::get('/admin/help-tags', [AdminDictionaryController::class, 'helpTags'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags');
+
+Route::post('/admin/help-tags', [AdminDictionaryController::class, 'storeHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.store');
+
+Route::put('/admin/help-tags/{helpTag}', [AdminDictionaryController::class, 'updateHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.update');
+
+Route::delete('/admin/help-tags/{helpTag}', [AdminDictionaryController::class, 'deleteHelpTag'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.help-tags.delete');
+
+Route::get('/admin/clinics', [AdminDashboardController::class, 'clinics'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics');
+
+Route::post('/admin/clinics', [AdminDashboardController::class, 'storeClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.store');
+
+Route::put('/admin/clinics/{clinic}', [AdminDashboardController::class, 'updateClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.update');
+
+Route::delete('/admin/clinics/{clinic}', [AdminDashboardController::class, 'deleteClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.delete');
+
+Route::get('/appointments/{appointment}/review', [ReviewController::class, 'create'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('reviews.create');
+
+Route::post('/appointments/{appointment}/review', [ReviewController::class, 'store'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('reviews.store');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctors.show');
+
+Route::get('/nfz-comparison', [NfzComparisonController::class, 'index'])
+    ->name('nfz.comparison');
+
+Route::get('/nfz-comparison/compare', [NfzComparisonController::class, 'compare'])
+    ->name('nfz.compare');
+
+Route::get('/doctor-application', [DoctorApplicationController::class, 'create'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('doctor-applications.create');
+
+Route::post('/doctor-application', [DoctorApplicationController::class, 'store'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('doctor-applications.store');
+
+Route::get('/doctor/schedule', [DoctorDashboardController::class, 'schedule'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule');
+
+Route::post('/doctor/schedule', [DoctorDashboardController::class, 'storeScheduleSlots'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.store');
+
+Route::get('/doctor/schedule/{slot}/edit', [DoctorDashboardController::class, 'editScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.edit');
+
+Route::put('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'updateScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.update');
+
+Route::delete('/doctor/schedule/{slot}', [DoctorDashboardController::class, 'deleteScheduleSlot'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.schedule.destroy');
+
+Route::get('/doctor/services', [DoctorDashboardController::class, 'services'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services');
+
+Route::post('/doctor/services', [DoctorDashboardController::class, 'storeService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.store');
+
+Route::put('/doctor/services/{service}', [DoctorDashboardController::class, 'updateService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.update');
+
+Route::delete('/doctor/services/{service}', [DoctorDashboardController::class, 'deleteService'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.services.delete');
+
+Route::get('/doctor/appointments', [DoctorDashboardController::class, 'appointments'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.appointments');
+
+Route::get('/appointments/{appointment}/payment', [PaymentController::class, 'show'])
+    ->middleware('auth')
+    ->name('payments.show');
+
+Route::post('/appointments/{appointment}/payment', [PaymentController::class, 'pay'])
+    ->middleware('auth')
+    ->name('payments.pay');
+
+Route::get('/doctor/profile', [DoctorDashboardController::class, 'profile'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile');
+
+Route::patch('/doctor/profile', [DoctorDashboardController::class, 'updateProfile'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile.update');
+
+Route::post('/doctor/profile/photo', [DoctorDashboardController::class, 'updatePhoto'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.profile.photo');
+
+Route::patch('/doctor/appointments/{appointment}/confirm', [DoctorDashboardController::class, 'confirmAppointment'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.appointments.confirm');
+
+Route::patch('/doctor/appointments/{appointment}/complete', [DoctorDashboardController::class, 'completeAppointment'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.appointments.complete');
+
+Route::get('/my-appointments', [PatientDashboardController::class, 'appointments'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('patient.appointments');
+
+Route::post('/appointments', [AppointmentController::class, 'store'])
+    ->middleware('auth')
+    ->name('appointments.store');
+
+Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
+    ->middleware(['auth', 'role:patient,admin'])
+    ->name('appointments.cancel');
+
+Route::get('/dashboard', DashboardRedirectController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
