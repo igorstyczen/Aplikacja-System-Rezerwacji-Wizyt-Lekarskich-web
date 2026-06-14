@@ -131,6 +131,10 @@ Route::post('/admin/clinics', [AdminDashboardController::class, 'storeClinic'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.clinics.store');
 
+Route::get('/admin/clinics/{clinic}/edit', [AdminDashboardController::class, 'editClinic'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.clinics.edit');
+
 Route::put('/admin/clinics/{clinic}', [AdminDashboardController::class, 'updateClinic'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.clinics.update');

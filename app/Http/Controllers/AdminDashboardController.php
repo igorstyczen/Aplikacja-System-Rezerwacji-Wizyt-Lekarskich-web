@@ -426,6 +426,28 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Klinika została dodana.');
     }
 
+    public function editClinic(Clinic $clinic)
+    {
+        $clinic->load('doctors');
+
+        $doctors = Doctor::query()
+            ->where('is_active', true)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+
+        $canDelete = ! $clinic->services()->exists()
+            && ! $clinic->availabilitySlots()->exists()
+            && ! $clinic->appointments()->exists();
+
+        return view('admin.edit-clinic', [
+            'clinic' => $clinic,
+            'doctors' => $doctors,
+            'assignedDoctors' => $clinic->doctors->pluck('id')->toArray(),
+            'canDelete' => $canDelete,
+        ]);
+    }
+
     public function updateClinic(Request $request, Clinic $clinic)
     {
         $request->validate([
@@ -448,27 +470,35 @@ class AdminDashboardController extends Controller
             $clinic->doctors()->sync($request->input('doctors', []));
         });
 
-        return back()->with('success', 'Klinika została zaktualizowana.');
+        return redirect()
+            ->route('admin.clinics')
+            ->with('success', 'Klinika została zaktualizowana.');
     }
 
     public function deleteClinic(Clinic $clinic)
     {
         if ($clinic->services()->exists()) {
-            return back()->withErrors([
-                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane usługi.',
-            ]);
+            return redirect()
+                ->route('admin.clinics.edit', $clinic)
+                ->withErrors([
+                    'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane usługi.',
+                ]);
         }
 
         if ($clinic->availabilitySlots()->exists()) {
-            return back()->withErrors([
-                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane terminy w grafiku.',
-            ]);
+            return redirect()
+                ->route('admin.clinics.edit', $clinic)
+                ->withErrors([
+                    'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane terminy w grafiku.',
+                ]);
         }
 
         if ($clinic->appointments()->exists()) {
-            return back()->withErrors([
-                'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane wizyty.',
-            ]);
+            return redirect()
+                ->route('admin.clinics.edit', $clinic)
+                ->withErrors([
+                    'clinic' => 'Nie można usunąć kliniki, ponieważ są do niej przypisane wizyty.',
+                ]);
         }
 
         DB::transaction(function () use ($clinic) {
@@ -476,7 +506,9 @@ class AdminDashboardController extends Controller
             $clinic->delete();
         });
 
-        return back()->with('success', 'Klinika została usunięta.');
+        return redirect()
+            ->route('admin.clinics')
+            ->with('success', 'Klinika została usunięta.');
     }
 
     public function doctorApplications()

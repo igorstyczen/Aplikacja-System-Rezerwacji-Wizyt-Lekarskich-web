@@ -235,8 +235,52 @@
                         Wybierz usługę i dostępny termin. Po rezerwacji przejdziesz do płatności.
                     </p>
 
-                    @if ($doctor->services->count() > 0 && $availabilitySlots->count() > 0)
-                        <form method="POST" action="{{ route('appointments.store') }}" id="bookingForm">
+                    @if ($doctor->services->count() > 0)
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
+                            <div>
+                                <h4 style="font-size: 16px; font-weight: 900; color: #111827; margin-bottom: 4px;">
+                                    Wybierz termin
+                                </h4>
+
+                                <p style="font-size: 13px; color: #6b7280; margin: 0;">
+                                    {{ $weekStart->format('d.m.Y') }} - {{ $weekEnd->format('d.m.Y') }}
+                                    @if ($maxWeek > 0)
+                                        <span style="color: #9ca3af;">(tydzień {{ $week + 1 }} / {{ $maxWeek + 1 }})</span>
+                                    @endif
+                                </p>
+                            </div>
+
+                            <div style="display: flex; gap: 8px;">
+                                @if ($week > 0)
+                                    <a
+                                        href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week - 1]) }}"
+                                        style="padding: 8px 11px; background: #f3f4f6; color: #374151; border-radius: 10px; font-size: 12px; font-weight: 900; text-decoration: none;"
+                                    >
+                                        ← Poprzedni
+                                    </a>
+                                @endif
+
+                                @if ($week < $maxWeek)
+                                    <a
+                                        href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week + 1]) }}"
+                                        style="padding: 8px 11px; background: #dbeafe; color: #1d4ed8; border-radius: 10px; font-size: 12px; font-weight: 900; text-decoration: none;"
+                                    >
+                                        Następny →
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if ($slotsInWeekCount === 0)
+                            <p style="font-size: 13px; color: #6b7280; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+                                Brak wolnych terminów w tym tygodniu.
+                                @if ($week < $maxWeek)
+                                    Kliknij „Następny →”, aby zobaczyć kolejne tygodnie.
+                                @endif
+                            </p>
+                        @endif
+
+                        <form method="POST" action="{{ route('appointments.store') }}" id="bookingForm" novalidate>
                             @csrf
 
                             <div style="margin-bottom: 24px;">
@@ -247,7 +291,6 @@
                                 <select
                                     id="service_id"
                                     name="service_id"
-                                    required
                                     style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 12px 14px; font-size: 14px;"
                                 >
                                     <option value="">Wybierz usługę</option>
@@ -264,38 +307,6 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;">
-                                <div>
-                                    <h4 style="font-size: 16px; font-weight: 900; color: #111827; margin-bottom: 4px;">
-                                        Wybierz termin
-                                    </h4>
-
-                                    <p style="font-size: 13px; color: #6b7280;">
-                                        {{ $weekStart->format('d.m.Y') }} - {{ $weekEnd->format('d.m.Y') }}
-                                    </p>
-                                </div>
-
-                                <div style="display: flex; gap: 8px;">
-                                    @if ($week > 0)
-                                        <a
-                                            href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week - 1]) }}"
-                                            style="padding: 8px 11px; background: #f3f4f6; color: #374151; border-radius: 10px; font-size: 12px; font-weight: 900; text-decoration: none;"
-                                        >
-                                            ←
-                                        </a>
-                                    @endif
-
-                                    @if ($week < 4)
-                                        <a
-                                            href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week + 1]) }}"
-                                            style="padding: 8px 11px; background: #dbeafe; color: #1d4ed8; border-radius: 10px; font-size: 12px; font-weight: 900; text-decoration: none;"
-                                        >
-                                            →
-                                        </a>
-                                    @endif
-                                </div>
                             </div>
 
                             <div id="slotsCalendarWrapper" style="display: flex; flex-direction: column; gap: 14px;">
@@ -339,14 +350,13 @@
                                                                 Miniony dzień
                                                             </p>
                                                         @elseif ($daySlots->count() > 0)
-                                                            <div style="display: flex; flex-direction: column; gap: 6px;">
-                                                                @foreach ($daySlots as $index => $slot)
+                                                            <div class="day-slots-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto;">
+                                                                @foreach ($daySlots as $slot)
                                                                     <label
                                                                         class="slot-option"
                                                                         data-clinic-id="{{ $slot->clinic_id }}"
-                                                                        data-extra="{{ $index >= 4 ? '1' : '0' }}"
                                                                         data-day-id="{{ $dayId }}"
-                                                                        style="{{ $index >= 4 ? 'display: none;' : 'display: block;' }} cursor: pointer;"
+                                                                        style="display: block; cursor: pointer;"
                                                                     >
                                                                         <input
                                                                             type="radio"
@@ -368,17 +378,6 @@
                                                                     </label>
                                                                 @endforeach
                                                             </div>
-
-                                                            @if ($daySlots->count() > 4)
-                                                                <button
-                                                                    type="button"
-                                                                    class="show-more-slots"
-                                                                    data-day-id="{{ $dayId }}"
-                                                                    style="width: 100%; margin-top: 8px; padding: 6px 8px; background: #ecfdf5; color: #047857; border: none; border-radius: 8px; font-size: 11px; font-weight: 900; cursor: pointer;"
-                                                                >
-                                                                    Więcej
-                                                                </button>
-                                                            @endif
                                                         @else
                                                             <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">
                                                                 Brak terminów
@@ -405,36 +404,10 @@
                                 </button>
                             </div>
                         </form>
-                    @elseif ($doctor->services->count() === 0)
+                    @else
                         <p style="color: #6b7280;">
                             Ten lekarz nie ma jeszcze dodanych usług.
                         </p>
-                    @else
-                        <div>
-                            <p style="color: #6b7280; margin-bottom: 16px;">
-                                Brak wolnych terminów w tym tygodniu.
-                            </p>
-
-                            <div style="display: flex; gap: 10px;">
-                                @if ($week > 0)
-                                    <a
-                                        href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week - 1]) }}"
-                                        style="padding: 10px 14px; background: #f3f4f6; color: #374151; border-radius: 10px; font-size: 13px; font-weight: 900; text-decoration: none;"
-                                    >
-                                        ← Poprzedni
-                                    </a>
-                                @endif
-
-                                @if ($week < 4)
-                                    <a
-                                        href="{{ route('doctors.show', ['doctor' => $doctor, 'week' => $week + 1]) }}"
-                                        style="padding: 10px 14px; background: #dbeafe; color: #1d4ed8; border-radius: 10px; font-size: 13px; font-weight: 900; text-decoration: none;"
-                                    >
-                                        Następny →
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
                     @endif
                 </div>
             </div>
@@ -518,19 +491,13 @@
 
                 slotOptions.forEach(function (slotOption) {
                     const slotClinicId = slotOption.dataset.clinicId;
-                    const isExtra = slotOption.dataset.extra === '1';
                     const input = slotOption.querySelector('input[type="radio"]');
 
                     input.checked = false;
 
-                    if (selectedClinicId === slotClinicId) {
+                    if (String(selectedClinicId) === String(slotClinicId)) {
                         slotOption.dataset.availableForService = '1';
-
-                        if (!isExtra || slotOption.dataset.expanded === '1') {
-                            slotOption.style.display = 'block';
-                        } else {
-                            slotOption.style.display = 'none';
-                        }
+                        slotOption.style.display = 'block';
                     } else {
                         slotOption.dataset.availableForService = '0';
                         slotOption.style.display = 'none';
@@ -542,36 +509,6 @@
                 serviceSelect.addEventListener('change', filterSlotsByService);
                 filterSlotsByService();
             }
-
-            document.querySelectorAll('.show-more-slots').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const dayId = button.dataset.dayId;
-                    const hiddenSlots = document.querySelectorAll('.slot-option[data-day-id="' + dayId + '"][data-extra="1"]');
-
-                    const isExpanded = button.dataset.expanded === '1';
-
-                    hiddenSlots.forEach(function (slotOption) {
-                        if (isExpanded) {
-                            slotOption.dataset.expanded = '0';
-                            slotOption.style.display = 'none';
-                        } else {
-                            slotOption.dataset.expanded = '1';
-
-                            if (slotOption.dataset.availableForService !== '0') {
-                                slotOption.style.display = 'block';
-                            }
-                        }
-                    });
-
-                    if (isExpanded) {
-                        button.dataset.expanded = '0';
-                        button.textContent = 'Pokaż więcej godzin';
-                    } else {
-                        button.dataset.expanded = '1';
-                        button.textContent = 'Pokaż mniej godzin';
-                    }
-                });
-            });
 
             if (bookingForm) {
                 bookingForm.addEventListener('submit', function (event) {

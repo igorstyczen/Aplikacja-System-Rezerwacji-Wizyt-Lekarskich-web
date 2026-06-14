@@ -38,13 +38,17 @@
             </div>
 
             <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
-                <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
-                    Dodaj klinikę
-                </h2>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px;">
+                    <div>
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Dodaj klinikę
+                        </h2>
 
-                <p style="color: #6b7280; font-size: 14px; margin-bottom: 26px;">
-                    Dodaj nową placówkę i opcjonalnie przypisz do niej lekarzy.
-                </p>
+                        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+                            Dodaj nową placówkę i opcjonalnie przypisz do niej lekarzy.
+                        </p>
+                    </div>
+                </div>
 
                 <form method="POST" action="{{ route('admin.clinics.store') }}" style="display: flex; flex-direction: column; gap: 24px;">
                     @csrf
@@ -229,7 +233,7 @@
                         </h2>
 
                         <p style="font-size: 14px; color: #6b7280;">
-                            Wyszukaj klinikę i kliknij „Edytuj”, aby przejść do formularza edycji.
+                            Wyszukaj klinikę i kliknij „Edytuj”, aby przejść do osobnej strony edycji.
                         </p>
                     </div>
 
@@ -261,9 +265,7 @@
                                         </td>
                                         <td style="padding: 18px; font-size: 14px;">
                                             <a
-                                                href="#edit-clinic-{{ $clinic->id }}"
-                                                class="edit-clinic-link"
-                                                data-clinic-id="{{ $clinic->id }}"
+                                                href="{{ route('admin.clinics.edit', $clinic) }}"
                                                 style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; font-size: 12px; font-weight: 900; text-decoration: none;"
                                             >
                                                 Edytuj
@@ -274,171 +276,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 24px;">
-                    @foreach ($clinics as $clinic)
-                        @php
-                            $assignedDoctors = $clinic->doctors->pluck('id')->toArray();
-                            $isEditing = (string) request('edit') === (string) $clinic->id;
-                        @endphp
-
-                        <div
-                            id="edit-clinic-{{ $clinic->id }}"
-                            class="clinic-edit-panel"
-                            style="background: white; border: 1px solid {{ $isEditing ? '#93c5fd' : '#e5e7eb' }}; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05); {{ $isEditing ? '' : 'display: none;' }}"
-                        >
-                            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px;">
-                                <div>
-                                    <p style="color: #2563eb; font-size: 13px; font-weight: 900; margin-bottom: 6px;">
-                                        Edycja kliniki
-                                    </p>
-
-                                    <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 8px;">
-                                        {{ $clinic->name }}
-                                    </h2>
-
-                                    <p style="font-size: 14px; color: #4b5563;">
-                                        {{ $clinic->address }}, {{ $clinic->city }}
-                                    </p>
-                                </div>
-
-                                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; max-width: 420px;">
-                                    @forelse ($clinic->doctors as $assignedDoctor)
-                                        <span style="padding: 6px 10px; background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 800;">
-                                            Dr {{ $assignedDoctor->first_name }} {{ $assignedDoctor->last_name }}
-                                        </span>
-                                    @empty
-                                        <span style="padding: 6px 10px; background: #f3f4f6; color: #6b7280; border-radius: 999px; font-size: 12px; font-weight: 800;">
-                                            Brak przypisanych lekarzy
-                                        </span>
-                                    @endforelse
-                                </div>
-                            </div>
-
-                            <form method="POST" action="{{ route('admin.clinics.update', $clinic) }}" style="display: flex; flex-direction: column; gap: 22px;">
-                                @csrf
-                                @method('PUT')
-
-                                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px;">
-                                    <div>
-                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
-                                            Nazwa kliniki
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value="{{ $clinic->name }}"
-                                            required
-                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
-                                        >
-                                    </div>
-
-                                    <div>
-                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
-                                            Miasto
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            value="{{ $clinic->city }}"
-                                            required
-                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
-                                        >
-                                    </div>
-
-                                    <div>
-                                        <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
-                                            Adres
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            name="address"
-                                            value="{{ $clinic->address }}"
-                                            required
-                                            style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
-                                        >
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
-                                        Szczegóły
-                                    </label>
-
-                                    <textarea
-                                        name="details"
-                                        rows="3"
-                                        style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-size: 14px; resize: vertical;"
-                                    >{{ $clinic->details }}</textarea>
-                                </div>
-
-                                <div>
-                                    <h3 style="font-size: 14px; font-weight: 800; color: #374151; margin-bottom: 12px;">
-                                        Przypisani lekarze
-                                    </h3>
-
-                                    @if ($doctors->count() > 0)
-                                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
-                                            @foreach ($doctors as $doctor)
-                                                <label style="display: flex; align-items: center; gap: 10px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; background: #f9fafb; cursor: pointer;">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="doctors[]"
-                                                        value="{{ $doctor->id }}"
-                                                        @checked(in_array($doctor->id, $assignedDoctors))
-                                                    >
-
-                                                    <span style="font-size: 14px; font-weight: 700; color: #374151;">
-                                                        Dr {{ $doctor->first_name }} {{ $doctor->last_name }}
-                                                    </span>
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <p style="font-size: 14px; color: #6b7280;">
-                                            Brak lekarzy w systemie.
-                                        </p>
-                                    @endif
-                                </div>
-
-                                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding-top: 4px;">
-                                    <button
-                                        type="submit"
-                                        style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 22px; background: #2563eb; color: white; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
-                                    >
-                                        Zapisz zmiany
-                                    </button>
-                            </form>
-
-                                    @if (
-                                        ! $clinic->services()->exists()
-                                        && ! $clinic->availabilitySlots()->exists()
-                                        && ! $clinic->appointments()->exists()
-                                    )
-                                        <form method="POST" action="{{ route('admin.clinics.delete', $clinic) }}">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button
-                                                type="submit"
-                                                onclick="return confirm('Czy na pewno chcesz usunąć tę klinikę?')"
-                                                style="display: inline-flex; align-items: center; justify-content: center; padding: 11px 22px; background: #fee2e2; color: #b91c1c; font-size: 14px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer;"
-                                            >
-                                                Usuń klinikę
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span style="font-size: 14px; color: #9ca3af;">
-                                            Nie można usunąć — klinika jest używana w systemie.
-                                        </span>
-                                    @endif
-                                </div>
-                        </div>
-                    @endforeach
                 </div>
 
                 <div style="margin-top: 28px;">
@@ -454,38 +291,4 @@
 
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const editLinks = document.querySelectorAll('.edit-clinic-link');
-            const panels = document.querySelectorAll('.clinic-edit-panel');
-
-            function showEditPanel(clinicId) {
-                panels.forEach(function (panel) {
-                    panel.style.display = 'none';
-                    panel.style.borderColor = '#e5e7eb';
-                });
-
-                const target = document.getElementById('edit-clinic-' + clinicId);
-
-                if (target) {
-                    target.style.display = 'block';
-                    target.style.borderColor = '#93c5fd';
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-
-            editLinks.forEach(function (link) {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    showEditPanel(link.dataset.clinicId);
-                });
-            });
-
-            if (window.location.hash.startsWith('#edit-clinic-')) {
-                const clinicId = window.location.hash.replace('#edit-clinic-', '');
-                showEditPanel(clinicId);
-            }
-        });
-    </script>
 </x-app-layout>

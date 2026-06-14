@@ -57,7 +57,7 @@ class DoctorDashboardController extends Controller
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'slot_duration' => ['required', 'integer', 'min:10', 'max:180'],
             'repeat_weekly' => ['nullable', 'boolean'],
-            'repeat_until' => ['nullable', 'date', 'after_or_equal:date', 'required_if:repeat_weekly,1'],
+            'repeat_until' => ['nullable', 'date', 'after_or_equal:date', 'required_if:repeat_weekly,1,true,on,yes'],
         ]);
 
         $doctor = Doctor::where('user_id', Auth::id())->first();
@@ -68,28 +68,28 @@ class DoctorDashboardController extends Controller
 
         $doctor->clinics()->syncWithoutDetaching([$request->clinic_id]);
 
-        $baseDate = \Carbon\Carbon::parse($request->date);
+        $baseDate = \Carbon\Carbon::parse($request->date)->startOfDay();
         $duration = (int) $request->slot_duration;
         $isRecurring = $request->boolean('repeat_weekly');
         $repeatUntil = $isRecurring
             ? \Carbon\Carbon::parse($request->repeat_until)->endOfDay()
             : null;
 
+        if ($isRecurring && $repeatUntil->lt($baseDate)) {
+            return back()->withErrors([
+                'repeat_until' => 'Data końcowa powtarzania musi być późniejsza niż wybrany dzień.',
+            ])->withInput();
+        }
+
         $datesToCreate = [$baseDate->format('Y-m-d')];
 
         if ($isRecurring) {
             $datesToCreate = [];
-            $week = 0;
+            $occurrenceDate = $baseDate->copy();
 
-            while (true) {
-                $occurrenceDate = $baseDate->copy()->addWeeks($week);
-
-                if ($occurrenceDate->gt($repeatUntil)) {
-                    break;
-                }
-
+            while ($occurrenceDate->lte($repeatUntil)) {
                 $datesToCreate[] = $occurrenceDate->format('Y-m-d');
-                $week++;
+                $occurrenceDate->addWeek();
             }
         }
 
@@ -150,7 +150,7 @@ class DoctorDashboardController extends Controller
         }
 
         if ($request->boolean('repeat_weekly')) {
-            $message .= ' Terminy zostały powtórzone co tydzień do ' . \Carbon\Carbon::parse($request->repeat_until)->format('d.m.Y') . '.';
+            $message .= ' Terminy zostały powtórzone co tydzień przez ' . count($datesToCreate) . ' tygodni (do ' . \Carbon\Carbon::parse($request->repeat_until)->format('d.m.Y') . ').';
         }
 
         return back()->with('success', $message);

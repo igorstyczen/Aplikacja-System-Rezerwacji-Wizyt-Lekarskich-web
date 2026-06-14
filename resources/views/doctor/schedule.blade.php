@@ -144,41 +144,47 @@
                                 </div>
                             </div>
 
-                            <label style="display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 16px; cursor: pointer;">
-                                <input
-                                    type="checkbox"
-                                    id="repeat_weekly"
-                                    name="repeat_weekly"
-                                    value="1"
-                                    style="margin-top: 3px;"
-                                    @checked(old('repeat_weekly'))
-                                >
+                            <div style="padding: 16px 18px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 16px;">
+                                <label style="display: flex; align-items: flex-start; gap: 14px; cursor: pointer; margin-bottom: 0;">
+                                    <input
+                                        type="checkbox"
+                                        id="repeat_weekly"
+                                        name="repeat_weekly"
+                                        value="1"
+                                        style="margin-top: 3px;"
+                                        @checked(old('repeat_weekly'))
+                                    >
 
-                                <div style="flex: 1;">
-                                    <span style="display: block; font-size: 14px; font-weight: 800; color: #374151;">
-                                        Powtarzaj co tydzień
-                                    </span>
+                                    <div>
+                                        <span style="display: block; font-size: 14px; font-weight: 800; color: #374151;">
+                                            Powtarzaj co tydzień
+                                        </span>
 
-                                    <span style="display: block; font-size: 13px; color: #6b7280; margin-top: 4px; line-height: 1.5;">
-                                        System utworzy ten sam zakres godzin w wybranym dniu tygodnia aż do wskazanej daty końcowej.
-                                    </span>
-
-                                    <div id="repeat_until_wrapper" style="margin-top: 14px; {{ old('repeat_weekly') ? '' : 'display: none;' }}">
-                                        <label for="repeat_until" style="display: block; font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px;">
-                                            Powtarzaj do daty
-                                        </label>
-
-                                        <input
-                                            type="date"
-                                            id="repeat_until"
-                                            name="repeat_until"
-                                            value="{{ old('repeat_until') }}"
-                                            min="{{ old('date', now()->format('Y-m-d')) }}"
-                                            style="width: 100%; max-width: 260px; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px; font-size: 14px;"
-                                        >
+                                        <span style="display: block; font-size: 13px; color: #6b7280; margin-top: 4px; line-height: 1.5;">
+                                            System utworzy ten sam zakres godzin w wybranym dniu tygodnia aż do wskazanej daty końcowej.
+                                        </span>
                                     </div>
+                                </label>
+
+                                <div id="repeat_until_wrapper" style="margin-top: 14px; padding-left: 30px; {{ old('repeat_weekly') ? '' : 'display: none;' }}">
+                                    <label for="repeat_until" style="display: block; font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px;">
+                                        Powtarzaj do daty
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        id="repeat_until"
+                                        name="repeat_until"
+                                        value="{{ old('repeat_until') }}"
+                                        min="{{ old('date', now()->format('Y-m-d')) }}"
+                                        style="width: 100%; max-width: 260px; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px; font-size: 14px;"
+                                    >
+
+                                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px; line-height: 1.5;">
+                                        Domyślnie ustawiane na 3 miesiące do przodu. Możesz wydłużyć lub skrócić ten okres.
+                                    </p>
                                 </div>
-                            </label>
+                            </div>
 
                             <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 16px; padding: 18px 20px;">
                                 <p style="font-size: 14px; color: #1e40af; line-height: 1.7; margin: 0;">
@@ -334,6 +340,34 @@
             const repeatUntilInput = document.getElementById('repeat_until');
             const dateInput = document.getElementById('date');
 
+            function addMonthsToDate(dateStr, months) {
+                if (!dateStr) {
+                    return '';
+                }
+
+                const parts = dateStr.split('-');
+                const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                date.setMonth(date.getMonth() + months);
+
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+
+                return year + '-' + month + '-' + day;
+            }
+
+            function ensureRepeatUntilDefault() {
+                if (!repeatCheckbox || !repeatCheckbox.checked || !repeatUntilInput || !dateInput) {
+                    return;
+                }
+
+                if (!repeatUntilInput.value && dateInput.value) {
+                    repeatUntilInput.value = addMonthsToDate(dateInput.value, 3);
+                }
+
+                syncRepeatUntilMin();
+            }
+
             function toggleRepeatUntil() {
                 if (!repeatCheckbox || !repeatUntilWrapper) {
                     return;
@@ -344,6 +378,14 @@
 
                 if (repeatUntilInput) {
                     repeatUntilInput.required = isChecked;
+
+                    if (!isChecked) {
+                        repeatUntilInput.setCustomValidity('');
+                    }
+                }
+
+                if (isChecked) {
+                    ensureRepeatUntilDefault();
                 }
             }
 
@@ -359,8 +401,35 @@
             }
 
             if (dateInput) {
-                dateInput.addEventListener('change', syncRepeatUntilMin);
+                dateInput.addEventListener('change', function () {
+                    syncRepeatUntilMin();
+
+                    if (repeatCheckbox && repeatCheckbox.checked) {
+                        repeatUntilInput.value = addMonthsToDate(dateInput.value, 3);
+                    }
+                });
                 syncRepeatUntilMin();
+            }
+
+            const scheduleForm = document.querySelector('form[action="{{ route('doctor.schedule.store') }}"]');
+
+            if (scheduleForm) {
+                scheduleForm.addEventListener('submit', function (event) {
+                    if (repeatCheckbox && repeatCheckbox.checked) {
+                        ensureRepeatUntilDefault();
+
+                        if (repeatUntilInput && !repeatUntilInput.value) {
+                            event.preventDefault();
+                            repeatUntilInput.setCustomValidity('Podaj datę końcową powtarzania.');
+                            repeatUntilInput.reportValidity();
+                            return;
+                        }
+
+                        if (repeatUntilInput) {
+                            repeatUntilInput.setCustomValidity('');
+                        }
+                    }
+                });
             }
         });
     </script>
