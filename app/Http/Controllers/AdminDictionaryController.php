@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DoctorSpecialization;
 use App\Models\HelpTag;
 use App\Models\Specialization;
+use App\Services\HelpTagSimilarityService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -123,10 +124,14 @@ class AdminDictionaryController extends Controller
         ]);
     }
 
-    public function storeHelpTag(Request $request)
+    public function storeHelpTag(Request $request, HelpTagSimilarityService $similarityService)
     {
         $request->merge([
             'tag_name' => trim($request->tag_name),
+        ]);
+
+        $request->validate([
+            'tag_name' => ['required', 'string', 'max:255'],
         ]);
 
         $existingTag = HelpTag::where('tag_name', $request->tag_name)->first();
@@ -139,9 +144,17 @@ class AdminDictionaryController extends Controller
                 ]);
         }
 
-        $request->validate([
-            'tag_name' => ['required', 'string', 'max:255'],
-        ]);
+        $similarTags = $similarityService->findSimilar($request->tag_name, 0.75);
+
+        if ($similarTags->isNotEmpty()) {
+            $suggestions = $similarTags->pluck('tag_name')->take(3)->implode(', ');
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'tag_name' => 'Podobny tag już istnieje: ' . $suggestions,
+                ]);
+        }
 
         HelpTag::create([
             'tag_name' => $request->tag_name,
@@ -150,7 +163,7 @@ class AdminDictionaryController extends Controller
         return back()->with('success', 'Tag został dodany.');
     }
 
-    public function updateHelpTag(Request $request, HelpTag $helpTag)
+    public function updateHelpTag(Request $request, HelpTag $helpTag, HelpTagSimilarityService $similarityService)
     {
         $request->merge([
             'tag_name' => trim($request->tag_name),
@@ -171,6 +184,19 @@ class AdminDictionaryController extends Controller
         $request->validate([
             'tag_name' => ['required', 'string', 'max:255'],
         ]);
+
+        $similarTags = $similarityService->findSimilar($request->tag_name, 0.75)
+            ->reject(fn (HelpTag $tag) => $tag->id === $helpTag->id);
+
+        if ($similarTags->isNotEmpty()) {
+            $suggestions = $similarTags->pluck('tag_name')->take(3)->implode(', ');
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'tag_name' => 'Podobny tag już istnieje: ' . $suggestions,
+                ]);
+        }
 
         $helpTag->update([
             'tag_name' => $request->tag_name,

@@ -154,14 +154,29 @@
                                     @checked(old('repeat_weekly'))
                                 >
 
-                                <div>
+                                <div style="flex: 1;">
                                     <span style="display: block; font-size: 14px; font-weight: 800; color: #374151;">
-                                        Powtarzaj co tydzień przez miesiąc
+                                        Powtarzaj co tydzień
                                     </span>
 
                                     <span style="display: block; font-size: 13px; color: #6b7280; margin-top: 4px; line-height: 1.5;">
-                                        System utworzy ten sam zakres godzin w wybranym dniu tygodnia przez kolejne 4 tygodnie.
+                                        System utworzy ten sam zakres godzin w wybranym dniu tygodnia aż do wskazanej daty końcowej.
                                     </span>
+
+                                    <div id="repeat_until_wrapper" style="margin-top: 14px; {{ old('repeat_weekly') ? '' : 'display: none;' }}">
+                                        <label for="repeat_until" style="display: block; font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 6px;">
+                                            Powtarzaj do daty
+                                        </label>
+
+                                        <input
+                                            type="date"
+                                            id="repeat_until"
+                                            name="repeat_until"
+                                            value="{{ old('repeat_until') }}"
+                                            min="{{ old('date', now()->format('Y-m-d')) }}"
+                                            style="width: 100%; max-width: 260px; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px; font-size: 14px;"
+                                        >
+                                    </div>
                                 </div>
                             </label>
 
@@ -311,4 +326,42 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const repeatCheckbox = document.getElementById('repeat_weekly');
+            const repeatUntilWrapper = document.getElementById('repeat_until_wrapper');
+            const repeatUntilInput = document.getElementById('repeat_until');
+            const dateInput = document.getElementById('date');
+
+            function toggleRepeatUntil() {
+                if (!repeatCheckbox || !repeatUntilWrapper) {
+                    return;
+                }
+
+                const isChecked = repeatCheckbox.checked;
+                repeatUntilWrapper.style.display = isChecked ? 'block' : 'none';
+
+                if (repeatUntilInput) {
+                    repeatUntilInput.required = isChecked;
+                }
+            }
+
+            function syncRepeatUntilMin() {
+                if (repeatUntilInput && dateInput && dateInput.value) {
+                    repeatUntilInput.min = dateInput.value;
+                }
+            }
+
+            if (repeatCheckbox) {
+                repeatCheckbox.addEventListener('change', toggleRepeatUntil);
+                toggleRepeatUntil();
+            }
+
+            if (dateInput) {
+                dateInput.addEventListener('change', syncRepeatUntilMin);
+                syncRepeatUntilMin();
+            }
+        });
+    </script>
 </x-app-layout>

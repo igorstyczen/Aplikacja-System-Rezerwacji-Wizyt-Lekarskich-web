@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\DoctorSpecialization;
 use App\Models\HelpTag;
+use App\Services\HelpTagSimilarityService;
 use App\Services\NfzApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,9 +39,16 @@ class HomeController extends Controller
         }
 
         if ($request->filled('tag')) {
-            $query->whereHas('helpTags', function ($q) use ($request) {
-                $q->where('tag_name', $request->tag);
-            });
+            $matchingTagIds = app(HelpTagSimilarityService::class)
+                ->findMatchingTagIds($request->tag);
+
+            if (count($matchingTagIds) > 0) {
+                $query->whereHas('helpTags', function ($q) use ($matchingTagIds) {
+                    $q->whereIn('help_tags.id', $matchingTagIds);
+                });
+            } else {
+                $query->whereRaw('0 = 1');
+            }
         }
 
         if ($request->filled('city')) {

@@ -205,10 +205,21 @@
                                 @endforeach
                             </div>
                         @else
-                            <p style="font-size: 14px; color: #6b7280;">
-                                Brak dostępnych tagów. Administrator powinien dodać tagi w systemie.
+                            <p style="font-size: 14px; color: #6b7280; margin-bottom: 18px;">
+                                Brak dostępnych tagów. Możesz dodać pierwszy tag poniżej.
                             </p>
                         @endif
+
+                        <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                            <h3 style="font-size: 16px; font-weight: 900; color: #111827; margin-bottom: 8px;">
+                                Dodaj własny tag
+                            </h3>
+
+                            <p style="font-size: 13px; color: #6b7280; margin-bottom: 16px; line-height: 1.6;">
+                                Jeśli brakuje tagu opisującego Twój obszar pomocy, możesz go dodać samodzielnie.
+                                System sprawdzi podobieństwo nazwy z istniejącymi tagami.
+                            </p>
+                        </div>
                     </div>
 
                     <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
@@ -232,6 +243,35 @@
                         </div>
                     </div>
                 </form>
+
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 28px 32px; margin-top: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <form method="POST" action="{{ route('doctor.help-tags.store') }}" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px;">
+                        @csrf
+
+                        <div style="flex: 1; min-width: 260px;">
+                            <label for="tag_name" style="display: block; font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 8px;">
+                                Nazwa nowego tagu
+                            </label>
+
+                            <input
+                                type="text"
+                                id="tag_name"
+                                name="tag_name"
+                                value="{{ old('tag_name') }}"
+                                placeholder="np. ból pleców"
+                                required
+                                style="width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 11px 14px; font-size: 14px;"
+                            >
+                        </div>
+
+                        <button
+                            type="submit"
+                            style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #059669; color: white; font-size: 14px; font-weight: 900; border-radius: 12px; border: none; cursor: pointer;"
+                        >
+                            Dodaj tag
+                        </button>
+                    </form>
+                </div>
 
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 32px; margin-top: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
                     <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">

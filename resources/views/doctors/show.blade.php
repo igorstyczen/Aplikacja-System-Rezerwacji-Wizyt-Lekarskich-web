@@ -298,77 +298,98 @@
                                 </div>
                             </div>
 
-                            <div style="display: flex; flex-direction: column; gap: 14px;">
-                                @foreach ($availabilitySlots as $date => $slots)
-                                    @php
-                                        $day = \Carbon\Carbon::parse($date)->startOfDay();
-                                        $dayId = 'day-' . $day->format('Ymd');
-                                    @endphp
+                            <div id="slotsCalendarWrapper" style="display: flex; flex-direction: column; gap: 14px;">
+                                <p id="selectServiceHint" style="font-size: 13px; color: #92400e; background: #fef3c7; border: 1px solid #fde68a; border-radius: 12px; padding: 12px 14px; margin: 0;">
+                                    Najpierw wybierz usługę, aby zobaczyć dostępne godziny.
+                                </p>
 
-                                    @if ($day->lt(\Carbon\Carbon::today()))
-                                        @continue
-                                    @endif
+                                <div style="overflow-x: auto;">
+                                    <table id="weekCalendarTable" style="width: 100%; border-collapse: collapse; min-width: 640px; opacity: 0.45; pointer-events: none;">
+                                        <thead>
+                                            <tr>
+                                                @foreach ($weekDays as $day)
+                                                    @php
+                                                        $isPast = $day->lt(\Carbon\Carbon::today());
+                                                        $dayKey = $day->format('Y-m-d');
+                                                        $daySlots = $availabilitySlots->get($dayKey, collect());
+                                                    @endphp
+                                                    <th style="padding: 10px 8px; text-align: center; border-bottom: 1px solid #e5e7eb; background: {{ $isPast ? '#f3f4f6' : '#f9fafb' }}; min-width: 88px;">
+                                                        <p style="font-size: 12px; font-weight: 900; color: {{ $isPast ? '#9ca3af' : '#111827' }}; margin: 0 0 4px 0; text-transform: capitalize;">
+                                                            {{ $day->locale('pl')->isoFormat('ddd') }}
+                                                        </p>
+                                                        <p style="font-size: 11px; color: #6b7280; margin: 0;">
+                                                            {{ $day->format('d.m') }}
+                                                        </p>
+                                                    </th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                @foreach ($weekDays as $day)
+                                                    @php
+                                                        $isPast = $day->lt(\Carbon\Carbon::today());
+                                                        $dayKey = $day->format('Y-m-d');
+                                                        $dayId = 'day-' . $day->format('Ymd');
+                                                        $daySlots = $availabilitySlots->get($dayKey, collect());
+                                                    @endphp
+                                                    <td style="vertical-align: top; padding: 10px 8px; border-bottom: 1px solid #f3f4f6; background: {{ $isPast ? '#fafafa' : 'white' }};">
+                                                        @if ($isPast)
+                                                            <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">
+                                                                Miniony dzień
+                                                            </p>
+                                                        @elseif ($daySlots->count() > 0)
+                                                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                                                @foreach ($daySlots as $index => $slot)
+                                                                    <label
+                                                                        class="slot-option"
+                                                                        data-clinic-id="{{ $slot->clinic_id }}"
+                                                                        data-extra="{{ $index >= 4 ? '1' : '0' }}"
+                                                                        data-day-id="{{ $dayId }}"
+                                                                        style="{{ $index >= 4 ? 'display: none;' : 'display: block;' }} cursor: pointer;"
+                                                                    >
+                                                                        <input
+                                                                            type="radio"
+                                                                            name="slot_id"
+                                                                            value="{{ $slot->id }}"
+                                                                            style="position: absolute; opacity: 0; pointer-events: none;"
+                                                                        >
 
-                                    <div class="day-card" style="border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; background: #f9fafb;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
-                                            <div>
-                                                <p style="font-size: 14px; font-weight: 900; color: #111827;">
-                                                    {{ ucfirst($day->locale('pl')->isoFormat('dddd')) }}
-                                                </p>
+                                                                        <div
+                                                                            class="slot-button"
+                                                                            style="text-align: center; padding: 8px 6px; border-radius: 10px; background: #dcfce7; color: #064e3b; font-size: 12px; font-weight: 900; border: 2px solid transparent;"
+                                                                        >
+                                                                            {{ $slot->start_time->format('H:i') }}
+                                                                        </div>
 
-                                                <p style="font-size: 12px; color: #6b7280;">
-                                                    {{ $day->format('d.m') }}
-                                                </p>
-                                            </div>
+                                                                        <p style="font-size: 9px; color: #6b7280; text-align: center; margin-top: 3px; line-height: 1.2;">
+                                                                            {{ $slot->clinic->name ?? 'Klinika' }}
+                                                                        </p>
+                                                                    </label>
+                                                                @endforeach
+                                                            </div>
 
-                                            <span style="font-size: 12px; color: #6b7280; font-weight: 800;">
-                                                {{ $slots->count() }} terminów
-                                            </span>
-                                        </div>
-
-                                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
-                                            @foreach ($slots as $index => $slot)
-                                                <label
-                                                    class="slot-option"
-                                                    data-clinic-id="{{ $slot->clinic_id }}"
-                                                    data-extra="{{ $index >= 6 ? '1' : '0' }}"
-                                                    data-day-id="{{ $dayId }}"
-                                                    style="{{ $index >= 6 ? 'display: none;' : 'display: block;' }} cursor: pointer;"
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        name="slot_id"
-                                                        value="{{ $slot->id }}"
-                                                        required
-                                                        style="position: absolute; opacity: 0; pointer-events: none;"
-                                                    >
-
-                                                    <div
-                                                        class="slot-button"
-                                                        style="text-align: center; padding: 9px 8px; border-radius: 999px; background: #dcfce7; color: #064e3b; font-size: 13px; font-weight: 900; border: 2px solid transparent;"
-                                                    >
-                                                        {{ $slot->start_time->format('H:i') }}
-                                                    </div>
-
-                                                    <p style="font-size: 10px; color: #6b7280; text-align: center; margin-top: 4px; line-height: 1.2;">
-                                                        {{ $slot->clinic->name ?? 'Klinika' }}
-                                                    </p>
-                                                </label>
-                                            @endforeach
-                                        </div>
-
-                                        @if ($slots->count() > 6)
-                                            <button
-                                                type="button"
-                                                class="show-more-slots"
-                                                data-day-id="{{ $dayId }}"
-                                                style="width: 100%; margin-top: 12px; padding: 8px 10px; background: #ecfdf5; color: #047857; border: none; border-radius: 10px; font-size: 12px; font-weight: 900; cursor: pointer;"
-                                            >
-                                                Pokaż więcej godzin
-                                            </button>
-                                        @endif
-                                    </div>
-                                @endforeach
+                                                            @if ($daySlots->count() > 4)
+                                                                <button
+                                                                    type="button"
+                                                                    class="show-more-slots"
+                                                                    data-day-id="{{ $dayId }}"
+                                                                    style="width: 100%; margin-top: 8px; padding: 6px 8px; background: #ecfdf5; color: #047857; border: none; border-radius: 8px; font-size: 11px; font-weight: 900; cursor: pointer;"
+                                                                >
+                                                                    Więcej
+                                                                </button>
+                                                            @endif
+                                                        @else
+                                                            <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">
+                                                                Brak terminów
+                                                            </p>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             <div style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
@@ -460,9 +481,40 @@
                 }
 
                 const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-                const selectedClinicId = selectedOption ? selectedOption.dataset.clinicId : null;
+                const selectedClinicId = selectedOption && selectedOption.value ? selectedOption.dataset.clinicId : null;
+                const calendarTable = document.getElementById('weekCalendarTable');
+                const selectServiceHint = document.getElementById('selectServiceHint');
 
                 clearSelectedSlots();
+
+                if (!selectedClinicId) {
+                    if (calendarTable) {
+                        calendarTable.style.opacity = '0.45';
+                        calendarTable.style.pointerEvents = 'none';
+                    }
+
+                    if (selectServiceHint) {
+                        selectServiceHint.style.display = 'block';
+                    }
+
+                    slotOptions.forEach(function (slotOption) {
+                        const input = slotOption.querySelector('input[type="radio"]');
+                        input.checked = false;
+                        slotOption.dataset.availableForService = '0';
+                        slotOption.style.display = 'none';
+                    });
+
+                    return;
+                }
+
+                if (calendarTable) {
+                    calendarTable.style.opacity = '1';
+                    calendarTable.style.pointerEvents = 'auto';
+                }
+
+                if (selectServiceHint) {
+                    selectServiceHint.style.display = 'none';
+                }
 
                 slotOptions.forEach(function (slotOption) {
                     const slotClinicId = slotOption.dataset.clinicId;
@@ -471,11 +523,13 @@
 
                     input.checked = false;
 
-                    if (!selectedClinicId || selectedClinicId === slotClinicId) {
+                    if (selectedClinicId === slotClinicId) {
                         slotOption.dataset.availableForService = '1';
 
                         if (!isExtra || slotOption.dataset.expanded === '1') {
                             slotOption.style.display = 'block';
+                        } else {
+                            slotOption.style.display = 'none';
                         }
                     } else {
                         slotOption.dataset.availableForService = '0';
@@ -491,8 +545,8 @@
 
             document.querySelectorAll('.show-more-slots').forEach(function (button) {
                 button.addEventListener('click', function () {
-                    const dayCard = button.closest('.day-card');
-                    const hiddenSlots = dayCard.querySelectorAll('.slot-option[data-extra="1"]');
+                    const dayId = button.dataset.dayId;
+                    const hiddenSlots = document.querySelectorAll('.slot-option[data-day-id="' + dayId + '"][data-extra="1"]');
 
                     const isExpanded = button.dataset.expanded === '1';
 

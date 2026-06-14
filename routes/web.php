@@ -220,6 +220,10 @@ Route::patch('/doctor/profile', [DoctorDashboardController::class, 'updateProfil
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.profile.update');
 
+Route::post('/doctor/help-tags', [DoctorDashboardController::class, 'storeHelpTag'])
+    ->middleware(['auth', 'role:doctor,admin'])
+    ->name('doctor.help-tags.store');
+
 Route::post('/doctor/profile/photo', [DoctorDashboardController::class, 'updatePhoto'])
     ->middleware(['auth', 'role:doctor,admin'])
     ->name('doctor.profile.photo');

@@ -139,7 +139,7 @@
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Kontakt</th>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Rola</th>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Status</th>
-                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Zmień rolę</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase; min-width: 220px;">Nadaj rolę</th>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Data utworzenia</th>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Akcje</th>
                                 </tr>
@@ -203,37 +203,37 @@
                                             @endif
                                         </td>
 
-                                        <td style="padding: 18px; font-size: 14px;">
+                                        <td style="padding: 18px; font-size: 14px; min-width: 280px;">
                                             @if ($user->id === Auth::id())
                                                 <span style="font-size: 12px; color: #9ca3af; font-weight: 700;">
                                                     Nie można zmienić własnej roli
                                                 </span>
                                             @else
-                                                <form method="POST" action="{{ route('admin.users.update-role', $user) }}" style="display: flex; align-items: center; gap: 10px;">
+                                                <form method="POST" action="{{ route('admin.users.update-role', $user) }}" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                                                     @csrf
                                                     @method('PATCH')
 
                                                     <select
                                                         name="role"
-                                                        style="border: 1px solid #d1d5db; border-radius: 10px; padding: 8px 10px; font-size: 13px;"
+                                                        style="min-width: 200px; flex: 1; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 700;"
                                                     >
                                                         <option value="patient" @selected($user->role === 'patient')>
-                                                            patient
+                                                            Pacjent
                                                         </option>
                                                         <option value="doctor" @selected($user->role === 'doctor')>
-                                                            doctor
+                                                            Lekarz
                                                         </option>
                                                         <option value="admin" @selected($user->role === 'admin')>
-                                                            admin
+                                                            Administrator
                                                         </option>
                                                     </select>
 
                                                     <button
                                                         type="submit"
                                                         onclick="return confirm('Czy na pewno chcesz zmienić rolę tego użytkownika?')"
-                                                        style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; border: none; font-size: 12px; font-weight: 900; cursor: pointer;"
+                                                        style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; border: none; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap;"
                                                     >
-                                                        Zapisz
+                                                        Zapisz rolę
                                                     </button>
                                                 </form>
                                             @endif

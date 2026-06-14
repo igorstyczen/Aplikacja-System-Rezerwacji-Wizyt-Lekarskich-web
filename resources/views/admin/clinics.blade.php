@@ -222,28 +222,85 @@
             </div>
 
             @if ($clinics->count() > 0)
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; overflow: hidden; margin-bottom: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                    <div style="padding: 26px 30px; border-bottom: 1px solid #e5e7eb;">
+                        <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
+                            Lista klinik
+                        </h2>
+
+                        <p style="font-size: 14px; color: #6b7280;">
+                            Wyszukaj klinikę i kliknij „Edytuj”, aby przejść do formularza edycji.
+                        </p>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                            <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <tr>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Nazwa</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Miasto</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Adres</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Lekarze</th>
+                                    <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($clinics as $clinic)
+                                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                                        <td style="padding: 18px; font-size: 14px; color: #111827; font-weight: 800;">
+                                            {{ $clinic->name }}
+                                        </td>
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $clinic->city }}
+                                        </td>
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $clinic->address }}
+                                        </td>
+                                        <td style="padding: 18px; font-size: 14px; color: #374151;">
+                                            {{ $clinic->doctors->count() }}
+                                        </td>
+                                        <td style="padding: 18px; font-size: 14px;">
+                                            <a
+                                                href="#edit-clinic-{{ $clinic->id }}"
+                                                class="edit-clinic-link"
+                                                data-clinic-id="{{ $clinic->id }}"
+                                                style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; background: #dbeafe; color: #1d4ed8; border-radius: 9px; font-size: 12px; font-weight: 900; text-decoration: none;"
+                                            >
+                                                Edytuj
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div style="display: flex; flex-direction: column; gap: 24px;">
                     @foreach ($clinics as $clinic)
                         @php
                             $assignedDoctors = $clinic->doctors->pluck('id')->toArray();
+                            $isEditing = (string) request('edit') === (string) $clinic->id;
                         @endphp
 
-                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
+                        <div
+                            id="edit-clinic-{{ $clinic->id }}"
+                            class="clinic-edit-panel"
+                            style="background: white; border: 1px solid {{ $isEditing ? '#93c5fd' : '#e5e7eb' }}; border-radius: 22px; padding: 28px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05); {{ $isEditing ? '' : 'display: none;' }}"
+                        >
                             <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px;">
                                 <div>
+                                    <p style="color: #2563eb; font-size: 13px; font-weight: 900; margin-bottom: 6px;">
+                                        Edycja kliniki
+                                    </p>
+
                                     <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 8px;">
                                         {{ $clinic->name }}
                                     </h2>
 
-                                    <p style="font-size: 14px; color: #4b5563; margin-bottom: 4px;">
+                                    <p style="font-size: 14px; color: #4b5563;">
                                         {{ $clinic->address }}, {{ $clinic->city }}
                                     </p>
-
-                                    @if ($clinic->details)
-                                        <p style="font-size: 14px; color: #6b7280;">
-                                            {{ $clinic->details }}
-                                        </p>
-                                    @endif
                                 </div>
 
                                 <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; max-width: 420px;">
@@ -397,4 +454,38 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editLinks = document.querySelectorAll('.edit-clinic-link');
+            const panels = document.querySelectorAll('.clinic-edit-panel');
+
+            function showEditPanel(clinicId) {
+                panels.forEach(function (panel) {
+                    panel.style.display = 'none';
+                    panel.style.borderColor = '#e5e7eb';
+                });
+
+                const target = document.getElementById('edit-clinic-' + clinicId);
+
+                if (target) {
+                    target.style.display = 'block';
+                    target.style.borderColor = '#93c5fd';
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            editLinks.forEach(function (link) {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    showEditPanel(link.dataset.clinicId);
+                });
+            });
+
+            if (window.location.hash.startsWith('#edit-clinic-')) {
+                const clinicId = window.location.hash.replace('#edit-clinic-', '');
+                showEditPanel(clinicId);
+            }
+        });
+    </script>
 </x-app-layout>

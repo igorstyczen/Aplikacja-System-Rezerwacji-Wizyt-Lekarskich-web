@@ -106,15 +106,16 @@
                                 id="role"
                                 name="role"
                                 class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                style="min-width: 220px; padding: 10px 12px; font-size: 14px; font-weight: 600;"
                             >
                                 <option value="patient" @selected(old('role', $user->role) === 'patient')>
-                                    patient
+                                    Pacjent
                                 </option>
                                 <option value="doctor" @selected(old('role', $user->role) === 'doctor')>
-                                    doctor
+                                    Lekarz
                                 </option>
                                 <option value="admin" @selected(old('role', $user->role) === 'admin')>
-                                    admin
+                                    Administrator
                                 </option>
                             </select>
                         @endif

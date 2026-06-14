@@ -10,6 +10,7 @@ use App\Models\DoctorSpecialization;
 use App\Models\HelpTag;
 use App\Models\Service;
 use App\Models\Specialization;
+use App\Services\HelpTagSimilarityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -56,6 +57,7 @@ class DoctorDashboardController extends Controller
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'slot_duration' => ['required', 'integer', 'min:10', 'max:180'],
             'repeat_weekly' => ['nullable', 'boolean'],
+            'repeat_until' => ['nullable', 'date', 'after_or_equal:date', 'required_if:repeat_weekly,1'],
         ]);
 
         $doctor = Doctor::where('user_id', Auth::id())->first();
@@ -68,15 +70,34 @@ class DoctorDashboardController extends Controller
 
         $baseDate = \Carbon\Carbon::parse($request->date);
         $duration = (int) $request->slot_duration;
-        $weeksToCreate = $request->boolean('repeat_weekly') ? 4 : 0;
+        $isRecurring = $request->boolean('repeat_weekly');
+        $repeatUntil = $isRecurring
+            ? \Carbon\Carbon::parse($request->repeat_until)->endOfDay()
+            : null;
+
+        $datesToCreate = [$baseDate->format('Y-m-d')];
+
+        if ($isRecurring) {
+            $datesToCreate = [];
+            $week = 0;
+
+            while (true) {
+                $occurrenceDate = $baseDate->copy()->addWeeks($week);
+
+                if ($occurrenceDate->gt($repeatUntil)) {
+                    break;
+                }
+
+                $datesToCreate[] = $occurrenceDate->format('Y-m-d');
+                $week++;
+            }
+        }
 
         $createdSlots = 0;
         $skippedSlots = 0;
 
-        DB::transaction(function () use ($doctor, $request, $baseDate, $duration, $weeksToCreate, &$createdSlots, &$skippedSlots) {
-            for ($week = 0; $week <= $weeksToCreate; $week++) {
-                $date = $baseDate->copy()->addWeeks($week)->format('Y-m-d');
-
+        DB::transaction(function () use ($doctor, $request, $duration, $datesToCreate, $isRecurring, $repeatUntil, &$createdSlots, &$skippedSlots) {
+            foreach ($datesToCreate as $date) {
                 $start = \Carbon\Carbon::parse($date . ' ' . $request->start_time);
                 $end = \Carbon\Carbon::parse($date . ' ' . $request->end_time);
 
@@ -99,6 +120,10 @@ class DoctorDashboardController extends Controller
                             'clinic_id' => $request->clinic_id,
                             'start_time' => $slotStart,
                             'end_time' => $slotEnd,
+                            'is_recurring' => $isRecurring,
+                            'recurrence_rule' => $isRecurring
+                                ? 'weekly_until:' . $repeatUntil->format('Y-m-d')
+                                : null,
                             'status' => 'available',
                         ]);
 
@@ -125,7 +150,7 @@ class DoctorDashboardController extends Controller
         }
 
         if ($request->boolean('repeat_weekly')) {
-            $message .= ' Terminy zostały powtórzone co tydzień przez miesiąc.';
+            $message .= ' Terminy zostały powtórzone co tydzień do ' . \Carbon\Carbon::parse($request->repeat_until)->format('d.m.Y') . '.';
         }
 
         return back()->with('success', $message);
@@ -493,6 +518,47 @@ class DoctorDashboardController extends Controller
         });
 
         return back()->with('success', 'Profil lekarza został zaktualizowany.');
+    }
+
+    public function storeHelpTag(Request $request, HelpTagSimilarityService $similarityService)
+    {
+        $request->validate([
+            'tag_name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $doctor = Doctor::where('user_id', Auth::id())->first();
+
+        if (! $doctor) {
+            abort(403);
+        }
+
+        $tagName = trim($request->tag_name);
+
+        $existingTag = HelpTag::where('tag_name', $tagName)->first();
+
+        if ($existingTag) {
+            $doctor->helpTags()->syncWithoutDetaching([$existingTag->id]);
+
+            return back()->with('success', 'Tag „' . $existingTag->tag_name . '” został przypisany do Twojego profilu.');
+        }
+
+        $similarTags = $similarityService->findSimilar($tagName, 0.75);
+
+        if ($similarTags->isNotEmpty()) {
+            $suggestions = $similarTags->pluck('tag_name')->take(3)->implode(', ');
+
+            return back()->withErrors([
+                'tag_name' => 'Podobny tag już istnieje w systemie: ' . $suggestions . '. Wybierz go z listy lub użyj innej nazwy.',
+            ]);
+        }
+
+        $tag = HelpTag::create([
+            'tag_name' => $tagName,
+        ]);
+
+        $doctor->helpTags()->attach($tag->id);
+
+        return back()->with('success', 'Nowy tag „' . $tag->tag_name . '” został dodany i przypisany do profilu.');
     }
 
     public function updatePhoto(Request $request)

@@ -21,11 +21,15 @@ class DoctorController extends Controller
         }
 
         /*
-         * Dla aktualnego tygodnia nie zaczynamy od poniedziałku,
-         * tylko od dzisiejszej daty. Dzięki temu nie pokazujemy minionych dni.
+         * Tydzień kalendarza od poniedziałku do niedzieli.
+         * week=0 to bieżący tydzień, week=1 następny itd.
          */
-        $weekStart = Carbon::today()->addWeeks($week)->startOfDay();
-        $weekEnd = $weekStart->copy()->addDays(6)->endOfDay();
+        $weekStart = Carbon::today()->startOfWeek(Carbon::MONDAY)->addWeeks($week)->startOfDay();
+        $weekEnd = $weekStart->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay();
+
+        $weekDays = collect(range(0, 6))->map(function (int $offset) use ($weekStart) {
+            return $weekStart->copy()->addDays($offset)->startOfDay();
+        });
 
         $doctor->load([
             'specializations',
@@ -57,6 +61,7 @@ class DoctorController extends Controller
             'week' => $week,
             'weekStart' => $weekStart,
             'weekEnd' => $weekEnd,
+            'weekDays' => $weekDays,
         ]);
     }
 }
