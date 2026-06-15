@@ -4,6 +4,83 @@ Repozytorium: [Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web](https://github.
 
 ---
 
+## Opis projektu
+
+**System Rezerwacji Wizyt Lekarskich** to aplikacja webowa do zarządzania prywatnymi wizytami lekarskimi online. Umożliwia pacjentom wyszukanie lekarza, rezerwację wolnego terminu, opłacenie wizyty oraz wystawienie opinii po jej zakończeniu. Lekarze prowadzą grafik dostępności, usługi i obsługują wizyty pacjentów. Administrator nadzoruje użytkowników, kliniki, słowniki oraz wnioski o utworzenie profilu lekarza.
+
+Aplikacja jest przeznaczona dla:
+
+- **pacjentów** — wyszukiwanie lekarzy, rezerwacja terminów, płatność, opinie,
+- **lekarzy** — prowadzenie grafiku, usług i obsługa wizyt,
+- **administratorów** — nadzór nad użytkownikami, klinikami, słownikami i wnioskami o profil lekarza,
+- **użytkowników publicznych** — przegląd profili lekarzy i porównanie terminów prywatnych z kolejkami NFZ.
+
+Technologie: **Laravel 12** (PHP 8.2+), **MySQL**, **Blade**, **Tailwind CSS**, **Alpine.js**, **Docker**.
+
+---
+
+## Przebieg aplikacji
+
+Poniżej przedstawiono główny scenariusz użycia systemu — od wejścia na stronę do wystawienia opinii. Zrzuty ekranu wykonano na środowisku lokalnym (`http://localhost:8000`) z kontami testowymi z seedera.
+
+### 1. Strona główna — wyszukiwanie lekarza
+
+Pacjent wchodzi na stronę główną, przegląda listę zweryfikowanych lekarzy i może filtrować wyniki po specjalizacji, mieście lub tagu problemu zdrowotnego.
+
+![Strona główna z listą lekarzy](./screenshots/01-strona-glowna.png)
+
+### 2. Logowanie
+
+Aby zarezerwować wizytę, pacjent loguje się na swoje konto (rejestracja tworzy automatycznie profil pacjenta).
+
+![Formularz logowania](./screenshots/02-logowanie.png)
+
+**Konto testowe pacjenta:** `pacjent1@test.pl` / `password`
+
+### 3. Rezerwacja wizyty
+
+Na profilu lekarza pacjent wybiera usługę, następnie wolny termin w kalendarzu tygodniowym (poniedziałek–niedziela) i klika **Zarezerwuj wizytę**. System w transakcji tworzy wizytę ze statusem `pending_payment` i blokuje slot (`booked`).
+
+![Profil lekarza — wybór usługi i terminu](./screenshots/03-rezerwacja-wizyty.png)
+
+### 4. Płatność
+
+Pacjent trafia na stronę płatności z limitem **10 minut**. Wybiera metodę (BLIK lub karta — symulacja testowa). Po opłaceniu wizyta przechodzi w status `pending`, a płatność w `paid`.
+
+![Strona płatności za wizytę](./screenshots/04-platnosc.png)
+
+### 5. Potwierdzenie wizyty przez lekarza
+
+Lekarz loguje się do panelu **Wizyty pacjentów**, widzi opłaconą wizytę i klika **Potwierdź** (status → `confirmed`), a po wizycie **Zakończ** (status → `completed`).
+
+![Panel lekarza — potwierdzenie wizyty](./screenshots/05-potwierdzenie-lekarza.png)
+
+**Konto testowe lekarza:** `doktor1@test.pl` / `password`
+
+### 6. Wystawienie opinii
+
+Po zakończonej wizycie pacjent w **Moje wizyty** dodaje opinię: ocenę (1–5), komentarz i opcjonalnie zdjęcie.
+
+![Formularz dodawania opinii](./screenshots/06-opinia.png)
+
+### 7. Opinia na profilu lekarza
+
+Dodana opinia jest widoczna na publicznym profilu lekarza w sekcji **Opinie**.
+
+![Opinia pacjenta widoczna na profilu lekarza](./screenshots/07-opinia-na-profilu.png)
+
+### Statusy wizyty w przebiegu
+
+| Status | Znaczenie |
+|--------|-----------|
+| `pending_payment` | Termin zarezerwowany, oczekuje płatności (limit 10 min) |
+| `pending` | Opłacona, czeka na potwierdzenie lekarza |
+| `confirmed` | Potwierdzona przez lekarza lub admina |
+| `completed` | Zrealizowana — pacjent może dodać opinię |
+| `cancelled` | Anulowana (np. brak płatności w czasie) |
+
+---
+
 ## 1. Autorzy i podział ról
 
 Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
@@ -93,19 +170,6 @@ Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
 
 ---
 
-## 3. Przeznaczenie aplikacji
-
-**System Rezerwacji Wizyt Lekarskich** to aplikacja webowa do zarządzania prywatnymi wizytami lekarskimi online.
-
-Aplikacja jest przeznaczona dla:
-
-- **pacjentów** — wyszukiwanie lekarzy, rezerwacja terminów, płatność, opinie,
-- **lekarzy** — prowadzenie grafiku, usług i obsługa wizyt,
-- **administratorów** — nadzór nad użytkownikami, klinikami, słownikami i wnioskami o profil lekarza,
-- **użytkowników publicznych** — przegląd profili lekarzy i porównanie terminów prywatnych z kolejkami NFZ.
-
----
-
 ## 4. Opis funkcjonalności
 
 ### Funkcje publiczne (bez logowania)
@@ -152,195 +216,13 @@ Jeden użytkownik może mieć **równocześnie** profil lekarza i pacjenta (np. 
 
 ---
 
-## 5. Schemat ERD
+## 5. Diagram ERD
 
-Poniższy schemat w formacie **DBML** można wkleić na dbdiagram.io (https://dbdiagram.io) w celu wygenerowania diagramu ERD.
+Diagram encji i relacji w bazie danych systemu. Główne tabele: `users`, `patients`, `doctors`, `clinics`, `services`, `availability_slots`, `appointments`, `reviews`.
 
-```dbml
-Table users {
-  id bigint [pk, increment]
-  name varchar
-  email varchar [unique]
-  email_verified_at timestamp [null]
-  password varchar
-  role varchar [default: 'patient'] // admin, doctor, patient
-  phone varchar [null]
-  is_active boolean [default: true]
-  remember_token varchar [null]
-  created_at timestamp
-  updated_at timestamp
-}
+*diagram-erd*
 
-Table doctors {
-  id bigint [pk, increment]
-  user_id bigint [unique, ref: > users.id]
-  first_name varchar
-  last_name varchar
-  photo_url varchar [null]
-  bio text [null]
-  is_verified boolean [default: false]
-  is_for_adults boolean [default: true]
-  is_for_children boolean [default: false]
-  is_active boolean [default: true]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table patients {
-  id bigint [pk, increment]
-  user_id bigint [unique, ref: > users.id]
-  first_name varchar
-  last_name varchar
-  pesel varchar [null]
-  phone varchar [null]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table clinics {
-  id bigint [pk, increment]
-  name varchar
-  address varchar
-  city varchar
-  details text [null]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table clinic_doctor {
-  clinic_id bigint [ref: > clinics.id]
-  doctor_id bigint [ref: > doctors.id]
-  created_at timestamp
-  updated_at timestamp
-
-  indexes {
-    (clinic_id, doctor_id) [pk]
-  }
-}
-
-Table specializations {
-  id bigint [pk, increment]
-  name varchar [unique]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table doctor_specializations {
-  id bigint [pk, increment]
-  doctor_id bigint [ref: > doctors.id]
-  specialization_id bigint [ref: > specializations.id]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table help_tags {
-  id bigint [pk, increment]
-  name varchar [unique]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table doctors_help_tags {
-  doctor_id bigint [ref: > doctors.id]
-  help_tag_id bigint [ref: > help_tags.id]
-
-  indexes {
-    (doctor_id, help_tag_id) [pk]
-  }
-}
-
-Table services {
-  id bigint [pk, increment]
-  doctor_id bigint [ref: > doctors.id]
-  clinic_id bigint [ref: > clinics.id]
-  name varchar
-  description text [null]
-  price decimal
-  duration_minutes int
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table availability_slots {
-  id bigint [pk, increment]
-  doctor_id bigint [ref: > doctors.id]
-  clinic_id bigint [ref: > clinics.id]
-  start_time datetime
-  end_time datetime
-  is_recurring boolean [default: false]
-  recurrence_rule varchar [null]
-  status varchar [default: 'available'] // available, booked
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table appointments {
-  id bigint [pk, increment]
-  patient_id bigint [ref: > patients.id]
-  doctor_id bigint [ref: > doctors.id]
-  service_id bigint [ref: > services.id]
-  clinic_id bigint [ref: > clinics.id]
-  date timestamp
-  length int
-  status varchar [default: 'pending'] // pending_payment, pending, confirmed, completed, cancelled
-  payment_status varchar [default: 'unpaid']
-  payment_method varchar [null]
-  payment_amount decimal [null]
-  paid_at timestamp [null]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table reviews {
-  id bigint [pk, increment]
-  appointment_id bigint [unique, ref: > appointments.id]
-  doctor_id bigint [ref: > doctors.id]
-  rating tinyint
-  comment text [null]
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table doctor_applications {
-  id bigint [pk, increment]
-  user_id bigint [ref: > users.id]
-  first_name varchar
-  last_name varchar
-  phone varchar [null]
-  bio text [null]
-  is_for_adults boolean [default: true]
-  is_for_children boolean [default: false]
-  status varchar [default: 'pending'] // pending, approved, rejected
-  admin_note text [null]
-  reviewed_at timestamp [null]
-  specialization varchar [null]
-  clinic_name varchar [null]
-  clinic_address varchar [null]
-  clinic_city varchar [null]
-  help_tag_ids json [null]
-  created_at timestamp
-  updated_at timestamp
-}
-```
-
-### Relacje (skrót)
-
-```
-users 1──1 doctors
-users 1──1 patients
-doctors N──M clinics (clinic_doctor)
-doctors N──M specializations (doctor_specializations)
-doctors N──M help_tags (doctors_help_tags)
-doctors 1──N services
-doctors 1──N availability_slots
-clinics 1──N services
-clinics 1──N availability_slots
-patients 1──N appointments
-doctors 1──N appointments
-services 1──N appointments
-appointments 1──0..1 reviews
-users 1──N doctor_applications
-```
+![diagram-erd](./screenshots/diagram-erd.png)
 
 ---
 
@@ -438,9 +320,9 @@ Szczegółowa instrukcja (wariant bez Docker, VS Code, rozwiązywanie problemów
 
 ---
 
-## 8. Wybrany, reprezentatywny przebieg użycia aplikacji / logiki biznesowej
+## 8. Szczegóły logiki biznesowej rezerwacji
 
-Poniżej opisano **główny przepływ biznesowy**: rezerwacja wizyty przez pacjenta — od wyszukania lekarza do potwierdzenia przez lekarza.
+Szczegółowy przebieg aplikacji ze zrzutami ekranu opisano w sekcji [Przebieg aplikacji](#przebieg-aplikacji) na początku dokumentacji. Poniżej uzupełnienie techniczne.
 
 ### Krok 1 — Wyszukanie lekarza
 
@@ -488,46 +370,10 @@ Administrator może wykonać te same operacje z panelu `/admin/appointments`.
 2. Pacjent w **Moje wizyty** może dodać opinię (ocena 1–5 + komentarz).
 3. Opinia jest widoczna na profilu lekarza.
 
-### Diagram sekwencji
-
-```mermaid
-sequenceDiagram
-    participant P as Pacjent
-    participant A as Aplikacja
-    participant DB as Baza danych
-    participant L as Lekarz
-
-    P->>A: Wybór usługi i slotu
-    A->>DB: Transakcja: wizyta (pending_payment), slot → booked
-    A->>P: Strona płatności (limit 10 min)
-
-    alt Płatność w czasie
-        P->>A: BLIK / karta (symulacja)
-        A->>DB: status=pending, payment_status=paid
-        L->>A: Potwierdzenie wizyty
-        A->>DB: status=confirmed
-        L->>A: Zakończenie wizyty
-        A->>DB: status=completed
-        P->>A: Dodanie opinii
-    else Brak płatności w 10 min
-        A->>DB: status=cancelled, slot → available
-    end
-```
-
-### Statusy wizyty
-
-| Status | Znaczenie |
-|--------|-----------|
-| `pending_payment` | Termin zarezerwowany, oczekuje płatności |
-| `pending` | Opłacona, czeka na potwierdzenie lekarza |
-| `confirmed` | Potwierdzona przez lekarza/admina |
-| `completed` | Zrealizowana |
-| `cancelled` | Anulowana (np. brak płatności) |
-
 ---
 
 ## Załączniki
 
 - [Instalacja — szczegóły i rozwiązywanie problemów](INSTALACJA.md)
-- [Zrzuty ekranu](screenshots/) — folder `docs/screenshots/`
+- [Zrzuty ekranu](./screenshots/) — folder `docs/screenshots/`
 - [Historia zmian](../CHANGELOG.md)
