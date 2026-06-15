@@ -165,7 +165,7 @@ Diagram encji i relacji w bazie danych systemu. Główne tabele: `users`, `patie
 ---
 
 ## 6. Kierunki dalszego rozwoju
-
+bulwar Ikara 16
 ### Co zrobilibyśmy innaczej
 
 - **Warstwa API** — wydzielenie REST API (np. dla aplikacji mobilnej) zamiast logiki wyłącznie w kontrolerach Blade.

@@ -165,7 +165,7 @@ Diagram encji i relacji w bazie danych systemu. Główne tabele: `users`, `patie
 ---
 
 ## 6. Kierunki dalszego rozwoju
-
+bulwar Ikara 16
 ### Co zrobilibyśmy innaczej
 
 - **Warstwa API** — wydzielenie REST API (np. dla aplikacji mobilnej) zamiast logiki wyłącznie w kontrolerach Blade.
@@ -307,6 +307,68 @@ Administrator może wykonać te same operacje z panelu `/admin/appointments`.
 1. Po wizycie lekarz (lub admin) oznacza ją jako `completed`.
 2. Pacjent w **Moje wizyty** może dodać opinię (ocena 1–5 + komentarz).
 3. Opinia jest widoczna na profilu lekarza.
+
+---
+
+## 9. Przebieg aplikacji
+
+Poniżej przedstawiono główny scenariusz użycia systemu — od wejścia na stronę do wystawienia opinii. Zrzuty ekranu wykonano na środowisku lokalnym (`http://localhost:8000`) z kontami testowymi z seedera.
+
+### 1. Strona główna — wyszukiwanie lekarza
+
+Pacjent wchodzi na stronę główną, przegląda listę zweryfikowanych lekarzy i może filtrować wyniki po specjalizacji, mieście lub tagu problemu zdrowotnego.
+
+![Strona główna z listą lekarzy](./screenshots/01-strona-glowna.png)
+
+### 2. Logowanie
+
+Aby zarezerwować wizytę, pacjent loguje się na swoje konto (rejestracja tworzy automatycznie profil pacjenta).
+
+![Formularz logowania](./screenshots/02-logowanie.png)
+
+**Konto testowe pacjenta:** `pacjent1@test.pl` / `password`
+
+### 3. Rezerwacja wizyty
+
+Na profilu lekarza pacjent wybiera usługę, następnie wolny termin w kalendarzu tygodniowym (poniedziałek–niedziela) i klika **Zarezerwuj wizytę**. System w transakcji tworzy wizytę ze statusem `pending_payment` i blokuje slot (`booked`).
+
+![Profil lekarza — wybór usługi i terminu](./screenshots/03-rezerwacja-wizyty.png)
+
+### 4. Płatność
+
+Pacjent trafia na stronę płatności z limitem **10 minut**. Wybiera metodę (BLIK lub karta — symulacja testowa). Po opłaceniu wizyta przechodzi w status `pending`, a płatność w `paid`.
+
+![Strona płatności za wizytę](./screenshots/04-platnosc.png)
+
+### 5. Potwierdzenie wizyty przez lekarza
+
+Lekarz loguje się do panelu **Wizyty pacjentów**, widzi opłaconą wizytę i klika **Potwierdź** (status → `confirmed`), a po wizycie **Zakończ** (status → `completed`).
+
+![Panel lekarza — potwierdzenie wizyty](./screenshots/05-potwierdzenie-lekarza.png)
+
+**Konto testowe lekarza:** `doktor1@test.pl` / `password`
+
+### 6. Wystawienie opinii
+
+Po zakończonej wizycie pacjent w **Moje wizyty** dodaje opinię: ocenę (1–5), komentarz i opcjonalnie zdjęcie.
+
+![Formularz dodawania opinii](./screenshots/06-opinia.png)
+
+### 7. Opinia na profilu lekarza
+
+Dodana opinia jest widoczna na publicznym profilu lekarza w sekcji **Opinie**.
+
+![Opinia pacjenta widoczna na profilu lekarza](./screenshots/07-opinia-na-profilu.png)
+
+### Statusy wizyty w przebiegu
+
+| Status | Znaczenie |
+|--------|-----------|
+| `pending_payment` | Termin zarezerwowany, oczekuje płatności (limit 10 min) |
+| `pending` | Opłacona, czeka na potwierdzenie lekarza |
+| `confirmed` | Potwierdzona przez lekarza lub admina |
+| `completed` | Zrealizowana — pacjent może dodać opinię |
+| `cancelled` | Anulowana (np. brak płatności w czasie) |
 
 ---
 
