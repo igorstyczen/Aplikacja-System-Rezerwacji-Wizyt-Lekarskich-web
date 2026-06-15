@@ -15,7 +15,7 @@ Aplikacja jest przeznaczona dla:
 - **administratorów** — nadzór nad użytkownikami, klinikami, słownikami i wnioskami o profil lekarza,
 - **użytkowników publicznych** — przegląd profili lekarzy i porównanie terminów prywatnych z kolejkami NFZ.
 
-Technologie: **Laravel 12** (PHP 8.2+), **MySQL**, **Blade**, **Tailwind CSS**, **Alpine.js**, **Docker**.
+Technologie: **Laravel 13** (PHP 8.3+), **MySQL**, **Blade**, **Tailwind CSS 4**, **Alpine.js**, **Docker**.
 
 ---
 
@@ -81,8 +81,8 @@ Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
 
 | Technologia | Wersja / rola |
 |-------------|---------------|
-| PHP | 8.2+ |
-| Laravel | 12 |
+| PHP | 8.3+ |
+| Laravel | 13 |
 | Laravel Breeze | Autentykacja, rejestracja, reset hasła |
 | Eloquent ORM | Warstwa dostępu do bazy danych |
 | MySQL | 8.0 — baza relacyjna |
@@ -92,7 +92,7 @@ Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
 | Technologia | Rola |
 |-------------|------|
 | Blade | Szablony HTML |
-| Tailwind CSS 3 | Stylowanie |
+| Tailwind CSS | 4 — stylowanie |
 | Alpine.js 3 | Interakcje po stronie klienta |
 | Vite 7 | Budowanie assetów |
 

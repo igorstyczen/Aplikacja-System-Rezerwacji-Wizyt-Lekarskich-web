@@ -45,6 +45,35 @@
                 </div>
             @endif
 
+            @php
+                $sort = $sort ?? request('sort', 'desc');
+                if (! in_array($sort, ['asc', 'desc'], true)) {
+                    $sort = 'desc';
+                }
+            @endphp
+
+            @if ($doctor)
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 18px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                    <span style="font-size: 14px; font-weight: 900; color: #047857; white-space: nowrap;">
+                        Sortowanie po dacie wizyty:
+                    </span>
+
+                    <a
+                        href="{{ route('doctor.appointments', ['sort' => 'desc']) }}"
+                        style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 900; text-decoration: none; border: 2px solid {{ $sort === 'desc' ? '#059669' : '#d1d5db' }}; background: {{ $sort === 'desc' ? '#059669' : 'white' }}; color: {{ $sort === 'desc' ? 'white' : '#374151' }};"
+                    >
+                        ↓ Od najnowszej
+                    </a>
+
+                    <a
+                        href="{{ route('doctor.appointments', ['sort' => 'asc']) }}"
+                        style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 900; text-decoration: none; border: 2px solid {{ $sort === 'asc' ? '#059669' : '#d1d5db' }}; background: {{ $sort === 'asc' ? '#059669' : 'white' }}; color: {{ $sort === 'asc' ? 'white' : '#374151' }};"
+                    >
+                        ↑ Od najstarszej
+                    </a>
+                </div>
+            @endif
+
             @if ($appointments->count() > 0)
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
                     <div style="padding: 26px 30px; border-bottom: 1px solid #e5e7eb;">
@@ -52,8 +81,8 @@
                             Lista wizyt pacjentów
                         </h2>
 
-                        <p style="font-size: 14px; color: #6b7280;">
-                            Najnowsze rezerwacje, statusy wizyt oraz informacje o płatnościach.
+                        <p style="font-size: 14px; color: #6b7280; margin: 0;">
+                            Statusy wizyt oraz informacje o płatnościach.
                         </p>
                     </div>
 
@@ -62,7 +91,16 @@
                             <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
                                 <tr>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">
-                                        Data
+                                        <a
+                                            href="{{ route('doctor.appointments', ['sort' => $sort === 'desc' ? 'asc' : 'desc']) }}"
+                                            style="display: inline-flex; align-items: center; gap: 6px; color: #059669; text-decoration: none;"
+                                            title="Kliknij, aby zmienić kolejność sortowania"
+                                        >
+                                            Data
+                                            <span style="font-size: 14px; line-height: 1;">
+                                                {{ $sort === 'desc' ? '↓' : '↑' }}
+                                            </span>
+                                        </a>
                                     </th>
                                     <th style="padding: 14px 18px; text-align: left; font-size: 12px; font-weight: 900; color: #6b7280; text-transform: uppercase;">
                                         Pacjent

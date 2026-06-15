@@ -259,8 +259,14 @@ class DoctorDashboardController extends Controller
         return back()->with('success', 'Termin został usunięty z grafiku.');
     }
 
-    public function appointments()
+    public function appointments(Request $request)
     {
+        $sort = $request->query('sort', 'desc');
+
+        if (! in_array($sort, ['asc', 'desc'], true)) {
+            $sort = 'desc';
+        }
+
         $doctor = Doctor::where('user_id', Auth::id())->first();
 
         if (! $doctor) {
@@ -268,6 +274,7 @@ class DoctorDashboardController extends Controller
                 'doctor' => null,
                 'appointments' => collect(),
                 'message' => 'Nie masz profilu lekarza.',
+                'sort' => $sort,
             ]);
         }
 
@@ -277,13 +284,14 @@ class DoctorDashboardController extends Controller
                 'clinic',
             ])
             ->where('doctor_id', $doctor->id)
-            ->orderBy('date', 'desc')
+            ->orderBy('date', $sort)
             ->get();
 
         return view('doctor.appointments', [
             'doctor' => $doctor,
             'appointments' => $appointments,
             'message' => null,
+            'sort' => $sort,
         ]);
     }
 

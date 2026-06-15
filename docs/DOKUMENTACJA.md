@@ -15,7 +15,7 @@ Aplikacja jest przeznaczona dla:
 - **administratorów** — nadzór nad użytkownikami, klinikami, słownikami i wnioskami o profil lekarza,
 - **użytkowników publicznych** — przegląd profili lekarzy i porównanie terminów prywatnych z kolejkami NFZ.
 
-Technologie: **Laravel 12** (PHP 8.2+), **MySQL**, **Blade**, **Tailwind CSS**, **Alpine.js**, **Docker**.
+Technologie: **Laravel 13** (PHP 8.3+), **MySQL**, **Blade**, **Tailwind CSS 4**, **Alpine.js**, **Docker**.
 
 ---
 
@@ -77,24 +77,26 @@ Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
 
 ## 2. Użyte technologie
 
+Projekt korzysta z **najnowszych stabilnych wersji** frameworków frontendowych i backendowych.
+
 ### Backend
 
 | Technologia | Wersja / rola |
 |-------------|---------------|
-| PHP | 8.2+ |
-| Laravel | 12 |
+| PHP | 8.3+ |
+| Laravel | 13 |
 | Laravel Breeze | Autentykacja, rejestracja, reset hasła |
 | Eloquent ORM | Warstwa dostępu do bazy danych |
 | MySQL | 8.0 — baza relacyjna |
 
 ### Frontend
 
-| Technologia | Rola |
-|-------------|------|
+| Technologia | Wersja / rola |
+|-------------|---------------|
 | Blade | Szablony HTML |
-| Tailwind CSS 3 | Stylowanie |
-| Alpine.js 3 | Interakcje po stronie klienta |
-| Vite 7 | Budowanie assetów |
+| Tailwind CSS | 4 — stylowanie (utility-first CSS) |
+| Alpine.js | 3 — interakcje po stronie klienta |
+| Vite | 7 — budowanie assetów |
 
 ### Infrastruktura i narzędzia
 
@@ -165,7 +167,7 @@ Diagram encji i relacji w bazie danych systemu. Główne tabele: `users`, `patie
 ---
 
 ## 6. Kierunki dalszego rozwoju
-bulwar Ikara 16
+
 ### Co zrobilibyśmy innaczej
 
 - **Warstwa API** — wydzielenie REST API (np. dla aplikacji mobilnej) zamiast logiki wyłącznie w kontrolerach Blade.
@@ -191,6 +193,7 @@ bulwar Ikara 16
 
 - Docker Desktop (uruchomiony)
 - Git (opcjonalnie, do klonowania repozytorium)
+- PHP **8.3+** (w kontenerze Docker lub lokalnie przy instalacji bez Dockera)
 
 ### Krok 1 — Pobranie projektu
 

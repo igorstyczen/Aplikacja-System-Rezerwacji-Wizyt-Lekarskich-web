@@ -82,7 +82,7 @@ docker exec -it medical_app bash
 
 ### Wymagania
 
-- PHP 8.2+ z rozszerzeniami: `pdo_mysql`, `mbstring`, `openssl`, `zip`
+- PHP **8.3+** z rozszerzeniami: `pdo_mysql`, `mbstring`, `openssl`, `zip`
 - [Composer](https://getcomposer.org/)
 - [Node.js](https://nodejs.org/) 18+
 - MySQL 8 (lokalnie lub XAMPP)
