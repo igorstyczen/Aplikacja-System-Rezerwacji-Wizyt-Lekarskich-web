@@ -14,6 +14,8 @@ use App\Services\HelpTagSimilarityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DoctorDashboardController extends Controller
 {
@@ -24,7 +26,7 @@ class DoctorDashboardController extends Controller
         if (! $doctor) {
             return view('doctor.schedule', [
                 'doctor' => null,
-                'slots' => collect(),
+                'slots' => new LengthAwarePaginator([], 0, 50),
                 'clinics' => collect(),
                 'message' => 'Nie masz profilu lekarza.',
             ]);
@@ -38,7 +40,8 @@ class DoctorDashboardController extends Controller
         $slots = AvailabilitySlot::with('clinic')
             ->where('doctor_id', $doctor->id)
             ->orderBy('start_time')
-            ->get();
+            ->paginate(50)
+            ->withQueryString();
 
         return view('doctor.schedule', [
             'doctor' => $doctor,
@@ -575,6 +578,11 @@ class DoctorDashboardController extends Controller
 
         $file = $request->file('photo');
         $path = $file->store('doctor-avatars', 'public');
+
+        if ($doctor->photo_url) {
+            $previousPath = preg_replace('#^storage/#', '', $doctor->photo_url);
+            Storage::disk('public')->delete($previousPath);
+        }
 
         $doctor->update([
             'photo_url' => 'storage/' . $path,

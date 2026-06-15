@@ -31,6 +31,7 @@ Pierwszy start może trwać kilka minut (Composer + cache Laravel). Kolejne rest
 
 ```powershell
 docker exec medical_app php artisan key:generate
+docker exec medical_app php artisan storage:link
 docker exec medical_app php artisan migrate --seed --force
 docker exec medical_app npm install
 docker exec medical_app npm run build

@@ -24,10 +24,6 @@
                     </x-nav-link>
 
                     @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            Panel
-                        </x-nav-link>
-
                         @if (Auth::user()->role === 'admin')
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                                 Admin
@@ -86,9 +82,17 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="inline-flex items-center gap-2 px-3 py-2 border border-gray-100 text-sm leading-4 font-medium rounded-xl text-gray-600 bg-white hover:text-gray-900 hover:shadow-sm focus:outline-none transition">
-                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-                                    {{ mb_substr(Auth::user()->name, 0, 1) }}
-                                </div>
+                                @if ($navDoctor?->photo_url)
+                                    <img
+                                        src="{{ $navDoctor->public_photo_url }}"
+                                        alt="Zdjęcie lekarza"
+                                        style="width: 32px; height: 32px; border-radius: 9999px; object-fit: cover; object-position: center; display: block; flex-shrink: 0;"
+                                    >
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                                        {{ mb_substr(Auth::user()->name, 0, 1) }}
+                                    </div>
+                                @endif
 
                                 <div>{{ Auth::user()->name }}</div>
 
@@ -159,10 +163,6 @@
             </x-responsive-nav-link>
 
             @auth
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    Panel
-                </x-responsive-nav-link>
-
                 @if (Auth::user()->role === 'admin')
                     <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         Admin

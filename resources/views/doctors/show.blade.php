@@ -33,15 +33,15 @@
             <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; padding: 34px; margin-bottom: 28px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);">
                 <div style="display: flex; align-items: flex-start; gap: 30px;">
                     <div style="width: 128px; height: 128px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        @if ($doctor->photo_url)
+                        @if ($doctor->public_photo_url)
                             <img
-                                src="{{ asset($doctor->photo_url) }}"
+                                src="{{ $doctor->public_photo_url }}"
                                 alt="Zdjęcie lekarza"
                                 style="width: 128px; height: 128px; object-fit: cover; object-position: center 20%; display: block;"
                             >
                         @else
                             <span style="color: #6b7280; font-size: 34px; font-weight: 900;">
-                                {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
+                                {{ $doctor->initials }}
                             </span>
                         @endif
                     </div>

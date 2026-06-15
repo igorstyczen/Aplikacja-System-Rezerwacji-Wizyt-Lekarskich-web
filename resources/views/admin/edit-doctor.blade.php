@@ -97,15 +97,15 @@
                         </label>
 
                         <div style="width: 112px; height: 112px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
-                            @if ($doctor->photo_url)
+                            @if ($doctor->public_photo_url)
                                 <img
-                                    src="{{ asset($doctor->photo_url) }}"
+                                    src="{{ $doctor->public_photo_url }}"
                                     alt="Zdjęcie lekarza"
                                     style="width: 112px; height: 112px; object-fit: cover; object-position: center 20%; display: block;"
                                 >
                             @else
                                 <span style="color: #6b7280; font-size: 28px; font-weight: 900;">
-                                    {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
+                                    {{ $doctor->initials }}
                                 </span>
                             @endif
                         </div>

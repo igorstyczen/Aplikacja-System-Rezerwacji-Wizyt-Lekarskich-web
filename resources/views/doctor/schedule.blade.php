@@ -212,7 +212,7 @@
                 </div>
             @endif
 
-            @if ($slots->count() > 0)
+            @if ($slots->total() > 0)
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">
                     <div style="padding: 26px 30px; border-bottom: 1px solid #e5e7eb;">
                         <h2 style="font-size: 22px; font-weight: 900; color: #111827; margin-bottom: 6px;">
@@ -221,8 +221,13 @@
 
                         <p style="font-size: 14px; color: #6b7280;">
                             Wolne, zarezerwowane i niedostępne terminy w Twoim grafiku.
+                            @if ($slots->total() > $slots->perPage())
+                                <strong style="color: #374151;">Na stronie: {{ $slots->perPage() }} terminów.</strong>
+                            @endif
                         </p>
                     </div>
+
+                    <x-simple-pagination :paginator="$slots" item-label="terminów" />
 
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
@@ -321,6 +326,8 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <x-simple-pagination :paginator="$slots" item-label="terminów" />
                 </div>
             @else
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 22px; padding: 32px; box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);">

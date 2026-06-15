@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Doctor extends Model
@@ -74,5 +75,33 @@ class Doctor extends Model
     public function getFullNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;
+    }
+
+    protected function publicPhotoUrl(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            if (blank($this->photo_url)) {
+                return null;
+            }
+
+            if (str_starts_with($this->photo_url, 'http://') || str_starts_with($this->photo_url, 'https://')) {
+                return $this->photo_url;
+            }
+
+            $path = ltrim($this->photo_url, '/');
+
+            if (! str_starts_with($path, 'storage/')) {
+                $path = 'storage/' . $path;
+            }
+
+            $version = $this->updated_at?->getTimestamp() ?? $this->id;
+
+            return asset($path) . '?v=' . $version;
+        });
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        return mb_substr($this->first_name, 0, 1) . mb_substr($this->last_name, 0, 1);
     }
 }

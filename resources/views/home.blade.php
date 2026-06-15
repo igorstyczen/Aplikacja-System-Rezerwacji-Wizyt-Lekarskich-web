@@ -205,15 +205,15 @@
                             <div>
                                 <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 18px;">
                                     <div style="width: 78px; height: 78px; border-radius: 9999px; overflow: hidden; background: #e5e7eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        @if ($doctor->photo_url)
+                                        @if ($doctor->public_photo_url)
                                             <img
-                                                src="{{ asset($doctor->photo_url) }}"
+                                                src="{{ $doctor->public_photo_url }}"
                                                 alt="Zdjęcie lekarza"
                                                 style="width: 78px; height: 78px; object-fit: cover; object-position: center 20%; display: block;"
                                             >
                                         @else
                                             <span style="color: #6b7280; font-size: 20px; font-weight: 900;">
-                                                {{ mb_substr($doctor->first_name, 0, 1) }}{{ mb_substr($doctor->last_name, 0, 1) }}
+                                                {{ $doctor->initials }}
                                             </span>
                                         @endif
                                     </div>

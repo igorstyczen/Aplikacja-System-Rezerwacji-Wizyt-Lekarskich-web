@@ -1,388 +1,533 @@
 # Dokumentacja projektu — System Rezerwacji Wizyt Lekarskich
 
-## 1. Wprowadzenie
-
-**System Rezerwacji Wizyt Lekarskich** to aplikacja webowa umożliwiająca:
-
-- pacjentom **wyszukiwanie lekarzy** i **rezerwację wizyt** online,
-- lekarzom **zarządzanie grafikiem**, usługami i wizytami,
-- administratorom **nadzór** nad użytkownikami, klinikami i wnioskami o profil lekarza,
-- wszystkim użytkownikom **porównanie terminów prywatnych z kolejkami NFZ**.
-
-Aplikacja jest napisana w **Laravel 12** (PHP 8.2+) z autentykacją **Laravel Breeze** i interfejsem **Blade + Tailwind CSS**.
+Repozytorium: [Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web](https://github.com/igorstyczen/Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web)
 
 ---
 
-## 2. Zrzuty ekranu
+## 1. Autorzy i podział ról
 
-> Zrzuty ekranu znajdują się w folderze [`screenshots/`](./screenshots/). Jeśli podgląd Markdown ich nie pokazuje, otwórz plik ponownie lub użyj **Markdown: Open Preview** (`Ctrl+Shift+V`).
+Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
 
-### Strona publiczna
+### Krystian Świąder
 
-#### Strona główna — wyszukiwarka lekarzy
+**Logika rezerwacji**
 
-<p align="center">
-  <img src="./screenshots/01-strona-glowna.png" alt="Strona główna" width="900">
-</p>
+- pobieranie wolnych slotów lekarza,
+- sprawdzanie, czy termin jest wolny,
+- tworzenie wizyty,
+- blokowanie zajętego terminu,
+- zmiana statusu wizyty,
+- anulowanie wizyty,
+- filtrowanie wizyt po lekarzu, pacjencie i statusie.
 
-Hero z opisem platformy, filtry (specjalizacja, miasto, tag problemu zdrowotnego) oraz lista zweryfikowanych lekarzy.
+**Kalendarz i sloty dostępności**
 
-#### Logowanie
+- dodawanie slotów przez lekarza/admina,
+- pobieranie slotów dla konkretnego lekarza,
+- sprawdzanie kolizji godzin,
+- oznaczanie slotów jako zajęte po rezerwacji.
 
-<p align="center">
-  <img src="./screenshots/02-logowanie.png" alt="Logowanie" width="900">
-</p>
+**Pozostałe**
 
-Formularz logowania z opcją „Remember me” i resetem hasła.
+- strona główna z listą lekarzy,
+- upload zdjęcia lekarza,
+- upload zdjęć do opinii.
 
-#### Rejestracja
+### Igor Styczeń
 
-<p align="center">
-  <img src="./screenshots/03-rejestracja.png" alt="Rejestracja" width="900">
-</p>
+**Panel administratora — pełny CRUD**
 
-Rejestracja tworzy konto z rolą `patient` oraz automatycznie profil pacjenta.
+- użytkownicy,
+- lekarze,
+- pacjenci,
+- kliniki,
+- usługi,
+- wizyty,
+- sloty dostępności,
+- opinie.
 
-#### Porównanie z NFZ
+**Wyszukiwarka i tagi**
 
-<p align="center">
-  <img src="./screenshots/04-porownanie-nfz.png" alt="Porównanie NFZ" width="900">
-</p>
+- mechanizm filtrowania lekarzy na stronie głównej,
+- wyszukiwanie po imieniu i nazwisku, specjalizacji, problemie zdrowotnym (tagu), mieście,
+- filtrowanie informacji, czy lekarz przyjmuje dzieci.
 
-Integracja z publicznym API NFZ — wyszukiwanie kolejek i porównanie z najbliższym terminem prywatnym.
+**Profil lekarza**
 
-#### Profil lekarza
-
-<p align="center">
-  <img src="./screenshots/05-profil-lekarza.png" alt="Profil lekarza" width="900">
-</p>
-
-Szczegóły lekarza: specjalizacje, kliniki, usługi, dostępne terminy, opinie pacjentów.
+- szczegółowy widok lekarza: dane osobowe, specjalizacje, opis, kliniki, usługi, dostępne terminy, opinie pacjentów,
+- przejście ze strony głównej do profilu konkretnego lekarza,
+- wyświetlenie informacji potrzebnych pacjentowi do umówienia wizyty.
 
 ---
+
+## 2. Użyte technologie
+
+### Backend
+
+| Technologia | Wersja / rola |
+|-------------|---------------|
+| PHP | 8.2+ |
+| Laravel | 12 |
+| Laravel Breeze | Autentykacja, rejestracja, reset hasła |
+| Eloquent ORM | Warstwa dostępu do bazy danych |
+| MySQL | 8.0 — baza relacyjna |
+
+### Frontend
+
+| Technologia | Rola |
+|-------------|------|
+| Blade | Szablony HTML |
+| Tailwind CSS 3 | Stylowanie |
+| Alpine.js 3 | Interakcje po stronie klienta |
+| Vite 7 | Budowanie assetów |
+
+### Infrastruktura i narzędzia
+
+| Technologia | Rola |
+|-------------|------|
+| Docker + Docker Compose | Uruchomienie aplikacji, PHP/Apache, MySQL, phpMyAdmin |
+| Composer | Zależności PHP |
+| npm | Zależności JavaScript |
+| PHPUnit | Testy automatyczne |
+| API NFZ (`api.nfz.gov.pl`) | Porównanie kolejek publicznych z terminami prywatnymi |
+
+---
+
+## 3. Przeznaczenie aplikacji
+
+**System Rezerwacji Wizyt Lekarskich** to aplikacja webowa do zarządzania prywatnymi wizytami lekarskimi online.
+
+Aplikacja jest przeznaczona dla:
+
+- **pacjentów** — wyszukiwanie lekarzy, rezerwacja terminów, płatność, opinie,
+- **lekarzy** — prowadzenie grafiku, usług i obsługa wizyt,
+- **administratorów** — nadzór nad użytkownikami, klinikami, słownikami i wnioskami o profil lekarza,
+- **użytkowników publicznych** — przegląd profili lekarzy i porównanie terminów prywatnych z kolejkami NFZ.
+
+---
+
+## 4. Opis funkcjonalności
+
+### Funkcje publiczne (bez logowania)
+
+- Strona główna z wyszukiwarką lekarzy (filtry: specjalizacja, miasto, tag problemu zdrowotnego).
+- Podgląd profilu lekarza: bio, specjalizacje, kliniki, usługi, kalendarz terminów, opinie.
+- Porównanie terminów prywatnych z kolejkami NFZ (integracja z publicznym API).
 
 ### Panel pacjenta
 
-<p align="center">
-  <img src="./screenshots/06-panel-pacjenta.png" alt="Panel pacjenta" width="900">
-</p>
-
-Lista wizyt pacjenta ze statusami (oczekuje płatności, opłacona, potwierdzona, zakończona, anulowana).
-
----
+- Rejestracja i logowanie (automatyczne tworzenie profilu pacjenta).
+- Rezerwacja wizyty: wybór usługi, terminu w kalendarzu tygodniowym (pon.–ndz.), potwierdzenie.
+- Płatność testowa (BLIK lub karta) z limitem czasu 10 minut.
+- Lista własnych wizyt ze statusami.
+- Składanie opinii po zakończonej wizycie.
+- Wniosek o utworzenie profilu lekarza.
 
 ### Panel lekarza
 
-#### Grafik
-
-<p align="center">
-  <img src="./screenshots/07-grafik-lekarza.png" alt="Grafik lekarza" width="900">
-</p>
-
-Dodawanie, edycja i usuwanie slotów dostępności powiązanych z kliniką.
-
-#### Wizyty
-
-<p align="center">
-  <img src="./screenshots/08-wizyty-lekarza.png" alt="Wizyty lekarza" width="900">
-</p>
-
-Przegląd i obsługa wizyt (potwierdzenie, zakończenie).
-
----
+- Zarządzanie grafikiem: dodawanie, edycja, usuwanie slotów; powtarzanie co tydzień do wybranej daty.
+- Zarządzanie usługami medycznymi (cena, czas trwania, klinika).
+- Przegląd i obsługa wizyt (potwierdzenie, zakończenie).
+- Edycja profilu lekarza, w tym dodawanie tagów problemów zdrowotnych (z wykrywaniem podobnych tagów).
 
 ### Panel administratora
 
-#### Dashboard
+- Dashboard ze statystykami (użytkownicy, lekarze, wizyty).
+- Zarządzanie użytkownikami (edycja roli, aktywacja/dezaktywacja).
+- Zarządzanie lekarzami (weryfikacja, tworzenie, edycja).
+- Zarządzanie klinikami (lista z filtrami, dodawanie, osobny widok edycji, przypisywanie lekarzy).
+- Obsługa wniosków o profil lekarza (akceptacja / odrzucenie).
+- Zarządzanie słownikami: specjalizacje, tagi problemów zdrowotnych.
+- Podgląd i obsługa wszystkich wizyt.
 
-<p align="center">
-  <img src="./screenshots/09-panel-admina.png" alt="Panel admina" width="900">
-</p>
+### Role i uprawnienia
 
-Statystyki: użytkownicy, lekarze, pacjenci, wizyty wg statusu, ostatnie rezerwacje.
+| Rola | Wartość w bazie | Dostęp |
+|------|-----------------|--------|
+| Administrator | `admin` | Pełny panel admina |
+| Lekarz | `doctor` | Panel lekarza (+ funkcje pacjenta, jeśli ma profil pacjenta) |
+| Pacjent | `patient` | Panel pacjenta |
 
-#### Zarządzanie lekarzami
-
-<p align="center">
-  <img src="./screenshots/10-zarzadzanie-lekarzami.png" alt="Zarządzanie lekarzami" width="900">
-</p>
-
-Lista lekarzy z filtrowaniem, weryfikacją, aktywacją/dezaktywacją.
+Jeden użytkownik może mieć **równocześnie** profil lekarza i pacjenta (np. lekarz rezerwujący wizytę u innego specjalisty).
 
 ---
 
-## 3. Role użytkowników
+## 5. Schemat ERD
 
-```mermaid
-flowchart TB
-    subgraph Publiczne
-        HOME[Strona główna]
-        NFZ[Porównanie NFZ]
-        DOC[Profil lekarza]
-    end
+Poniższy schemat w formacie **DBML** można wkleić na dbdiagram.io (https://dbdiagram.io) w celu wygenerowania diagramu ERD.
 
-    subgraph Pacjent
-        P1[Moje wizyty]
-        P2[Rezerwacja + płatność]
-        P3[Opinie]
-        P4[Wniosek o profil lekarza]
-    end
+```dbml
+Table users {
+  id bigint [pk, increment]
+  name varchar
+  email varchar [unique]
+  email_verified_at timestamp [null]
+  password varchar
+  role varchar [default: 'patient'] // admin, doctor, patient
+  phone varchar [null]
+  is_active boolean [default: true]
+  remember_token varchar [null]
+  created_at timestamp
+  updated_at timestamp
+}
 
-    subgraph Lekarz
-        D1[Grafik]
-        D2[Usługi]
-        D3[Wizyty]
-        D4[Profil]
-    end
+Table doctors {
+  id bigint [pk, increment]
+  user_id bigint [unique, ref: > users.id]
+  first_name varchar
+  last_name varchar
+  photo_url varchar [null]
+  bio text [null]
+  is_verified boolean [default: false]
+  is_for_adults boolean [default: true]
+  is_for_children boolean [default: false]
+  is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
+}
 
-    subgraph Admin
-        A1[Dashboard]
-        A2[Użytkownicy]
-        A3[Lekarze / kliniki]
-        A4[Wnioski lekarzy]
-        A5[Słowniki]
-    end
+Table patients {
+  id bigint [pk, increment]
+  user_id bigint [unique, ref: > users.id]
+  first_name varchar
+  last_name varchar
+  pesel varchar [null]
+  phone varchar [null]
+  created_at timestamp
+  updated_at timestamp
+}
 
-    HOME --> P2
-    P2 --> P1
-    D1 --> P2
-    A3 --> HOME
+Table clinics {
+  id bigint [pk, increment]
+  name varchar
+  address varchar
+  city varchar
+  details text [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table clinic_doctor {
+  clinic_id bigint [ref: > clinics.id]
+  doctor_id bigint [ref: > doctors.id]
+  created_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (clinic_id, doctor_id) [pk]
+  }
+}
+
+Table specializations {
+  id bigint [pk, increment]
+  name varchar [unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table doctor_specializations {
+  id bigint [pk, increment]
+  doctor_id bigint [ref: > doctors.id]
+  specialization_id bigint [ref: > specializations.id]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table help_tags {
+  id bigint [pk, increment]
+  name varchar [unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table doctors_help_tags {
+  doctor_id bigint [ref: > doctors.id]
+  help_tag_id bigint [ref: > help_tags.id]
+
+  indexes {
+    (doctor_id, help_tag_id) [pk]
+  }
+}
+
+Table services {
+  id bigint [pk, increment]
+  doctor_id bigint [ref: > doctors.id]
+  clinic_id bigint [ref: > clinics.id]
+  name varchar
+  description text [null]
+  price decimal
+  duration_minutes int
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table availability_slots {
+  id bigint [pk, increment]
+  doctor_id bigint [ref: > doctors.id]
+  clinic_id bigint [ref: > clinics.id]
+  start_time datetime
+  end_time datetime
+  is_recurring boolean [default: false]
+  recurrence_rule varchar [null]
+  status varchar [default: 'available'] // available, booked
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table appointments {
+  id bigint [pk, increment]
+  patient_id bigint [ref: > patients.id]
+  doctor_id bigint [ref: > doctors.id]
+  service_id bigint [ref: > services.id]
+  clinic_id bigint [ref: > clinics.id]
+  date timestamp
+  length int
+  status varchar [default: 'pending'] // pending_payment, pending, confirmed, completed, cancelled
+  payment_status varchar [default: 'unpaid']
+  payment_method varchar [null]
+  payment_amount decimal [null]
+  paid_at timestamp [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reviews {
+  id bigint [pk, increment]
+  appointment_id bigint [unique, ref: > appointments.id]
+  doctor_id bigint [ref: > doctors.id]
+  rating tinyint
+  comment text [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table doctor_applications {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  first_name varchar
+  last_name varchar
+  phone varchar [null]
+  bio text [null]
+  is_for_adults boolean [default: true]
+  is_for_children boolean [default: false]
+  status varchar [default: 'pending'] // pending, approved, rejected
+  admin_note text [null]
+  reviewed_at timestamp [null]
+  specialization varchar [null]
+  clinic_name varchar [null]
+  clinic_address varchar [null]
+  clinic_city varchar [null]
+  help_tag_ids json [null]
+  created_at timestamp
+  updated_at timestamp
+}
 ```
 
-| Rola | Wartość `users.role` | Middleware |
-|------|----------------------|------------|
-| Administrator | `admin` | `auth`, `role:admin` |
-| Lekarz | `doctor` | `auth`, `role:doctor,admin` |
-| Pacjent | `patient` | `auth`, `role:patient,admin` |
+### Relacje (skrót)
 
-**Uwaga:** Jeden użytkownik może mieć **równocześnie** profil lekarza (`doctors`) i pacjenta (`patients`) — np. lekarz rezerwujący wizytę u innego specjalisty.
+```
+users 1──1 doctors
+users 1──1 patients
+doctors N──M clinics (clinic_doctor)
+doctors N──M specializations (doctor_specializations)
+doctors N──M help_tags (doctors_help_tags)
+doctors 1──N services
+doctors 1──N availability_slots
+clinics 1──N services
+clinics 1──N availability_slots
+patients 1──N appointments
+doctors 1──N appointments
+services 1──N appointments
+appointments 1──0..1 reviews
+users 1──N doctor_applications
+```
 
 ---
 
-## 4. Przepływ rezerwacji wizyty
+## 6. Kierunki dalszego rozwoju
+
+### Co zrobilibyśmy innaczej
+
+- **Warstwa API** — wydzielenie REST API (np. dla aplikacji mobilnej) zamiast logiki wyłącznie w kontrolerach Blade.
+- **Front-end SPA** — rozważenie Vue/React dla bardziej interaktywnego kalendarza i paneli, zamiast mieszanki Blade + inline JS.
+- **Testy** — szersze pokrycie testami Feature (rezerwacja, płatność, timeout, role) już na etapie implementacji.
+- **Konfiguracja środowiska** — jeden skrypt `setup` uruchamiany przy pierwszym `docker compose up`, zamiast ręcznych kroków migracji i buildu.
+
+### Co wymaga dopracowania
+
+- **Płatności** — integracja z prawdziwym bramką płatności (PayU, Przelewy24, Stripe).
+- **Powiadomienia** — e-mail/SMS o rezerwacji, przypomnienia przed wizytą, anulowanie po timeoutie.
+- **Weryfikacja e-mail** — obecnie wymagana przez część tras; w środowisku demo wymaga ręcznego oznaczenia kont.
+- **Bezpieczeństwo i RODO** — audyt przechowywania danych wrażliwych (PESEL), polityka prywatności, logi dostępu.
+- **Wydajność** — cache wyników API NFZ, indeksy na często filtrowanych kolumnach (miasto, data slotu).
+- **Dostępność (a11y)** — poprawa kontrastów, etykiet formularzy i nawigacji klawiaturą.
+- **Panel lekarza** — masowe generowanie grafiku, wyjątki od reguł cyklicznych (święta, urlopy).
+
+---
+
+## 7. Instrukcja krok po kroku uruchomienia aplikacji
+
+### Wymagania
+
+- Docker Desktop (uruchomiony)
+- Git (opcjonalnie, do klonowania repozytorium)
+
+### Krok 1 — Pobranie projektu
+
+```powershell
+git clone https://github.com/igorstyczen/Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web.git
+cd Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web
+```
+
+### Krok 2 — Uruchomienie kontenerów
+
+```powershell
+docker compose up -d --build
+```
+
+Pierwsze uruchomienie może trwać kilka minut (instalacja zależności PHP w wolumenie Docker).
+
+### Krok 3 — Konfiguracja aplikacji (tylko przy pierwszym uruchomieniu)
+
+```powershell
+docker exec medical_app php artisan key:generate
+docker exec medical_app php artisan storage:link
+docker exec medical_app php artisan migrate --seed --force
+docker exec medical_app npm install
+docker exec medical_app npm run build
+```
+
+### Krok 4 — Weryfikacja e-maili kont demo (zalecane)
+
+```powershell
+docker exec medical_app php artisan tinker --execute="App\Models\User::query()->update(['email_verified_at' => now()]);"
+```
+
+### Krok 5 — Otwarcie aplikacji
+
+| Usługa | Adres |
+|--------|-------|
+| Aplikacja | http://localhost:8000 |
+| phpMyAdmin | http://localhost:8080 |
+
+**phpMyAdmin:** serwer `db`, użytkownik `laravel`, hasło `secret`, baza `medical_booking`.
+
+### Konta testowe
+
+| E-mail | Hasło | Rola |
+|--------|-------|------|
+| admin@test.pl | password | Administrator |
+| doktor1@test.pl | password | Lekarz |
+| pacjent1@test.pl | password | Pacjent |
+
+### Przydatne komendy
+
+```powershell
+# Zatrzymanie
+docker compose down
+
+# Ponowne seedowanie (czyści dane!)
+docker exec medical_app php artisan migrate:fresh --seed --force
+
+# Po zmianie kodu / .env
+docker exec medical_app php artisan optimize:clear
+docker compose restart app
+```
+
+Szczegółowa instrukcja (wariant bez Docker, VS Code, rozwiązywanie problemów): [docs/INSTALACJA.md](INSTALACJA.md).
+
+---
+
+## 8. Wybrany, reprezentatywny przebieg użycia aplikacji / logiki biznesowej
+
+Poniżej opisano **główny przepływ biznesowy**: rezerwacja wizyty przez pacjenta — od wyszukania lekarza do potwierdzenia przez lekarza.
+
+### Krok 1 — Wyszukanie lekarza
+
+1. Pacjent wchodzi na stronę główną (`/`).
+2. Ustawia filtry (np. specjalizacja „Kardiologia”, miasto „Warszawa”).
+3. Klika profil wybranego lekarza (`/doctors/{id}`).
+
+### Krok 2 — Wybór usługi i terminu
+
+1. Na profilu lekarza pacjent **najpierw wybiera usługę** (np. „Konsultacja — 150 zł, 30 min”).
+2. Bez wybranej usługi kalendarz terminów jest zablokowany.
+3. Pacjent przegląda kalendarz tygodniowy (poniedziałek–niedziela) i klika wolny slot.
+4. Potwierdza rezerwację formularzem (`POST /appointments`).
+
+### Krok 3 — Rezerwacja w bazie (transakcja)
+
+Aplikacja w jednej transakcji bazy danych:
+
+1. Blokuje wiersz slotu (`lockForUpdate`).
+2. Sprawdza, czy slot ma status `available`.
+3. Tworzy wizytę ze statusem `pending_payment`.
+4. Ustawia slot na `booked`.
+
+Jeśli slot został zajęty równolegle przez innego użytkownika — zwracany jest komunikat błędu.
+
+### Krok 4 — Płatność (symulacja, limit 10 minut)
+
+1. Pacjent trafia na stronę płatności (`/appointments/{id}/payment`).
+2. Wybiera metodę: BLIK (6 cyfr) lub karta (16 cyfr + data + CVV).
+3. Po „opłaceniu” wizyta przechodzi w status `pending`, płatność `paid`.
+
+**Timeout:** jeśli pacjent nie opłaci wizyty w ciągu 10 minut, wizyta jest anulowana (`cancelled`), a slot wraca do statusu `available`.
+
+### Krok 5 — Potwierdzenie przez lekarza
+
+1. Lekarz loguje się i otwiera **Moje wizyty** (`/doctor/appointments`).
+2. Widzi opłaconą wizytę ze statusem `pending`.
+3. Klika **Potwierdź** — status zmienia się na `confirmed`.
+
+Administrator może wykonać te same operacje z panelu `/admin/appointments`.
+
+### Krok 6 — Realizacja wizyty i opinia
+
+1. Po wizycie lekarz (lub admin) oznacza ją jako `completed`.
+2. Pacjent w **Moje wizyty** może dodać opinię (ocena 1–5 + komentarz).
+3. Opinia jest widoczna na profilu lekarza.
+
+### Diagram sekwencji
 
 ```mermaid
 sequenceDiagram
     participant P as Pacjent
     participant A as Aplikacja
     participant DB as Baza danych
+    participant L as Lekarz
 
-    P->>A: Wybiera slot + usługę na profilu lekarza
-    A->>DB: Transakcja — tworzy wizytę (pending_payment)
-    A->>DB: Slot → status booked
-    A->>P: Przekierowanie do płatności (10 min)
+    P->>A: Wybór usługi i slotu
+    A->>DB: Transakcja: wizyta (pending_payment), slot → booked
+    A->>P: Strona płatności (limit 10 min)
 
     alt Płatność w czasie
-        P->>A: BLIK lub karta (symulacja)
-        A->>DB: payment_status=paid, status=pending
-        A->>P: Wizyta oczekuje na potwierdzenie lekarza
-    else Timeout 10 min
-        A->>DB: Anulowanie wizyty, slot → available
+        P->>A: BLIK / karta (symulacja)
+        A->>DB: status=pending, payment_status=paid
+        L->>A: Potwierdzenie wizyty
+        A->>DB: status=confirmed
+        L->>A: Zakończenie wizyty
+        A->>DB: status=completed
+        P->>A: Dodanie opinii
+    else Brak płatności w 10 min
+        A->>DB: status=cancelled, slot → available
     end
-
-    Note over A,DB: Lekarz/admin potwierdza → confirmed → completed
 ```
 
-### Statusy wizyty (`appointments.status`)
+### Statusy wizyty
 
-| Status | Opis |
-|--------|------|
-| `pending_payment` | Termin zablokowany, oczekuje płatności (max 10 min) |
-| `pending` | Opłacona, oczekuje potwierdzenia lekarza |
+| Status | Znaczenie |
+|--------|-----------|
+| `pending_payment` | Termin zarezerwowany, oczekuje płatności |
+| `pending` | Opłacona, czeka na potwierdzenie lekarza |
 | `confirmed` | Potwierdzona przez lekarza/admina |
 | `completed` | Zrealizowana |
-| `cancelled` | Anulowana |
-
-### Płatność testowa
-
-Płatność jest **symulowana** — nie łączy się z prawdziwym operatorem płatności.
-
-- **BLIK:** 6 cyfr
-- **Karta:** 16 cyfr + MM/RR + CVV
+| `cancelled` | Anulowana (np. brak płatności) |
 
 ---
 
-## 5. Integracja z API NFZ
+## Załączniki
 
-Serwis `App\Services\NfzApiService` komunikuje się z:
-
-```
-https://api.nfz.gov.pl/app-itl-api/queues
-```
-
-Parametry: `benefit`, `locality`, `province`, `case`.
-
-Aplikacja:
-
-1. Wyszukuje najbliższy **prywatny termin** w bazie (dopasowanie po usłudze/specjalizacji/mieście).
-2. Pobiera **kolejki NFZ** z API.
-3. Oblicza **różnicę w dniach** między terminem prywatnym a najbliższą datą NFZ.
-
-Trasy: `/nfz-comparison`, `/nfz-comparison/compare`.
-
----
-
-## 6. Model danych
-
-```mermaid
-erDiagram
-    users ||--o| doctors : "profil lekarza"
-    users ||--o| patients : "profil pacjenta"
-    doctors ||--o{ doctor_specializations : ma
-    doctors }o--o{ help_tags : "doctors_help_tags"
-    doctors }o--o{ clinics : "clinic_doctor"
-    doctors ||--o{ services : oferuje
-    doctors ||--o{ availability_slots : ma
-    clinics ||--o{ services : w
-    clinics ||--o{ availability_slots : w
-    patients ||--o{ appointments : rezerwuje
-    doctors ||--o{ appointments : prowadzi
-    services ||--o{ appointments : dotyczy
-    clinics ||--o{ appointments : w
-    appointments ||--o| reviews : może_mieć
-    users ||--o{ doctor_applications : składa
-```
-
-### Główne tabele
-
-| Tabela | Opis |
-|--------|------|
-| `users` | Konta logowania, rola, aktywność |
-| `doctors` | Profil lekarza, weryfikacja, grupy wiekowe |
-| `patients` | Profil pacjenta (PESEL, telefon) |
-| `clinics` | Przychodnie / gabinety |
-| `services` | Usługi medyczne z ceną i czasem trwania |
-| `availability_slots` | Terminy w grafiku (`available`, `booked`) |
-| `appointments` | Rezerwacje wizyt + dane płatności |
-| `reviews` | Opinie po zakończonej wizycie |
-| `doctor_applications` | Wnioski pacjentów o utworzenie profilu lekarza |
-| `specializations` | Słownik specjalizacji (admin) |
-| `help_tags` | Tagi problemów zdrowotnych (admin) |
-
----
-
-## 7. Architektura aplikacji
-
-```
-Aplikacja-System-Rezerwacji-Wizyt-Lekarskich-web/
-├── app/
-│   ├── Http/Controllers/     # Logika HTTP (MVC)
-│   ├── Http/Middleware/      # RoleMiddleware
-│   ├── Http/Requests/        # Walidacja formularzy
-│   ├── Models/               # Eloquent ORM
-│   └── Services/             # NfzApiService
-├── database/
-│   ├── migrations/           # Schemat bazy
-│   └── seeders/              # DemoDataSeeder
-├── resources/views/          # Szablony Blade
-├── routes/
-│   ├── web.php               # Trasy aplikacji
-│   └── auth.php              # Trasy Breeze
-├── public/                   # Punkt wejścia (index.php)
-├── docker/                   # Konfiguracja Apache/PHP
-└── docker-compose.yml
-```
-
-### Wzorce
-
-- **MVC** — kontrolery, modele, widoki Blade
-- **Middleware `role`** — kontrola dostępu wg roli
-- **Serwisy** — logika zewnętrzna (API NFZ)
-- **Transakcje DB** — rezerwacje i płatności (blokada wierszy `lockForUpdate`)
-
----
-
-## 8. Mapa tras (skrót)
-
-| Trasa | Opis |
-|-------|------|
-| `GET /` | Strona główna |
-| `GET /doctors/{id}` | Profil lekarza |
-| `POST /appointments` | Rezerwacja |
-| `GET /appointments/{id}/payment` | Płatność |
-| `GET /my-appointments` | Panel pacjenta |
-| `GET /doctor/schedule` | Grafik lekarza |
-| `GET /doctor/appointments` | Wizyty lekarza |
-| `GET /admin/dashboard` | Panel admina |
-| `GET /nfz-comparison` | Porównanie NFZ |
-| `GET /doctor-application` | Wniosek o profil lekarza |
-
-Pełna lista: plik `routes/web.php`.
-
----
-
-## 9. Wnioski o profil lekarza
-
-Pacjent (lub admin) może złożyć wniosek o utworzenie profilu lekarza. Administrator:
-
-- **akceptuje** — tworzy konto lekarza, profil, specjalizacje, klinikę,
-- **odrzuca** — wniosek pozostaje w historii ze statusem `rejected`.
-
-Trasa admina: `/admin/doctor-applications`.
-
----
-
-## 10. Bezpieczeństwo
-
-- Hasła hashowane (bcrypt)
-- CSRF na formularzach
-- Middleware autoryzacji i ról
-- Dezaktywacja kont (`users.is_active`)
-- Weryfikacja e-mail (Laravel Breeze) — trasa `/dashboard` wymaga `verified`
-- Blokada terminów z timeoutem płatności (10 min)
-
----
-
-## 11. Testy
-
-```powershell
-# W kontenerze Docker
-docker exec medical_app php artisan test
-
-# Lokalnie
-composer test
-```
-
-Testy Feature obejmują m.in. autentykację Breeze i profil użytkownika (`tests/Feature/`).
-
----
-
-## 12. Ponowne generowanie screenshotów
-
-W folderze `docs/` znajduje się skrypt Playwright:
-
-```powershell
-cd docs
-npm install
-npx playwright install chromium
-node capture-screenshots.mjs
-```
-
-Wymaga uruchomionej aplikacji na `http://localhost:8000` i zaseedowanej bazy.
-
----
-
-## 13. Zależności
-
-### PHP (`composer.json`)
-
-- `laravel/framework` ^12.0
-- `laravel/tinker` ^2.10
-
-### Dev
-
-- `laravel/breeze` — autentykacja
-- `laravel/sail` — Docker (alternatywa)
-- `phpunit/phpunit` — testy
-
-### JavaScript (`package.json`)
-
-- Vite 7, Tailwind CSS 3, Alpine.js 3
-
----
-
-## 14. Autorzy i przeznaczenie
-
-Projekt wykonali: **Krystian Świąder** i **Igor Styczeń**.
-
-Projekt stanowi **system rezerwacji wizyt lekarskich** — typowo projekt zaliczeniowy / portfolio. Płatności i integracje są uproszczone do celów demonstracyjnych.
+- [Instalacja — szczegóły i rozwiązywanie problemów](INSTALACJA.md)
+- [Zrzuty ekranu](screenshots/) — folder `docs/screenshots/`
+- [Historia zmian](../CHANGELOG.md)
